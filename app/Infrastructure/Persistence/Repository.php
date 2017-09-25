@@ -1,0 +1,150 @@
+<?php
+
+namespace App\Infrastructure\Persistence;
+
+use App\Domain\Model\Documents\Shared\AbstractDocument;
+use Ramsey\Uuid\Uuid;
+
+class Repository
+{
+    protected $documentClass;
+
+    public function __construct($documentClass)
+    {
+        $this->documentClass = $documentClass;
+    }
+
+    public function newQuery()
+    {
+        return (new $this->documentClass)->newQuery();
+    }
+
+    public function getDocumentClass()
+    {
+        return $this->documentClass;
+    }
+
+    public function generateUuid()
+    {
+        return (string)Uuid::uuid5(Uuid::uuid4(), config('app.url'));
+    }
+
+    /**
+     * @param $uuid
+     * @return AbstractDocument|null
+     */
+    public function find($uuid)
+    {
+        if (in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($this->getDocumentClass()))) {
+            $document = $this->newQuery()->withTrashed()->find($uuid);
+        } else {
+            $document = $this->newQuery()->find($uuid);
+        }
+
+        return $document;
+    }
+
+    public function create(array $data, $protectedData = [], $save = true)
+    {
+        $document = new $this->documentClass;
+
+        $document->fill($data);
+
+        $document->uuid = $this->generateUuid();
+
+        foreach ($protectedData as $attribute => $value) {
+            $document->{$attribute} = $value;
+        }
+
+        if ($save) {
+            $document->save();
+        }
+
+        $document->touchOwners();
+
+        return $document;
+    }
+
+    public function update(array $data, $protectedData = [])
+    {
+        $document = $this->find($data['uuid']);
+
+        $document->fill($data);
+
+        foreach ($protectedData as $attribute => $value) {
+            $document->{$attribute} = $value;
+        }
+
+        $document->save();
+
+        return $document;
+    }
+
+    public function delete($uuid)
+    {
+        $document = $this->find($uuid);
+
+        if ($document) {
+            $document->delete();
+        }
+
+        return $document;
+    }
+
+    public function restore($uuid)
+    {
+        $document = $this->newQuery()->withTrashed()->get()->find($uuid);
+
+        $document->restore();
+
+        return $document;
+    }
+
+    public function archive($uuid)
+    {
+        $document = $this->find($uuid);
+
+        if ($document->archived_at) {
+            $document->archived_at = null;
+        }
+        else {
+            $document->archived_at = $document->freshTimestamp();
+        }
+
+        $document->save();
+
+        return $document;
+    }
+
+    public function deleteBatch($uuids)
+    {
+        $this->newQuery()->whereIn('uuid', $uuids)->delete();
+
+        return $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get();
+    }
+
+    public function restoreBatch($uuids)
+    {
+        $this->newQuery()->whereIn('uuid', $uuids)->restore();
+
+        return $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get();
+    }
+
+    public function archiveBatch($uuids)
+    {
+        $this->newQuery()->whereIn('uuid', $uuids)->update([
+            'archived_at' => $document->freshTimestamp()
+        ]);
+
+        return $this->newQuery()->whereIn('uuid', $uuids)->get();
+    }
+
+    public function unarchiveBatch($uuids)
+    {
+        $this->newQuery()->whereIn('uuid', $uuids)->update([
+            'archived_at' => null
+        ]);
+
+        return $this->newQuery()->whereIn('uuid', $uuids)->get();
+    }
+}
