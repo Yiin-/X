@@ -25,7 +25,7 @@ class Project extends AbstractDocument
         'user_uuid'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         return (new ProjectTransformer)->transform($this);
     }

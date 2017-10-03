@@ -2,9 +2,10 @@
 
 namespace App\Application\Providers;
 
-use App\Domain\Listeners\DocumentPermissionsListener;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Event;
+use App\Domain\Listeners\DocumentPermissionsListener;
+use App\Domain\Listeners\ActivityListener;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -21,6 +22,7 @@ class EventServiceProvider extends ServiceProvider
 
     protected $subscribe = [
         DocumentPermissionsListener::class,
+        ActivityListener::class
     ];
 
     /**

@@ -5,9 +5,12 @@ namespace App\Domain\Model\CRM\Project;
 use App\Domain\Model\Documents\Shared\AbstractDocumentRepository;
 use App\Infrastructure\Persistence\Repository;
 use App\Domain\Model\Authentication\User\UserRepository;
+use App\Domain\Model\Documents\Shared\Traits\FillsUserData;
 
 class ProjectRepository extends AbstractDocumentRepository
 {
+    use FillsUserData;
+
     protected $repository;
     protected $userRepository;
 
@@ -15,28 +18,5 @@ class ProjectRepository extends AbstractDocumentRepository
     {
         $this->repository = new Repository(Project::class);
         $this->userRepository = $userRepository;
-    }
-
-    /**
-     * TODO: throw custom exception, if user is not defined
-     * @param $data
-     * @param array $protectedData
-     * @return mixed
-     */
-    public function create($data, $protectedData = [])
-    {
-        if (!isset($protectedData['user_uuid'])) {
-            $protectedData['user_uuid'] = auth()->id();
-        }
-        $user = $this->userRepository->find($protectedData['user_uuid']);
-
-        if (!isset($protectedData['company_uuid'])) {
-            // TODO: Pick current selected company, not the first one
-            $protectedData['company_uuid'] = $user->companies()->first()->uuid;
-        }
-
-        $project = $this->repository->create($data, $protectedData);
-
-        return $project;
     }
 }

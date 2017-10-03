@@ -16,6 +16,7 @@ class Expense extends AbstractDocument
     protected $fillable = [
         'vendor_uuid',
         'client_uuid',
+        'amount',
         'currency_id',
         'date'
     ];
@@ -25,7 +26,7 @@ class Expense extends AbstractDocument
         'company_uuid'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         return [
             'uuid' => $this->uuid,

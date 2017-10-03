@@ -62,6 +62,9 @@ class AuthService
             $data['user'] = $user;
             $data['user']['company'] = $user->account->uuid;
             $data['user']['profile'] = $user->profile;
+            $data['user']['settings'] = $user->settings;
+            $data['user']['preferences'] = $user->preferences;
+            $data['preloadedData'] = $this->accountService->fetchDataForUser($user);
 
             return $data;
         }
@@ -103,7 +106,7 @@ class AuthService
             if ($grantType === 'password') {
                 throw new InvalidCredentialsException('invalid_credentials');
             }
-            throw new InvalidCredentialsException('invalid_token');
+            throw new InvalidCredentialsException('invalid_token ' . $grantType . ' ' . $data['refresh_token']);
         }
 
         $data = json_decode($response->getContent());
@@ -117,6 +120,15 @@ class AuthService
             null,
             false,
             true // HttpOnly
+        );
+        Cookie::queue(
+            '_accessToken',
+            $data->access_token,
+            864000,
+            null,
+            null,
+            false,
+            false
         );
 
         return [

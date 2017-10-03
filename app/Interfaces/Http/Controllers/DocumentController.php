@@ -21,6 +21,12 @@ abstract class DocumentController extends AbstractController
     abstract public function getValidationRules($action);
     abstract public function getValidationAttributes();
 
+    public function dummy()
+    {
+        $document = factory($this->repository->getDocumentClass())->make();
+        return $document->transform();
+    }
+
     /**
      * Get list of all visible documents.
      * @return \Illuminate\Http\JsonResponse
@@ -36,7 +42,7 @@ abstract class DocumentController extends AbstractController
                 ->orderBy('id', 'desc')
                 ->get()
                 ->map(function ($model) {
-                    return $model->getTableData();
+                    return $model->transform();
                 })
             );
     }
@@ -64,7 +70,7 @@ abstract class DocumentController extends AbstractController
 
         // $this->authorize('see', $document);
 
-        return response()->json($document->getTableData());
+        return response()->json($document->transform());
     }
 
     /**
@@ -82,7 +88,7 @@ abstract class DocumentController extends AbstractController
 
         $data = $request->get($this->getResourceName(), []);
 
-        return response()->json($this->repository->create($data)->getTableData(), 201);
+        return response()->json($this->repository->create($data)->transform(), 201);
     }
 
     /**
@@ -107,7 +113,7 @@ abstract class DocumentController extends AbstractController
 
         $data['uuid'] = $uuid;
 
-        return response()->json($this->repository->update($data)->getTableData());
+        return response()->json($this->repository->update($data)->transform());
     }
 
     /**
@@ -119,7 +125,7 @@ abstract class DocumentController extends AbstractController
     {
         // $this->authorize('delete', $this->repository->find($uuid));
 
-        return response()->json($this->repository->delete($uuid)->getTableData());
+        return response()->json($this->repository->delete($uuid)->transform());
     }
 
     /**
@@ -131,7 +137,7 @@ abstract class DocumentController extends AbstractController
     {
         // $this->authorize('delete', $this->repository->find($uuid));
 
-        return response()->json($this->repository->restore($uuid)->getTableData());
+        return response()->json($this->repository->restore($uuid)->transform());
     }
 
     /**
@@ -143,7 +149,7 @@ abstract class DocumentController extends AbstractController
     {
         // $this->authorize('archive', $this->repository->find($uuid));
 
-        return response()->json($this->repository->archive($uuid)->getTableData());
+        return response()->json($this->repository->archive($uuid)->transform());
     }
 
     /**
@@ -153,7 +159,7 @@ abstract class DocumentController extends AbstractController
     {
         return response()->json(
             $this->repository->deleteBatch($request->get('uuids', []))->map(function ($document) {
-                return $document->getTableData();
+                return $document->transform();
             })
         );
     }
@@ -162,7 +168,7 @@ abstract class DocumentController extends AbstractController
     {
         return response()->json(
             $this->repository->restoreBatch($request->get('uuids', []))->map(function ($document) {
-                return $document->getTableData();
+                return $document->transform();
             })
         );
     }
@@ -171,7 +177,7 @@ abstract class DocumentController extends AbstractController
     {
         return response()->json(
             $this->repository->archiveBatch($request->get('uuids', []))->map(function ($document) {
-                return $document->getTableData();
+                return $document->transform();
             })
         );
     }
@@ -180,7 +186,7 @@ abstract class DocumentController extends AbstractController
     {
         return response()->json(
             $this->repository->unarchiveBatch($request->get('uuids', []))->map(function ($document) {
-                return $document->getTableData();
+                return $document->transform();
             })
         );
     }
@@ -237,7 +243,7 @@ abstract class DocumentController extends AbstractController
             ->orderBy($orderBy, $orderDirection)
             ->get()
             ->map(function ($model) {
-                return $model->getTableData();
+                return $model->transform();
             });
     }
 

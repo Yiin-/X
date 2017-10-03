@@ -20,7 +20,7 @@ class ExpenseCategory extends AbstractDocument
         'company_uuid'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         return [
             'uuid' => $this->uuid,

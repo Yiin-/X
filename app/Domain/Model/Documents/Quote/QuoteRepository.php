@@ -6,9 +6,12 @@ use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Shared\AbstractDocumentRepository;
 use App\Infrastructure\Persistence\Repository;
 use App\Domain\Model\Authentication\User\UserRepository;
+use App\Domain\Model\Documents\Shared\Traits\FillsUserData;
 
 class QuoteRepository extends AbstractDocumentRepository
 {
+    use FillsUserData;
+
     protected $repository;
     protected $userRepository;
 
@@ -18,26 +21,8 @@ class QuoteRepository extends AbstractDocumentRepository
         $this->userRepository = $userRepository;
     }
 
-    /**
-     * TODO: throw custom exception, if user is not defined
-     * @param $data
-     * @param array $protectedData
-     * @return mixed
-     */
-    public function create($data, $protectedData = [])
+    public function saving(&$quote, &$data, &$protectedData)
     {
-        if (!isset($protectedData['user_uuid'])) {
-            $protectedData['user_uuid'] = auth()->id();
-        }
-        $user = $this->userRepository->find($protectedData['user_uuid']);
-
-        if (!isset($protectedData['company_uuid'])) {
-            // TODO: Pick current selected company, not the first one
-            $protectedData['company_uuid'] = $user->companies()->first()->uuid;
-        }
-
-        $quote = $this->repository->create($data, $protectedData, false);
-
         $bill = Bill::create([
             'billable_type' => get_class($quote),
             'billable_uuid' => $quote->uuid,
@@ -63,16 +48,10 @@ class QuoteRepository extends AbstractDocumentRepository
                 'index' => $index
             ]);
         }
-
-        $quote->save();
-
-        return $quote;
     }
 
-    public function update($data, $protectedData = [])
+    public function updated(&$quote, &$data, &$protectedData)
     {
-        $quote = $this->repository->update($data, $protectedData);
-
         $quote->bill->update([
             'number' => $data['quote_number'],
             'po_number' => $data['po_number'],

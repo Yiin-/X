@@ -6,9 +6,12 @@ use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Shared\AbstractDocumentRepository;
 use App\Infrastructure\Persistence\Repository;
 use App\Domain\Model\Authentication\User\UserRepository;
+use App\Domain\Model\Documents\Shared\Traits\FillsUserData;
 
 class RecurringInvoiceRepository extends AbstractDocumentRepository
 {
+    use FillsUserData;
+
     protected $repository;
     protected $userRepository;
 
@@ -18,26 +21,24 @@ class RecurringInvoiceRepository extends AbstractDocumentRepository
         $this->userRepository = $userRepository;
     }
 
+    public function adjustData(&$data)
+    {
+        if (array_key_exists('frequency_type', $data) && is_null($data['frequency_type'])) {
+            unset($data['frequency_type']);
+        }
+        if (array_key_exists('frequency_id', $data) && !$data['frequency_id']) {
+            unset($data['frequency_id']);
+        }
+    }
+
     /**
      * TODO: throw custom exception, if user is not defined
      * @param $data
      * @param array $protectedData
      * @return mixed
      */
-    public function create($data, $protectedData = [])
+    public function saving(&$recurringInvoice, &$data, &$protectedData)
     {
-        if (!isset($protectedData['user_uuid'])) {
-            $protectedData['user_uuid'] = auth()->id();
-        }
-        $user = $this->userRepository->find($protectedData['user_uuid']);
-
-        if (!isset($protectedData['company_uuid'])) {
-            // TODO: Pick current selected company, not the first one
-            $protectedData['company_uuid'] = $user->companies()->first()->uuid;
-        }
-
-        $recurringInvoice = $this->repository->create($data, $protectedData, false);
-
         $bill = Bill::create([
             'billable_type' => get_class($recurringInvoice),
             'billable_uuid' => $recurringInvoice->uuid,
@@ -60,16 +61,10 @@ class RecurringInvoiceRepository extends AbstractDocumentRepository
                 'index' => $index
             ]);
         }
-
-        $recurringInvoice->save();
-
-        return $recurringInvoice;
     }
 
-    public function update($data, $protectedData = [])
+    public function updated(&$recurringInvoice, &$data, &$protectedData)
     {
-        $recurringInvoice = $this->repository->update($data, $protectedData);
-
         $billData = [];
 
         foreach ([
@@ -101,7 +96,5 @@ class RecurringInvoiceRepository extends AbstractDocumentRepository
                 ]);
             }
         }
-
-        return $recurringInvoice;
     }
 }

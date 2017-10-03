@@ -9,6 +9,7 @@ class DocumentWasDeleted
 {
     use BroadcastsToUsers;
 
+    public $user;
     public $document;
 
     /**
@@ -18,6 +19,7 @@ class DocumentWasDeleted
      */
     public function __construct(AbstractDocument $document)
     {
+        $this->user = auth()->user();
         $this->document = $document;
 
         $this->broadcastToUsers($document);

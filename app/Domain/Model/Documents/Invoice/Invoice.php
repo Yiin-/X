@@ -54,7 +54,7 @@ class Invoice extends AbstractDocument
         return round($this->amount() - $this->paidIn());
     }
 
-    public function getTableData()
+    public function transform()
     {
         $amount = $this->amount();
         $paid_in = $this->paidIn();
@@ -81,7 +81,7 @@ class Invoice extends AbstractDocument
             'discount_type' => $this->bill->discount_type,
             'discount_value' => $this->bill->discount,
             'items' => $this->bill->items->map(function (BillItem $item) {
-                return $item->getTableData();
+                return $item->transform();
             }),
             'note_to_client' => $this->bill->notes,
             'terms' => $this->bill->terms,

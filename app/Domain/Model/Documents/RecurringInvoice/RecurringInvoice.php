@@ -56,7 +56,7 @@ class RecurringInvoice extends AbstractDocument
         return $amount;
     }
 
-    public function getTableData()
+    public function transform()
     {
         return [
             'uuid' => $this->uuid,
@@ -76,7 +76,7 @@ class RecurringInvoice extends AbstractDocument
             'discount_type' => $this->bill->discount_type,
             'discount_value' => $this->bill->discount,
             'items' => $this->bill->items->map(function (BillItem $item) {
-                return $item->getTableData();
+                return $item->transform();
             }),
             'note_to_client' => $this->bill->notes,
             'terms' => $this->bill->terms,

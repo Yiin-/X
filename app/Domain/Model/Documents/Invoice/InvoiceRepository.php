@@ -6,38 +6,33 @@ use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Shared\AbstractDocumentRepository;
 use App\Infrastructure\Persistence\Repository;
 use App\Domain\Model\Authentication\User\UserRepository;
+use App\Domain\Model\Documents\Quote\QuoteRepository;
+use App\Domain\Model\Documents\Shared\Traits\FillsUserData;
 
 class InvoiceRepository extends AbstractDocumentRepository
 {
+    use FillsUserData;
+
     protected $repository;
     protected $userRepository;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, QuoteRepository $quoteRepository)
     {
         $this->repository = new Repository(Invoice::class);
         $this->userRepository = $userRepository;
+        $this->quoteRepository = $quoteRepository;
     }
 
-    /**
-     * TODO: throw custom exception, if user is not defined
-     * @param $data
-     * @param array $protectedData
-     * @return mixed
-     */
-    public function create($data, $protectedData = [])
+    public function fillMissingData(&$data, &$protectedData)
     {
-        if (!isset($protectedData['user_uuid'])) {
-            $protectedData['user_uuid'] = auth()->id();
+        if (isset($data['quote_uuid'])) {
+            $protectedData['invoiceable_type'] = Quote::class;
+            $protectedData['invoiceable_uuid'] = $data['quote_uuid'];
         }
-        $user = $this->userRepository->find($protectedData['user_uuid']);
+    }
 
-        if (!isset($protectedData['company_uuid'])) {
-            // TODO: Pick current selected company, not the first one
-            $protectedData['company_uuid'] = $user->companies()->first()->uuid;
-        }
-
-        $invoice = $this->repository->create($data, $protectedData, false);
-
+    public function saving($invoice, &$data, &$protectedData)
+    {
         $bill = Bill::create([
             'billable_type' => get_class($invoice),
             'billable_uuid' => $invoice->uuid,
@@ -46,6 +41,7 @@ class InvoiceRepository extends AbstractDocumentRepository
             'partial' => $data['partial'],
             'discount' => $data['discount_value'],
             'discount_type' => $data['discount_type'],
+            'currency_id' => $data['currency_id'],
             'date' => $data['invoice_date'],
             'due_date' => $data['due_date'],
             'notes' => $data['note_to_client'],
@@ -63,16 +59,10 @@ class InvoiceRepository extends AbstractDocumentRepository
                 'index' => $index
             ]);
         }
-
-        $invoice->save();
-
-        return $invoice;
     }
 
-    public function update($data, $protectedData = [])
+    public function updated(&$invoice, &$data, &$protectedData)
     {
-        $invoice = $this->repository->update($data, $protectedData);
-
         $billData = [];
 
         foreach ([
@@ -83,11 +73,12 @@ class InvoiceRepository extends AbstractDocumentRepository
             'discount_type' => 'discount_type',
             'invoice_date' => 'date',
             'due_date' => 'due_date',
+            'currency_id' => 'currency_id',
             'note_to_client' => 'notes',
             'terms' => 'terms',
             'footer' => 'footer'
         ] as $field => $billField) {
-            if (isset($data[$field])) {
+            if (array_key_exists($field, $data)) {
                 $billData[$billField] = $data[$field];
             }
         }
@@ -107,7 +98,5 @@ class InvoiceRepository extends AbstractDocumentRepository
                 ]);
             }
         }
-
-        return $invoice;
     }
 }

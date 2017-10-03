@@ -5,7 +5,6 @@ namespace App\Interfaces\Http\Controllers\Auth;
 use Illuminate\Http\Request;
 use App\Interfaces\Http\Controllers\AbstractController;
 use App\Domain\Service\Auth\AuthService;
-use App\Domain\Service\User\AccountService;
 use App\Interfaces\Http\Requests\Auth\RegisterRequest;
 use App\Interfaces\Http\Requests\Auth\LoginRequest;
 
@@ -15,11 +14,9 @@ class AuthController extends AbstractController
     private $accountService;
 
     public function __construct(
-        AuthService $authService,
-        AccountService $accountService
+        AuthService $authService
     ) {
         $this->authService = $authService;
-        $this->accountService = $accountService;
     }
 
     public function register(RegisterRequest $request)
@@ -64,6 +61,11 @@ class AuthController extends AbstractController
     public function refresh(Request $request)
     {
         return response()->json($this->authService->attemptRefresh());
+    }
+
+    public function heartbeat()
+    {
+        return 'OK';
     }
 
     public function logout()

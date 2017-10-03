@@ -17,7 +17,8 @@ class Product extends AbstractDocument
         'currency_id',
         'qty',
         'tax_rate_uuid',
-        'description'
+        'description',
+        'identification_number'
     ];
 
     protected $hidden = [
@@ -25,7 +26,7 @@ class Product extends AbstractDocument
         'company_uuid'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         return [
             'uuid' => $this->uuid,
@@ -35,6 +36,8 @@ class Product extends AbstractDocument
             'currency' => $this->currency,
             'description' => $this->description,
             'qty' => $this->qty,
+            'is_service' => $this->qty === null,
+            'identification_number' => $this->identification_number,
 
             'tax_rate' => $this->taxRate,
 

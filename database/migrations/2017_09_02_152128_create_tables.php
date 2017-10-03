@@ -145,14 +145,14 @@ class CreateTables extends Migration
                 ->onDelete('cascade')->onUpdate('cascade');
 
             $table->string('name');
-            $table->integer('price');
+            $table->decimal('price', 13, 3);
 
             $table->integer('currency_id')->unsigned()->nullable();
             $table->foreign('currency_id')
                 ->references('id')->on('currencies')
                 ->onDelete('set null')->onUpdate('cascade');
 
-            $table->integer('qty')->nullable();
+            $table->decimal('qty', 13, 3)->nullable();
             $table->text('description')->nullable();
 
             $table->string('tax_rate_uuid')->nullable();
@@ -249,12 +249,17 @@ class CreateTables extends Migration
             $table->string('number')->nullable();
             $table->string('po_number')->nullable();
 
-            $table->integer('partial')->default(0);
-            $table->integer('discount')->default(0);
+            $table->decimal('partial', 13, 3)->default(0);
+            $table->decimal('discount', 13, 3)->default(0);
             $table->enum('discount_type', \App\Domain\Constants\Bill\DiscountTypes::LIST);
 
             $table->date('date')->nullable();
             $table->date('due_date')->nullable();
+
+            $table->integer('currency_id')->unsigned();
+            $table->foreign('currency_id')
+                ->references('id')->on('currencies')
+                ->onDelete('restrict')->onUpdate('cascade');
 
             $table->text('notes')->nullable();
             $table->text('terms')->nullable();
@@ -281,9 +286,9 @@ class CreateTables extends Migration
                 ->references('uuid')->on('products')
                 ->onDelete('cascade')->onUpdate('cascade');
 
-            $table->integer('cost');
-            $table->integer('qty');
-            $table->integer('discount')->nullable();
+            $table->decimal('cost', 13, 3);
+            $table->decimal('qty', 13, 3);
+            $table->decimal('discount', 3, 4)->nullable();
 
             $table->string('tax_rate_uuid')->nullable();
             $table->foreign('tax_rate_uuid')
@@ -411,10 +416,15 @@ class CreateTables extends Migration
                 ->references('uuid')->on('clients')
                 ->onDelete('cascade')->onUpdate('cascade');
 
-            $table->decimal('amount', 13, 2);
-            $table->decimal('balance', 13, 2);
+            $table->decimal('amount', 13, 3);
+            $table->decimal('balance', 13, 3);
             $table->date('credit_date');
-            $table->string('credit_number');
+            $table->string('credit_number')->nullable();
+
+            $table->integer('currency_id')->unsigned();
+            $table->foreign('currency_id')
+                ->references('id')->on('currencies')
+                ->onDelete('restrict')->onUpdate('cascade');
 
             $table->timestamps();
             $table->timestamp('archived_at')->nullable();
@@ -463,8 +473,8 @@ class CreateTables extends Migration
             $table->string('phone')->nullable();
             $table->string('logo')->nullable();
 
-            $table->string('adress1')->nullable();
-            $table->string('adress2')->nullable();
+            $table->string('address1')->nullable();
+            $table->string('address2')->nullable();
             $table->string('city')->nullable();
             $table->string('postal_code')->nullable();
             $table->string('state')->nullable();
@@ -513,7 +523,7 @@ class CreateTables extends Migration
                 ->references('uuid')->on('expense_categories')
                 ->onDelete('cascade')->onUpdate('cascade');
 
-            $table->decimal('amount', 13, 2);
+            $table->decimal('amount', 13, 3);
 
             $table->integer('currency_id')->unsigned()->nullable();
             $table->foreign('currency_id')
@@ -554,8 +564,8 @@ class CreateTables extends Migration
                 ->references('uuid')->on('invoices')
                 ->onDelete('cascade')->onUpdate('cascade');
 
-            $table->decimal('amount', 13, 2);
-            $table->decimal('refunded', 13, 2)->default(0);
+            $table->decimal('amount', 13, 3);
+            $table->decimal('refunded', 13, 3)->default(0);
 
             $table->integer('currency_id')->unsigned()->nullable();
             $table->foreign('currency_id')

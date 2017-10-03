@@ -15,7 +15,7 @@ class Profile extends AbstractDocument
         'job_position'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         return [
             'uuid' => $this->uuid,

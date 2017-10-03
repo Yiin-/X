@@ -44,7 +44,7 @@ class Client extends AbstractDocument
         'company_uuid'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         $firstContact = $this->contacts()->first();
 
@@ -80,7 +80,7 @@ class Client extends AbstractDocument
 
             // Relationships
             'country' => $this->country,
-            'contacts' => $this->contacts->map(function ($contact) { return $contact->getTableData(); }),
+            'contacts' => $this->exists ? $this->contacts->map(function ($contact) { return $contact->transform(); }) : $this->contacts,
             'currency' => $this->currency,
             'language' => $this->language,
             'company_size' => $this->company_size,

@@ -29,6 +29,17 @@ class Repository
         return (string)Uuid::uuid5(Uuid::uuid4(), config('app.url'));
     }
 
+    public function getVisible($userUuid = null)
+    {
+        return $this->newQuery()
+            ->visible($userUuid)
+            ->orderBy('id', 'desc')
+            ->get()
+            ->map(function (AbstractDocument $model) {
+                return $model->transform();
+            });
+    }
+
     /**
      * @param $uuid
      * @return AbstractDocument|null
@@ -49,7 +60,6 @@ class Repository
         $document = new $this->documentClass;
 
         $document->fill($data);
-
         $document->uuid = $this->generateUuid();
 
         foreach ($protectedData as $attribute => $value) {
@@ -85,7 +95,7 @@ class Repository
         $document = $this->find($uuid);
 
         if ($document) {
-            $document->delete();
+            $document->forceDelete();
         }
 
         return $document;
@@ -118,9 +128,11 @@ class Repository
 
     public function deleteBatch($uuids)
     {
-        $this->newQuery()->whereIn('uuid', $uuids)->delete();
+        $documents = $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get();
 
-        return $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get();
+        $this->newQuery()->whereIn('uuid', $uuids)->forceDelete();
+
+        return $documents;
     }
 
     public function restoreBatch($uuids)
@@ -133,7 +145,7 @@ class Repository
     public function archiveBatch($uuids)
     {
         $this->newQuery()->whereIn('uuid', $uuids)->update([
-            'archived_at' => $document->freshTimestamp()
+            'archived_at' => (new $this->documentClass)->freshTimestamp()
         ]);
 
         return $this->newQuery()->whereIn('uuid', $uuids)->get();

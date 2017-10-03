@@ -20,7 +20,7 @@ class Role extends AbstractDocument
 
     protected $dispatchesEvents = [];
 
-    public function getTableData()
+    public function transform()
     {
         return [
             'name' => $this->name

@@ -13,7 +13,7 @@ class Account extends AbstractDocument
         'site_address'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         return [
             'uuid' => $this->uuid,

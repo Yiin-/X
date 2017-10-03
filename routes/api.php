@@ -6,6 +6,19 @@ Route::post('login/refresh', 'Auth\AuthController@refresh');
 
 Route::middleware('auth:api')->group(function () {
     /**
+     * Heartbeat
+     */
+    Route::post('heartbeat', 'Auth\AuthController@heartbeat');
+    Route::post('logout', 'Auth\AuthController@logout');
+
+    /**
+     * Testing
+     */
+    Route::get('dummy-clients', 'Documents\ClientController@dummy');
+    Route::get('dummy-vendors', 'Documents\VendorController@dummy');
+    Route::get('dummy-products', 'Documents\ProductController@dummy');
+
+    /**
      * Documents
      */
     // Clients
@@ -134,6 +147,13 @@ Route::middleware('auth:api')->group(function () {
      */
     Route::prefix('settings')->group(function () {
         Route::post('currency', 'Settings\UserSettingsController@changeCurrency');
+    });
+
+    /**
+     * System
+     */
+    Route::prefix('system')->group(function () {
+        Route::post('activity-log', 'System\ActivityLogController@index');
     });
 
     /**

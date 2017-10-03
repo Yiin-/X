@@ -3,7 +3,14 @@
 namespace App\Domain\Service\User;
 
 use App\Domain\Constants\Permission\Actions;
+use App\Domain\Service\Passive\PassiveDataService;
+use App\Domain\Service\Documents\DocumentsService;
+use App\Domain\Service\CRM\CrmService;
+use App\Domain\Service\System\SystemService;
+use App\Domain\Service\Features\FeaturesService;
 use App\Domain\Model\Authentication\Account\AccountRepository;
+use App\Domain\Model\Authentication\User\User;
+use App\Domain\Model\Documents\Passive\Currency;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Credit\Credit;
 use App\Domain\Model\Documents\Expense\Expense;
@@ -31,18 +38,35 @@ class AccountService
     protected $companyRepository;
     protected $roleRepository;
 
+    protected $passiveDataService;
+    protected $documentsService;
+    protected $crmService;
+    protected $featuresService;
+
     public function __construct(
         AccountRepository $accountRepository,
         ProfileRepository $profileRepository,
         UserRepository $userRepository,
         CompanyRepository $companyRepository,
-        RoleRepository $roleRepository
+        RoleRepository $roleRepository,
+
+        PassiveDataService $passiveDataService,
+        DocumentsService $documentsService,
+        CrmService $crmService,
+        SystemService $systemService
+        // FeaturesService $featuresService
     ) {
         $this->accountRepository = $accountRepository;
         $this->profileRepository = $profileRepository;
         $this->userRepository = $userRepository;
         $this->companyRepository = $companyRepository;
         $this->roleRepository = $roleRepository;
+
+        $this->passiveDataService = $passiveDataService;
+        $this->documentsService = $documentsService;
+        $this->crmService = $crmService;
+        $this->systemService = $systemService;
+        // $this->featuresService = $featuresService;
     }
 
     public function createNewAccount(
@@ -144,8 +168,27 @@ class AccountService
         $user->roles()->attach($rootRole->uuid);
 
         /**
+         * Set default settings for user
+         */
+        $user->settings()->create([
+            'currency_id' => Currency::whereCode('EUR')->first()->id,
+            'locale' => 'en'
+        ]);
+
+        /**
          * Return created user
          */
         return $user;
+    }
+
+    public function fetchDataForUser($user = null)
+    {
+        return [
+            'passive' => $this->passiveDataService->getAll(),
+            'documents' => $this->documentsService->getAll($user),
+            'crm' => $this->crmService->getAll($user),
+            'system' => $this->systemService->getAll($user)
+            // 'features' => $this->featuresService->getAll()
+        ];
     }
 }

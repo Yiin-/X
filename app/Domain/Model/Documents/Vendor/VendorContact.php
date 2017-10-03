@@ -7,7 +7,7 @@ use App\Domain\Model\Documents\Shared\AbstractDocument;
 
 class VendorContact extends AbstractDocument
 {
-    public function getTableData()
+    public function transform()
     {
         return [
             // ID

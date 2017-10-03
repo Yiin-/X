@@ -26,6 +26,6 @@ class ProjectService
     {
         $project = $this->projectRepository->create($data);
 
-        return $project->getTableData();
+        return $project->transform();
     }
 }

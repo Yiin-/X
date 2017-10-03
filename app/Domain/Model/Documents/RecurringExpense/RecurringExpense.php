@@ -44,7 +44,7 @@ class RecurringExpense extends AbstractDocument
         'deleted_at'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         return [
             'uuid' => $this->uuid,

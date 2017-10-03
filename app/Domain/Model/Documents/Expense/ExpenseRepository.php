@@ -5,9 +5,12 @@ namespace App\Domain\Model\Documents\Expense;
 use App\Domain\Model\Documents\Shared\AbstractDocumentRepository;
 use App\Infrastructure\Persistence\Repository;
 use App\Domain\Model\Authentication\User\UserRepository;
+use App\Domain\Model\Documents\Shared\Traits\FillsUserData;
 
 class ExpenseRepository extends AbstractDocumentRepository
 {
+    use FillsUserData;
+
     protected $repository;
     protected $userRepository;
 
@@ -17,24 +20,10 @@ class ExpenseRepository extends AbstractDocumentRepository
         $this->userRepository = $userRepository;
     }
 
-    /**
-     * TODO: throw custom exception, if user is not defined
-     * @param $data
-     * @param array $protectedData
-     * @return mixed
-     */
-    public function create($data, $protectedData = [])
+    public function fillMissingData(&$data, &$protectedData)
     {
-        if (!isset($protectedData['user_uuid'])) {
-            $protectedData['user_uuid'] = auth()->id();
+        if (empty($data['date'])) {
+            $data['date'] = date('Y-m-d');
         }
-        $user = $this->userRepository->find($protectedData['user_uuid']);
-
-        if (!isset($protectedData['company_uuid'])) {
-            // TODO: Pick current selected company, not the first one
-            $protectedData['company_uuid'] = $user->companies()->first()->uuid;
-        }
-
-        return $this->repository->create($data, $protectedData);
     }
 }

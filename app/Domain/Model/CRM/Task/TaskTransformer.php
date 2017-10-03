@@ -12,7 +12,7 @@ class TaskTransformer extends DocumentTransformer
             'name' => $task->name,
             'is_completed' => $task->is_completed,
 
-            'user' => $task->user->getTableData()
+            'user' => $task->user->transform()
         ];
     }
 }

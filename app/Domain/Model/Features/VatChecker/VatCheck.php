@@ -19,7 +19,7 @@ class VatCheck extends AbstractDocument
         'message'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         return [];
     }

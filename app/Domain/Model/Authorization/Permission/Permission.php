@@ -19,7 +19,7 @@ class Permission extends AbstractDocument
 
     protected $dispatchesEvents = [];
 
-    public function getTableData()
+    public function transform()
     {
         return [
             'type' => $this->type

@@ -41,6 +41,8 @@ $app->singleton(
     App\Application\Exceptions\Handler::class
 );
 
+include_once app_path('Domain/Helpers/naming.php');
+
 /*
 |--------------------------------------------------------------------------
 | Return The Application

@@ -20,7 +20,7 @@ class Company extends AbstractDocument
         'account_uuid'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         return [
             'uuid' => $this->uuid,

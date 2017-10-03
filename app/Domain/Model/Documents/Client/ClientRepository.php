@@ -6,9 +6,12 @@ use App\Domain\Model\Documents\Profile\ProfileRepository;
 use App\Domain\Model\Documents\Shared\AbstractDocumentRepository;
 use App\Infrastructure\Persistence\Repository;
 use App\Domain\Model\Authentication\User\UserRepository;
+use App\Domain\Model\Documents\Shared\Traits\FillsUserData;
 
 class ClientRepository extends AbstractDocumentRepository
 {
+    use FillsUserData;
+
     protected $repository;
     protected $userRepository;
     protected $profileRepository;
@@ -20,25 +23,9 @@ class ClientRepository extends AbstractDocumentRepository
         $this->profileRepository = $profileRepository;
     }
 
-    /**
-     * TODO: throw custom exception, if user is not defined
-     * @param $data
-     * @param array $protectedData
-     * @return mixed
-     */
-    public function create($data, $protectedData = [])
+    public function saved(&$client, &$data, &$protectedData)
     {
-        if (!isset($protectedData['user_uuid'])) {
-            $protectedData['user_uuid'] = auth()->id();
-        }
-        $user = $this->userRepository->find($protectedData['user_uuid']);
-
-        if (!isset($protectedData['company_uuid'])) {
-            // TODO: Pick current selected company, not the first one
-            $protectedData['company_uuid'] = $user->companies()->first()->uuid;
-        }
-
-        $client = $this->repository->create($data, $protectedData);
+        $client->contacts()->delete();
 
         $profiles = array_map(function ($contact) {
             return $this->profileRepository->create($contact);

@@ -11,10 +11,12 @@ use App\Domain\Model\Authentication\User\User;
 use App\Domain\Model\Authentication\Company\Company;
 use App\Domain\Model\Authorization\Permission\Permission;
 use App\Domain\Constants\Permission\Actions as PermissionActions;
-use App\Domain\Events\Document\DocumentIsDeleting;
 use App\Domain\Events\Document\DocumentWasCreated;
-use App\Domain\Events\Document\DocumentWasDeleted;
 use App\Domain\Events\Document\DocumentWasUpdated;
+use App\Domain\Events\Document\DocumentWasSaved;
+use App\Domain\Events\Document\DocumentIsDeleting;
+use App\Domain\Events\Document\DocumentWasDeleted;
+use App\Domain\Events\Document\DocumentWasRestored;
 
 abstract class AbstractDocument extends Model
 {
@@ -33,12 +35,13 @@ abstract class AbstractDocument extends Model
     protected $dispatchesEvents = [
         'created' => DocumentWasCreated::class,
         'updated' => DocumentWasUpdated::class,
-        'saved' => DocumentWasUpdated::class,
+        'saved' => DocumentWasSaved::class,
         'deleting' => DocumentIsDeleting::class,
         'deleted' => DocumentWasDeleted::class,
+        'restored' => DocumentWasRestored::class,
     ];
 
-    abstract public function getTableData();
+    abstract public function transform();
 
     public function user()
     {
@@ -59,29 +62,29 @@ abstract class AbstractDocument extends Model
             });
     }
 
-    public function scopeVisible($query, $user_id = null)
+    public function scopeVisible($query, $user_uuid = null)
     {
-        return $this->checkForPermission($query, $user_id, PermissionActions::VIEW);
+        return $this->checkForPermission($query, $user_uuid, PermissionActions::VIEW);
     }
 
-    public function scopeEditable($query, $user_id = null)
+    public function scopeEditable($query, $user_uuid = null)
     {
-        return $this->checkForPermission($query, $user_id, PermissionActions::EDIT);
+        return $this->checkForPermission($query, $user_uuid, PermissionActions::EDIT);
     }
 
-    public function scopeDeletable($query, $user_id = null)
+    public function scopeDeletable($query, $user_uuid = null)
     {
-        return $this->checkForPermission($query, $user_id, PermissionActions::DELETE);
+        return $this->checkForPermission($query, $user_uuid, PermissionActions::DELETE);
     }
 
-    public function scopeExportable($query, $user_id = null)
+    public function scopeExportable($query, $user_uuid = null)
     {
-        return $this->checkForPermission($query, $user_id, PermissionActions::EXPORT);
+        return $this->checkForPermission($query, $user_uuid, PermissionActions::EXPORT);
     }
 
-    public function scopeArchivable($query, $user_id = null)
+    public function scopeArchivable($query, $user_uuid = null)
     {
-        return $this->checkForPermission($query, $user_id, PermissionActions::ARCHIVE);
+        return $this->checkForPermission($query, $user_uuid, PermissionActions::ARCHIVE);
     }
 
     public function checkForPermission($query, $userUuid, $permissionType)

@@ -22,12 +22,15 @@ class Bill extends AbstractDocument
         'discount_type',
         'date',
         'due_date',
+        'currency_id',
         'notes',
         'terms',
         'footer',
         'billable_type',
         'billable_uuid'
     ];
+
+    protected $dispatchesEvents = [];
 
     public function billable()
     {
@@ -39,7 +42,7 @@ class Bill extends AbstractDocument
         return $this->hasMany(BillItem::class)->orderBy('index', 'asc');
     }
 
-    public function getTableData()
+    public function transform()
     {
         return [];
     }

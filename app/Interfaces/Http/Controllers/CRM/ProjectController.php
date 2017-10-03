@@ -30,14 +30,14 @@ class ProjectController extends DocumentController
     {
         return $this->taskListRepository->create(array_merge([
             'project_uuid' => $project
-        ], $request->get('task-list')))->getTableData();
+        ], $request->get('task-list')))->transform();
     }
 
     public function storeTask($project, $taskList, StoreTaskRequest $request)
     {
         return $this->taskRepository->create(array_merge([
             'task_list_uuid' => $taskList
-        ], $request->get('task')))->getTableData();
+        ], $request->get('task')))->transform();
     }
 
     public function getResourceName()

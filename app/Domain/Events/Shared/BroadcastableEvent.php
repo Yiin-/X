@@ -28,7 +28,7 @@ class BroadcastableEvent implements ShouldBroadcast
          */
         $this->event = $event;
         $this->documentName = class_basename($document);
-        $this->documentModel = $document->getTableData();
+        $this->documentModel = $document->transform();
     }
 
     /**

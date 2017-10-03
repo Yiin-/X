@@ -14,7 +14,7 @@ class Credit extends AbstractDocument
     protected $fillable = [
         'client_uuid',
         'amount',
-        // 'currency_id',
+        'currency_id',
         'balance',
         'credit_date',
         'credit_number'
@@ -25,7 +25,7 @@ class Credit extends AbstractDocument
         'company_uuid'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         return [
             'uuid' => $this->uuid,

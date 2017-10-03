@@ -20,7 +20,7 @@ class TaskList extends AbstractDocument
         'user_uuid'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         return (new TaskListTransformer)->transform($this);
     }

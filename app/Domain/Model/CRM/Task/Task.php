@@ -24,7 +24,7 @@ class Task extends AbstractDocument
         return $this->belongsTo(User::class);
     }
 
-    public function getTableData()
+    public function transform()
     {
         return (new TaskTransformer)->transform($this);
     }

@@ -56,7 +56,7 @@ class VatCheckController extends AbstractController
             $data = auth()->user()->vatChecks()->create([
                 'status' => \App\Domain\Constants\VatCheck\Statuses::VALID,
                 'name' => $result->name,
-                'address' => $result->address,
+                'address' => trim(str_replace(' ,', ', ', str_replace(' .', '. ', $result->address))),
                 'country_code' => $vat_CC,
                 'number' => $vat_VN
             ]);

@@ -24,10 +24,12 @@ class InvoiceController extends DocumentController
         $rules = [
             static::VALIDATION_RULES_CREATE => [
                 $this->getResourceName() => 'required|array',
+                "{$this->getResourceName()}.quote_uuid" => 'nullable|exists:quotes,uuid',
                 "{$this->getResourceName()}.client_uuid" => 'required|exists:clients,uuid',
                 "{$this->getResourceName()}.invoice_date" => 'nullable|date',
                 "{$this->getResourceName()}.due_date" => 'nullable|date',
                 "{$this->getResourceName()}.partial" => 'nullable|numeric',
+                "{$this->getResourceName()}.currency_id" => 'nullable|exists:currencies,id',
                 "{$this->getResourceName()}.items" => "array",
                 "{$this->getResourceName()}.items.*.product_uuid" => 'exists:products,uuid'
                 // "{$this->getResourceName()}.discount.type" => '',
@@ -37,6 +39,7 @@ class InvoiceController extends DocumentController
                 "{$this->getResourceName()}.invoice_date" => 'nullable|date',
                 "{$this->getResourceName()}.due_date" => 'nullable|date',
                 "{$this->getResourceName()}.partial" => 'nullable|numeric',
+                "{$this->getResourceName()}.currency_id" => 'nullable|exists:currencies,id',
                 "{$this->getResourceName()}.items" => "array",
                 "{$this->getResourceName()}.items.*.product_uuid" => 'exists:products,uuid'
             ]

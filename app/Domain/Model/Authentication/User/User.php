@@ -18,6 +18,7 @@ use App\Domain\Model\Authorization\Permission\Permission;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Profile\Profile;
 use App\Domain\Model\Features\VatChecker\VatCheck;
+use App\Domain\Model\System\ActivityLog\Activity;
 
 class User extends AbstractDocument implements
     AuthenticatableContract,
@@ -36,7 +37,7 @@ class User extends AbstractDocument implements
         'remember_token'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         return [
             'uuid' => $this->uuid,
@@ -78,6 +79,36 @@ class User extends AbstractDocument implements
     public function vatChecks()
     {
         return $this->hasMany(VatCheck::class);
+    }
+
+    public function settings()
+    {
+        return $this->hasOne(UserSettings::class);
+    }
+
+    public function preferences()
+    {
+        return $this->hasMany(UserPreference::class);
+    }
+
+    public function getPreferencesAttribute()
+    {
+        return $this->preferences()->get()->mapWithKeys(function (UserPreference $preference) {
+            return [ $preference->key => $preference->value ];
+        });
+    }
+
+    public function activity()
+    {
+        return $this->hasMany(Activity::class)->whereNotIn('document_type', [
+            \App\Domain\Model\Documents\Bill\Bill::class,
+            \App\Domain\Model\Documents\Bill\BillItem::class,
+            \App\Domain\Model\Documents\Client\ClientContact::class,
+            \App\Domain\Model\Documents\Vendor\VendorContact::class,
+            \App\Domain\Model\Documents\Payment\Refund::class,
+            \App\Domain\Model\Documents\Profile\Profile::class,
+            \App\Domain\Model\Features\VatChecker\VatCheck::class
+        ])->orderBy('id', 'desc');
     }
 
     public function getFullNameAttribute()

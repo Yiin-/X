@@ -14,13 +14,13 @@ class UserRepository extends AbstractDocumentRepository
         $this->repository = new Repository(User::class);
     }
 
-    public function create(array $data, $protectedData = [])
+    public function adjustData(&$data, &$protectedData)
     {
         $password = password_hash($data['password'], PASSWORD_BCRYPT);
 
-        return $this->repository->create($data, array_merge([
+        $protectedData = array_merge([
             'password' => $password
-        ], $protectedData));
+        ], $protectedData);
     }
 
     public function findByUsername($siteAddress, $username)

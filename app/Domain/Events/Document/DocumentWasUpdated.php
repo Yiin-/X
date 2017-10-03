@@ -9,6 +9,7 @@ class DocumentWasUpdated
 {
     use BroadcastsToUsers;
 
+    public $user;
     public $document;
 
     /**
@@ -18,10 +19,11 @@ class DocumentWasUpdated
      */
     public function __construct(AbstractDocument $document)
     {
+        $this->user = auth()->user();
         $this->document = $document;
 
-        if (!$document->wasRecentlyCreated) {
-            $this->broadcastToUsers($document, false);
-        }
+        // if (!$document->wasRecentlyCreated) {
+        //     $this->broadcastToUsers($document, false);
+        // }
     }
 }

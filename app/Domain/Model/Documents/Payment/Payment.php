@@ -32,7 +32,7 @@ class Payment extends AbstractDocument
 
     protected $touches = ['invoice'];
 
-    public function getTableData($exclude = [])
+    public function transform($exclude = [])
     {
         return [
             'uuid' => $this->uuid,

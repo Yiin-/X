@@ -9,6 +9,7 @@ class DocumentWasCreated
 {
     use BroadcastsToUsers;
 
+    public $user;
     public $document;
 
     /**
@@ -18,8 +19,8 @@ class DocumentWasCreated
      */
     public function __construct(AbstractDocument $document)
     {
+        $this->user = auth()->user();
         $this->document = $document;
-        \Log::debug('document was created');
 
         $this->broadcastToUsers($document);
     }

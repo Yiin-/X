@@ -2,9 +2,9 @@
 
 namespace App\Domain\Model\Documents\Vendor;
 
-use App\Domain\Model\Passive\Country;
-use App\Domain\Model\Passive\Currency;
-use App\Domain\Model\Expense\Expense;
+use App\Domain\Model\Documents\Passive\Country;
+use App\Domain\Model\Documents\Passive\Currency;
+use App\Domain\Model\Documents\Expense\Expense;
 use App\Domain\Model\Documents\Shared\AbstractDocument;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -19,8 +19,8 @@ class Vendor extends AbstractDocument
         'website',
         'phone',
         'logo',
-        'adress1',
-        'adress2',
+        'address1',
+        'address2',
         'city',
         'postal_code',
         'state',
@@ -34,8 +34,10 @@ class Vendor extends AbstractDocument
         'company_uuid'
     ];
 
-    public function getTableData()
+    public function transform()
     {
+        $firstContact = $this->contacts()->first();
+
         return [
             'uuid' => $this->uuid,
 
@@ -44,9 +46,10 @@ class Vendor extends AbstractDocument
             'vat_number' => $this->vat_number,
             'website' => $this->website,
             'phone' => $this->phone,
+            'email' => $firstContact ? $firstContact->profile->email : '',
             'logo' => $this->logo,
-            'adress1' => $this->adress1,
-            'adress2' => $this->adress2,
+            'address1' => $this->address1,
+            'address2' => $this->address2,
             'city' => $this->city,
             'postal_code' => $this->postal_code,
             'state' => $this->state,
@@ -54,7 +57,7 @@ class Vendor extends AbstractDocument
             'currency' => $this->currency,
             'notes' => $this->notes,
 
-            'contacts' => $this->contacts->map(function ($contact) { return $contact->getTableData(); }),
+            'contacts' => $this->exists ? $this->contacts->map(function ($contact) { return $contact->transform(); }) : $this->contacts,
             'expenses' => $this->expenses()->sum('amount'),
 
             'created_at' => $this->created_at,

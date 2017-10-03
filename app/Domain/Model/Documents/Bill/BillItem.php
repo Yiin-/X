@@ -18,10 +18,10 @@ class BillItem extends AbstractDocument
         'index'
     ];
 
-    public function getTableData()
+    public function transform()
     {
         return [
-            'product' => $this->product->getTableData(),
+            'product' => $this->product ? $this->product->transform() : null,
             'cost' => $this->cost,
             'discount' => $this->discount,
             'qty' => $this->qty,
@@ -29,6 +29,8 @@ class BillItem extends AbstractDocument
             'index' => $this->index
         ];
     }
+
+    protected $dispatchesEvents = [];
 
     public function getFinalPriceAttribute()
     {

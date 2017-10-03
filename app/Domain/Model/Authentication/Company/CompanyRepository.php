@@ -18,12 +18,10 @@ class CompanyRepository extends AbstractDocumentRepository
         $this->auth = $auth;
     }
 
-    public function create(array $data, $protectedData = [])
+    public function creating(&$data, &$protectedData)
     {
         if (!isset($protectedData['account_uuid'])) {
             $protectedData['account_uuid'] = $this->auth->user()->account_uuid;
         }
-
-        return $this->repository->create($data, $protectedData);
     }
 }
