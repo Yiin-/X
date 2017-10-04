@@ -37,7 +37,7 @@ class RecurringInvoiceRepository extends AbstractDocumentRepository
      * @param array $protectedData
      * @return mixed
      */
-    public function saving(&$recurringInvoice, &$data, &$protectedData)
+    public function savingNew(&$recurringInvoice, &$data, &$protectedData)
     {
         $bill = Bill::create([
             'billable_type' => get_class($recurringInvoice),

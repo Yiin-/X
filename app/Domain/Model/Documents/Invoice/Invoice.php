@@ -24,6 +24,28 @@ class Invoice extends AbstractDocument
         'company_uuid'
     ];
 
+    public function subTotal()
+    {
+        $amount = 0;
+
+        foreach ($this->bill->items as $item) {
+            $amount += $item->cost;
+        }
+
+        return $amount;
+    }
+
+    public function discount()
+    {
+        $amount = 0;
+
+        foreach ($this->bill->items as $item) {
+            $amount += $item->discount;
+        }
+
+        return $amount;
+    }
+
     public function amount()
     {
         $amount = 0;

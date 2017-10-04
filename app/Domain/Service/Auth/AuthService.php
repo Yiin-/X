@@ -106,7 +106,7 @@ class AuthService
             if ($grantType === 'password') {
                 throw new InvalidCredentialsException('invalid_credentials');
             }
-            throw new InvalidCredentialsException('invalid_token ' . $grantType . ' ' . $data['refresh_token']);
+            throw new InvalidCredentialsException('invalid_token');
         }
 
         $data = json_decode($response->getContent());

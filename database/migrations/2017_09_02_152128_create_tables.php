@@ -43,7 +43,8 @@ class CreateTables extends Migration
             $table->string('name');
             $table->string('symbol');
             $table->integer('precision');
-            $table->string('iso_4217')->nullable();
+            $table->string('iso_3166_2')->nullable();
+            $table->decimal('eur_rate', 15, 6);
 
             $table->timestamps();
         });
@@ -288,7 +289,7 @@ class CreateTables extends Migration
 
             $table->decimal('cost', 13, 3);
             $table->decimal('qty', 13, 3);
-            $table->decimal('discount', 3, 4)->nullable();
+            $table->decimal('discount', 10, 4)->nullable();
 
             $table->string('tax_rate_uuid')->nullable();
             $table->foreign('tax_rate_uuid')

@@ -21,7 +21,7 @@ class QuoteRepository extends AbstractDocumentRepository
         $this->userRepository = $userRepository;
     }
 
-    public function saving(&$quote, &$data, &$protectedData)
+    public function savingNew(&$quote, &$data, &$protectedData)
     {
         $bill = Bill::create([
             'billable_type' => get_class($quote),
