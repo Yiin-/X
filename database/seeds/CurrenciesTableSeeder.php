@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
+use App\Domain\Model\Documents\Passive\Country;
 use App\Domain\Model\Documents\Passive\Currency;
 
 class CurrenciesTableSeeder extends Seeder
@@ -84,6 +85,10 @@ class CurrenciesTableSeeder extends Seeder
         ];
 
         foreach ($currencies as $currency) {
+            $country = Country::where('currency_code', $currency['code'])->first();
+            if ($country) {
+                $currency['iso_3166_2'] = $country->iso_3166_2;
+            }
             Currency::create($currency);
         }
     }

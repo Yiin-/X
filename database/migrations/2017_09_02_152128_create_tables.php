@@ -44,7 +44,7 @@ class CreateTables extends Migration
             $table->string('symbol');
             $table->integer('precision');
             $table->string('iso_3166_2')->nullable();
-            $table->decimal('eur_rate', 15, 6);
+            $table->decimal('eur_rate', 15, 6)->default(1);
 
             $table->timestamps();
         });

@@ -10,6 +10,8 @@ class Currency extends Model
         'name',
         'code',
         'symbol',
-        'precision'
+        'precision',
+        'iso_3166_2',
+        'eur_rate'
     ];
 }
