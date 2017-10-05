@@ -21,7 +21,7 @@ class EventServiceProvider extends ServiceProvider
     ];
 
     protected $subscribe = [
-        DocumentPermissionsListener::class,
+        // DocumentPermissionsListener::class,
         ActivityListener::class
     ];
 
