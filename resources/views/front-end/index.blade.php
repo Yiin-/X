@@ -13,11 +13,6 @@
     <meta name="apple-mobile-web-app-title" content="Overseer">
     <meta name="application-name" content="Overseer From API">
     <meta name="theme-color" content="#ffffff">
-    @isset($auth)
-      <script type="application/json" id="auth">
-        {!! $auth !!}
-      </script>
-    @endisset
     @auth
       <script type="application/json" id="preloaded_json">
         {!! $preloadedJson !!}
@@ -27,6 +22,6 @@
   <body>
     <div id="app"></div>
     <script src="//api.yiin.lt/socket.io.js"></script>
-    <script src="//localhost:8080/app.js"></script>
+    <script src="/app.js"></script>
   </body>
 </html>
