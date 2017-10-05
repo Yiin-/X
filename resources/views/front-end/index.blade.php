@@ -13,24 +13,40 @@
     <meta name=apple-mobile-web-app-title content=Overseer>
     <meta name=application-name content=Overseer>
     <meta name=theme-color content=#ffffff>
-    @if (config('app.env') === 'production')
-        <link href=/static/css/app.css rel=stylesheet>
-    @endif
-    @auth
-      <script type="application/json" id="preloaded_json">
+
+@if (config('app.env') === 'production')
+    <link href=/static/css/app.css rel=stylesheet>
+@endif
+
+@if ($auth)
+    <script type="application/json" id="preloaded_json">
         {!! $preloadedJson !!}
-      </script>
-    @endauth
+    </script>
+@endif
+
+    <script type="text/javascript" id="auth">
+        window.isAuthenticated = {{ $auth ? 'true' : 'false' }};
+    </script>
   </head>
   <body>
     <div id="app"></div>
     <script src="//api.yiin.lt/socket.io.js"></script>
-    @if (config('app.env') === 'production')
-        <script type=text/javascript src=/static/js/manifest.js></script>
-        <script type=text/javascript src=/static/js/vendor.js></script>
-        <script type=text/javascript src=/static/js/app.js></script>
-    @else
-        <script type="text/javascript" src="http://localhost:8080/app.js"></script>
-    @endif
+
+@if (config('app.env') === 'production')
+    <script type=text/javascript src=/static/js/manifest.js></script>
+    <script type=text/javascript src=/static/js/vendor.js></script>
+    <script type=text/javascript src=/static/js/app.js></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-107566913-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-107566913-1');
+    </script>
+@else
+    <script type="text/javascript" src="http://localhost:8080/app.js"></script>
+@endif
+
   </body>
 </html>
