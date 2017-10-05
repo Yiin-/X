@@ -18,19 +18,16 @@
     <link href=/static/css/app.css rel=stylesheet>
 @endif
 
-@if ($auth)
+@isset ($preloadedJson)
     <script type="application/json" id="preloaded_json">
-        {!! $preloadedJson !!}
+        {!! json_encode($preloadedJson) !!}
     </script>
-@endif
+@endisset
 
-    <script type="text/javascript" id="auth">
-        window.isAuthenticated = {{ $auth ? 'true' : 'false' }};
-    </script>
   </head>
   <body>
     <div id="app"></div>
-    <script src="//api.yiin.lt/socket.io.js"></script>
+    <script src="/socket.io.js"></script>
 
 @if (config('app.env') === 'production')
     <script type=text/javascript src=/static/js/manifest.js></script>

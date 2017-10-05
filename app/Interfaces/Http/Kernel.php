@@ -39,7 +39,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        'auth0' => \App\Interfaces\Http\Middleware\Auth\LoginIfAuthenticated::class,
+        'web-auth' => \App\Interfaces\Http\Middleware\Auth\LoginIfAuthenticated::class,
         'auth' => \App\Interfaces\Http\Middleware\Auth\AccessTokenChecker::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,

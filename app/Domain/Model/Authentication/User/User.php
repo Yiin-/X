@@ -37,6 +37,8 @@ class User extends AbstractDocument implements
         'remember_token'
     ];
 
+    protected $dispatchesEvents = [];
+
     public function transform()
     {
         return [
@@ -118,7 +120,7 @@ class User extends AbstractDocument implements
     public function hasPermissionTo($action, $document)
     {
         if ($document instanceof AbstractDocument) {
-            return $this->companies()->where('uuid', $document->uuid)->exists();
+            return $this->companies()->where('uuid', $document->company_uuid)->exists();
         }
         return true;
     }

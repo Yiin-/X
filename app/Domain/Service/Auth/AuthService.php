@@ -29,7 +29,6 @@ class AuthService
     {
         $guestKey = $this->accountService->createNewDemoAccount();
 
-        \Log::debug('trying to login to ' . $guestKey);
         return $this->attemptLogin($guestKey, 'demo', 'demo', true);
     }
 
@@ -74,10 +73,11 @@ class AuthService
             $data['user']['preferences'] = $user->preferences;
 
             if ($isGuest) {
-                $data['user']['isDemo'] = true;
                 $data['user']['guest_key'] = $siteAddress;
             }
-            $data['preloadedData'] = $this->accountService->fetchDataForUser($user);
+            $data['preloadedData'] = [
+                'data' => $this->accountService->fetchDataForUser($user)
+            ];
 
             return $data;
         }

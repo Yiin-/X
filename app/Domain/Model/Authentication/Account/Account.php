@@ -13,6 +13,8 @@ class Account extends AbstractDocument
         'site_address'
     ];
 
+    protected $dispatchesEvents = [];
+
     public function transform()
     {
         return [

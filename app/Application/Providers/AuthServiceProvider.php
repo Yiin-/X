@@ -39,6 +39,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Client::class => ClientPolicy::class,
+        Credit::class => CreditPolicy::class,
         Expense::class => ExpensePolicy::class,
         Invoice::class => InvoicePolicy::class,
         RecurringInvoice::class => RecurringInvoicePolicy::class,

@@ -20,6 +20,8 @@ class Company extends AbstractDocument
         'account_uuid'
     ];
 
+    protected $dispatchesEvents = [];
+
     public function transform()
     {
         return [

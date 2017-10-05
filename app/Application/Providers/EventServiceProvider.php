@@ -14,11 +14,7 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    protected $listen = [
-        // 'App\Events\Event' => [
-        //     'App\Listeners\EventListener',
-        // ],
-    ];
+    protected $listen = [];
 
     protected $subscribe = [
         // DocumentPermissionsListener::class,

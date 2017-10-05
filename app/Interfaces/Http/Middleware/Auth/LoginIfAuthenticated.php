@@ -27,16 +27,19 @@ class LoginIfAuthenticated
 
     public function handle($request, Closure $next)
     {
-        if (request()->hasCookie('_accessToken')) {
-            $accessToken = request()->cookie('_accessToken');
+        /**
+         * If user has refresh token, refresh it now and try to login user.
+         * We're doing it, so we can know if user is authenticated already,
+         * before serving application back to the user.
+         */
+        if (request()->hasCookie('refreshToken')) {
             try {
-                $request->headers->set('Authorization', 'Bearer ' . $accessToken);
+                $authData = $this->authService->attemptRefresh();
+                $request->headers->set('Authorization', 'Bearer ' . $authData['access_token']);
 
                 return $this->authenticate->handle($request, $next, 'api');
             }
-            catch(\Exception $e) {
-                \Log::error($e->getMessage());
-            }
+            catch(\Exception $e) {}
         }
         return $next($request);
     }

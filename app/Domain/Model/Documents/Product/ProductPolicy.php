@@ -51,7 +51,13 @@ class ProductPolicy
      */
     public function update(User $user, Product $product)
     {
-        return $user->hasPermissionTo(Actions::EDIT, $product);
+        $allow = $user->hasPermissionTo(Actions::EDIT, $product);
+        \Log::debug('User #' . $user->id . ' tries to update product ' . $product->uuid . '. ' . ($allow ? 'Allow' : 'Do not allow'));
+        if (!$allow) {
+            \Log::debug("\tUser company: {$user->companies()->first()->uuid}");
+            \Log::debug("\tProduct company: {$product->company_uuid}");
+        }
+        return $allow;
     }
 
     /**

@@ -77,7 +77,10 @@ class AuthController extends AbstractController
 
     public function heartbeat()
     {
-        return 'OK';
+        if (auth()->check()) {
+            return 'OK';
+        }
+        return response(null, 401);
     }
 
     public function logout()

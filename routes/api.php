@@ -1,17 +1,27 @@
 <?php
 
-Route::post('register', 'Auth\AuthController@register');
+// Create a temporary demo account
 Route::post('demo', 'Auth\AuthController@demo');
+
+// Register a new account
+Route::post('register', 'Auth\AuthController@register');
+
+// Login to registered account
 Route::post('login', 'Auth\AuthController@login');
+
+// Refresh access token
 Route::post('login/refresh', 'Auth\AuthController@refresh');
 
-Route::middleware('auth:api')->group(function () {
-    /**
-     * Heartbeat
-     */
-    Route::post('heartbeat', 'Auth\AuthController@heartbeat');
-    Route::post('logout', 'Auth\AuthController@logout');
+// Revoke access token
+Route::post('logout', 'Auth\AuthController@logout');
 
+// Check if token still valid
+Route::post('heartbeat', 'Auth\AuthController@heartbeat');
+
+/**
+ * Routes that requires for user to be authenticated
+ */
+Route::middleware('auth:api')->group(function () {
     /**
      * Testing
      */
