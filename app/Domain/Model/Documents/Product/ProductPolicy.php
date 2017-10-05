@@ -38,6 +38,7 @@ class ProductPolicy
      */
     public function create(User $user)
     {
+        \Log::debug('User #' . $user->id . ' tries to create new product.');
         return $user->hasPermissionTo(Actions::CREATE, Product::class);
     }
 

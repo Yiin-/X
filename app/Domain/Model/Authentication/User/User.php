@@ -72,8 +72,7 @@ class User extends AbstractDocument implements
 
     public function permissions()
     {
-        return $this->belongsToManyLeftJoin(Permission::class, 'user_permission')
-                    ->belongsToManyThrough($this, Role::class, 'user_role', 'role_permission');
+        return $this->belongsToMany(Permission::class, 'user_permission');
     }
 
     public function vatChecks()
@@ -119,35 +118,31 @@ class User extends AbstractDocument implements
     public function hasPermissionTo($action, $document)
     {
         if ($document instanceof AbstractDocument) {
-            return $this->permissions()
-                ->where('type', $action)
-                ->where('permissible_type', get_class($document))
-                ->where('permissible_uuid', $document->uuid)
-                ->exists();
+            return $this->companies()->where('uuid', $document->uuid)->exists();
         }
-        return $this->permissions()
-            ->wherE('type', $action)
-            ->where('permissible_type', $document)
-            ->exists();
+        return true;
     }
 
     public function scopeWithPermissionTo($query, $action, $document)
     {
         if ($document instanceof AbstractDocument) {
-            return $query->whereHas('permissions', function ($query) use ($action, $document) {
-                $query->where('type', $action)
-                    ->where('permissible_type', get_class($document))
-                    ->where('permissible_uuid', $document->uuid);
+            return $query->whereHas('companies', function ($query) use ($document) {
+                return $query->where('uuid', $document->company_uuid);
             });
         }
-        return $query->whereHas('permissions', function ($query) use ($action, $document) {
-            $query->where('type', $action)
-                ->where('permissible_type', $document);
-        });
+        return $query;
     }
 
     public function findForPassport($username)
     {
-        return $this->where('username', $username)->first();
+        if (preg_match('/(.*)@(.*)$/', $username, $matches)) {
+            $username = $matches[1];
+            $siteAddress = $matches[2];
+
+            return $this->whereHas('account', function ($query) use ($siteAddress) {
+                $query->where('site_address', $siteAddress);
+            })->where('username', $username)->first();
+        }
+        return null;
     }
 }

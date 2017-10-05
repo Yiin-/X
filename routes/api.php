@@ -1,6 +1,7 @@
 <?php
 
 Route::post('register', 'Auth\AuthController@register');
+Route::post('demo', 'Auth\AuthController@demo');
 Route::post('login', 'Auth\AuthController@login');
 Route::post('login/refresh', 'Auth\AuthController@refresh');
 

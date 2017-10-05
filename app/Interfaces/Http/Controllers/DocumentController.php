@@ -33,7 +33,7 @@ abstract class DocumentController extends AbstractController
      */
     public function all()
     {
-        // $this->authorize('view', $this->repository->getDocumentClass());
+        $this->authorize('view', $this->repository->getDocumentClass());
 
         return response()->json(
             $this->repository->newQuery()
@@ -54,7 +54,7 @@ abstract class DocumentController extends AbstractController
      */
     public function index()
     {
-        // $this->authorize('view', $this->repository->getDocumentClass());
+        $this->authorize('view', $this->repository->getDocumentClass());
 
         return $this->all();
     }
@@ -68,7 +68,7 @@ abstract class DocumentController extends AbstractController
     {
         $document = $this->repository->find($uuid);
 
-        // $this->authorize('see', $document);
+        $this->authorize('see', $document);
 
         return response()->json($document->transform());
     }
@@ -80,7 +80,7 @@ abstract class DocumentController extends AbstractController
      */
     public function store(Request $request)
     {
-        // $this->authorize('create', $this->repository->getDocumentClass());
+        $this->authorize('create', $this->repository->getDocumentClass());
 
         $this->validate($request,
             $this->getValidationRules(static::VALIDATION_RULES_CREATE), [], $this->getValidationAttributes()
@@ -99,7 +99,7 @@ abstract class DocumentController extends AbstractController
      */
     public function update($uuid, Request $request)
     {
-        // $this->authorize('update', $this->repository->find($uuid));
+        $this->authorize('update', $this->repository->find($uuid));
 
         $this->validate($request,
             $this->getValidationRules(

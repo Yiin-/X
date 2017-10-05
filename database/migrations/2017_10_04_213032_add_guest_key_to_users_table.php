@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateDemoAccount extends Migration
+class AddGuestKeyToUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateDemoAccount extends Migration
      */
     public function up()
     {
-        app(App\Domain\Service\User\AccountService::class)->createNewAccount(
-            'Loneland', 'admin@overseer.io', 'loneland', 'John', 'Doe', 'john.doe@example.com', 'admin'
-        );
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('guest_key')->unique()->nullable();
+        });
     }
 
     /**

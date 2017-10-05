@@ -7,6 +7,7 @@ use App\Interfaces\Http\Controllers\AbstractController;
 use App\Domain\Service\Auth\AuthService;
 use App\Interfaces\Http\Requests\Auth\RegisterRequest;
 use App\Interfaces\Http\Requests\Auth\LoginRequest;
+use App\Interfaces\Http\Requests\Auth\DemoRequest;
 
 class AuthController extends AbstractController
 {
@@ -56,6 +57,17 @@ class AuthController extends AbstractController
         $data = $this->authService->attemptLogin($siteAddress, $username, $password);
 
         return response()->json($data);
+    }
+
+    public function demo(DemoRequest $request)
+    {
+        \Log::debug('demo');
+        if ($request->guest_key) {
+            return $this->authService->attemptLogin($request->guest_key, 'demo', 'demo');
+        }
+        else {
+            return $this->authService->registerDemoAccount();
+        }
     }
 
     public function refresh(Request $request)

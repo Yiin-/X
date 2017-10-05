@@ -15,19 +15,12 @@ class DocumentPermissionsListener
      */
     public function createPermissions($event)
     {
-        \Log::debug('creating document permissions');
         /**
          * @var Company $company
          */
         $company = $event->document->company;
 
-        \Log::debug($event->document);
-
         if (!$company) {
-            \Log::debug('no company');
-            \Log::debug($event->document->company_uuid);
-            \Log::debug($event->document->company);
-            \Log::debug($event->document->company()->first());
             return;
         }
 
@@ -37,7 +30,6 @@ class DocumentPermissionsListener
         $role = $company->roles()->whereNull('parent_role_uuid')->first();
 
         if (!$role) {
-            \Log::debug('no role');
             return;
         }
 
@@ -55,7 +47,6 @@ class DocumentPermissionsListener
      */
     public function deletePermissions($event)
     {
-        \Log::debug('deleting permissions');
         if ($event->document->isForceDeleting()) {
             $event->document->permissions()->delete();
         }

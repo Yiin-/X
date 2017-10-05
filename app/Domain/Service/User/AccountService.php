@@ -29,6 +29,7 @@ use App\Domain\Model\Documents\Profile\ProfileRepository;
 use App\Domain\Model\Authentication\User\UserRepository;
 use App\Domain\Model\Authentication\Company\CompanyRepository;
 use App\Domain\Model\Authorization\Role\RoleRepository;
+use Ramsey\Uuid\Uuid;
 
 class AccountService
 {
@@ -69,6 +70,17 @@ class AccountService
         // $this->featuresService = $featuresService;
     }
 
+    public function createNewDemoAccount()
+    {
+        $guestKey = (string)Uuid::uuid5(Uuid::uuid4(), 'demo');
+
+        $user = $this->createNewAccount(
+            'demo', 'demo', $guestKey, 'demo', 'demo', 'demo', 'demo', $guestKey
+        );
+
+        return $guestKey;
+    }
+
     public function createNewAccount(
         $companyName,
         $companyEmail,
@@ -76,7 +88,8 @@ class AccountService
         $firstName,
         $lastName,
         $userEmail,
-        $userPassword
+        $userPassword,
+        $guestKey = null
     ) {
         /**
          * Create a new account for the user.
@@ -100,12 +113,14 @@ class AccountService
          * Create a new user to manage created account
          * @var \App\Domain\Model\Authentication\User\User
          */
+        \Log::debug('creating account: ' . $userEmail . ':' . $userPassword);
         $user = $this->userRepository->create([
             'username' => $userEmail,
             'password' => $userPassword
         ], [
             'profile_uuid' => $profile->uuid,
-            'account_uuid' => $account->uuid
+            'account_uuid' => $account->uuid,
+            'guest_key' => $guestKey
         ]);
 
         /**

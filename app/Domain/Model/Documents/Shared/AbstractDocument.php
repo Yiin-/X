@@ -55,11 +55,7 @@ abstract class AbstractDocument extends Model
 
     public function permissions()
     {
-        return $this->morphMany(Permission::class, 'permissible', null, 'permissible_uuid')
-            ->orWhere(function ($query) {
-                $query->where('permissible_type', $this->getMorphClass())
-                    ->whereNull('permissible_uuid');
-            });
+        return $this->morphMany(Permission::class, 'permissible', 'permissible_type', 'permissible_uuid');
     }
 
     public function scopeVisible($query, $user_uuid = null)
@@ -90,14 +86,11 @@ abstract class AbstractDocument extends Model
     public function checkForPermission($query, $userUuid, $permissionType)
     {
         if (! $userUuid) {
-            $userUuid = auth()->id();
+            $user = auth()->user();
+        } else {
+            $user = User::find($userUuid);
         }
-        return $query->whereHas('permissions', function ($query) use ($userUuid, $permissionType) {
-            $query->where('permissions.type', $permissionType)
-                ->whereHas('users', function ($query) use ($userUuid) {
-                    $query->where('uuid', $userUuid);
-                });
-        });
+        return $query->whereIn('company_uuid', $user->companies->pluck('uuid'));
     }
 
     public static function find($uuid, $columns = ['*'])

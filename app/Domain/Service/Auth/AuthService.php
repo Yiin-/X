@@ -25,6 +25,14 @@ class AuthService
         $this->userRepository = $userRepository;
     }
 
+    public function registerDemoAccount()
+    {
+        $guestKey = $this->accountService->createNewDemoAccount();
+
+        \Log::debug('trying to login to ' . $guestKey);
+        return $this->attemptLogin($guestKey, 'demo', 'demo', true);
+    }
+
     public function register(
         $companyName,
         $companyEmail,
@@ -49,13 +57,13 @@ class AuthService
      * @param string $password
      * @return array
      */
-    public function attemptLogin($siteAddress, $username, $password)
+    public function attemptLogin($siteAddress, $username, $password, $isGuest = false)
     {
         $user = $this->userRepository->findByUsername($siteAddress, $username);
 
         if (!is_null($user)) {
             $data = $this->proxy('password', [
-                'username' => $username,
+                'username' => $username . '@' . $siteAddress,
                 'password' => $password
             ]);
 
@@ -64,6 +72,11 @@ class AuthService
             $data['user']['profile'] = $user->profile;
             $data['user']['settings'] = $user->settings;
             $data['user']['preferences'] = $user->preferences;
+
+            if ($isGuest) {
+                $data['user']['isDemo'] = true;
+                $data['user']['guest_key'] = $siteAddress;
+            }
             $data['preloadedData'] = $this->accountService->fetchDataForUser($user);
 
             return $data;
