@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>{{ config('APP_NAME') }}</title>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel=stylesheet type=text/css href=https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css>
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese" rel=stylesheet>
     <link rel=apple-touch-icon sizes=180x180 href=/static/apple-touch-icon.png>

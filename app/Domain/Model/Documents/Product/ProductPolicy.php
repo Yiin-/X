@@ -38,7 +38,6 @@ class ProductPolicy
      */
     public function create(User $user)
     {
-        \Log::debug('User #' . $user->id . ' tries to create new product.');
         return $user->hasPermissionTo(Actions::CREATE, Product::class);
     }
 
@@ -51,13 +50,7 @@ class ProductPolicy
      */
     public function update(User $user, Product $product)
     {
-        $allow = $user->hasPermissionTo(Actions::EDIT, $product);
-        \Log::debug('User #' . $user->id . ' tries to update product ' . $product->uuid . '. ' . ($allow ? 'Allow' : 'Do not allow'));
-        if (!$allow) {
-            \Log::debug("\tUser company: {$user->companies()->first()->uuid}");
-            \Log::debug("\tProduct company: {$product->company_uuid}");
-        }
-        return $allow;
+        return $user->hasPermissionTo(Actions::EDIT, $product);
     }
 
     /**

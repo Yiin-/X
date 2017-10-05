@@ -61,7 +61,6 @@ class AuthController extends AbstractController
 
     public function demo(DemoRequest $request)
     {
-        \Log::debug('demo');
         if ($request->guest_key) {
             return $this->authService->attemptLogin($request->guest_key, 'demo', 'demo');
         }
