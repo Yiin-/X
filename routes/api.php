@@ -18,6 +18,10 @@ Route::post('logout', 'Auth\AuthController@logout');
 // Check if token still valid
 Route::post('heartbeat', 'Auth\AuthController@heartbeat');
 
+Route::middleware('web-auth')->post('test', function () {
+    return auth()->user();
+});
+
 /**
  * Routes that requires for user to be authenticated
  */

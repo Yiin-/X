@@ -46,8 +46,6 @@ class Client extends AbstractDocument
 
     public function transform()
     {
-        $firstContact = $this->contacts()->first();
-
         $vatStatus = VatCheck::where([
             'country_code' => mb_substr($this->vat_number ?? '', 0, 2),
             'number' => mb_substr($this->vat_number ?? '', 2)
@@ -65,7 +63,7 @@ class Client extends AbstractDocument
 
             'website' => $this->website,
             'phone' => $this->phone,
-            'email' => $firstContact ? $firstContact->profile->email : '',
+            'email' => $this->primary_email,
 
             // Address
             'address1' => $this->address1,
@@ -123,4 +121,15 @@ class Client extends AbstractDocument
         return $this->belongsTo(Industry::class);
     }
 
+    public function hasPrimaryEmail()
+    {
+        return filter_var($this->primary_email, FILTER_VALIDATE_EMAIL);
+    }
+
+    public function getPrimaryEmailAttribute()
+    {
+        $primaryContact = $this->contacts()->first();
+
+        return $primaryContact ? $primaryContact->profile->email : '';
+    }
 }

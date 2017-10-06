@@ -7,6 +7,7 @@ use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Bill\BillItem;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Payment\Payment;
+use App\Domain\Model\Documents\Pdf\Pdf;
 use App\Domain\Model\Documents\Shared\AbstractDocument;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -23,6 +24,11 @@ class Invoice extends AbstractDocument
         'user_uuid',
         'company_uuid'
     ];
+
+    public function pdfs()
+    {
+        return $this->morphMany(Pdf::class, 'pdfable');
+    }
 
     public function subTotal()
     {
@@ -41,6 +47,17 @@ class Invoice extends AbstractDocument
 
         foreach ($this->bill->items as $item) {
             $amount += $item->discount;
+        }
+
+        return $amount;
+    }
+
+    public function taxes()
+    {
+        $amount = 0;
+
+        foreach ($this->bill->items as $item) {
+            $amount += $item->tax;
         }
 
         return $amount;

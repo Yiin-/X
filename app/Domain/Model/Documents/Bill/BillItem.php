@@ -32,14 +32,24 @@ class BillItem extends AbstractDocument
 
     protected $dispatchesEvents = [];
 
-    public function getFinalPriceAttribute()
+    public function getCostBeforeTaxAttribute()
     {
         $sum = $this->qty * $this->cost;
         $discount = $sum * $this->discount / 100;
-        $cost = $sum - $discount;
+
+        return $sum - $discount;
+    }
+
+    public function getTaxAttribute()
+    {
         $tax = $this->taxRate ? ($this->taxRate->rate / 100) : 0;
 
-        return ($tax * $cost) + $cost;
+        return $tax * $this->cost_before_tax;
+    }
+
+    public function getFinalPriceAttribute()
+    {
+        return $this->tax + $cost_before_tax;
     }
 
     public function bill()

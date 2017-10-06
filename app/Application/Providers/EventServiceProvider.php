@@ -6,6 +6,8 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use Illuminate\Support\Facades\Event;
 use App\Domain\Listeners\DocumentPermissionsListener;
 use App\Domain\Listeners\ActivityListener;
+use \App\Domain\Model\Documents\Invoice\Invoice;
+use \App\Domain\Observers\Documents\InvoiceObserver;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -17,7 +19,6 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [];
 
     protected $subscribe = [
-        // DocumentPermissionsListener::class,
         ActivityListener::class
     ];
 
@@ -30,6 +31,6 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot();
 
-        //
+        Invoice::observe(InvoiceObserver::class);
     }
 }

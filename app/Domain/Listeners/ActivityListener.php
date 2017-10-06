@@ -5,6 +5,7 @@ namespace App\Domain\Listeners;
 use App\Domain\Model\System\ActivityLog\ActivityRepository;
 use App\Domain\Events\Document\DocumentWasCreated;
 use App\Domain\Events\Document\DocumentWasUpdated;
+use App\Domain\Events\Document\DocumentWasSaved;
 use App\Domain\Events\Document\DocumentWasDeleted;
 use App\Domain\Events\Document\DocumentWasRestored;
 
@@ -27,6 +28,11 @@ class ActivityListener
         $this->activityRepository->registerUserActivity($event->user, 'updated', $event->document);
     }
 
+    public function documentWasSaved(DocumentWasSaved $event)
+    {
+        \Log::debug('documentWasSaved');
+    }
+
     public function documentWasDeleted(DocumentWasDeleted $event)
     {
         $this->activityRepository->registerUserActivity($event->user, 'deleted', $event->document);
@@ -43,5 +49,6 @@ class ActivityListener
         $events->listen(DocumentWasUpdated::class, self::class . '@documentWasUpdated');
         $events->listen(DocumentWasDeleted::class, self::class . '@documentWasDeleted');
         $events->listen(DocumentWasRestored::class, self::class . '@documentWasRestored');
+        $events->listen(DocumentWasSaved::class, self::class . '@documentWasSaved');
     }
 }

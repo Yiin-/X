@@ -1,18 +1,25 @@
-const htmlPdf = require('html-pdf-chrome');
-const fs = require('fs');
-const microtime = require('microtime')
+const htmlPdf = require('html-pdf-chrome')
+const fs = require('fs')
+const app = require('express')
 
 const options = {
   port: 9222
-};
+}
 
-fs.readFile('test.html', function (err, data) {
-  if (err) throw err;
+app.post('/pdf/raw', (req, res) => {
+  htmlPdf.create(res.body.html, options).then((pdf) => {
+    res.send()
+  })
+})
 
-  const ms = microtime.now()
+app.listen(3000)
+
+fs.readFile('test.html', (err, data) => {
+  if (err) {
+    throw err
+  }
 
   htmlPdf.create(data, options).then((pdf) => {
-    console.log((microtime.now() - ms) / 1000000)
-    fs.writeFile("test.pdf", pdf.toBuffer())
-  }).catch((err) => console.log(err));
-});
+    fs.writeFile('test.pdf', pdf.toBuffer())
+  })
+})

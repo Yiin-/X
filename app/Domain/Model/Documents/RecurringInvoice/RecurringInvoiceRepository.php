@@ -45,6 +45,7 @@ class RecurringInvoiceRepository extends AbstractDocumentRepository
             'po_number' => $data['po_number'],
             'discount' => $data['discount_value'],
             'discount_type' => $data['discount_type'],
+            'currency_id' => $data['currency_id'],
             'date' => $data['start_date'],
             'notes' => $data['note_to_client'],
             'terms' => $data['terms'],
@@ -71,12 +72,13 @@ class RecurringInvoiceRepository extends AbstractDocumentRepository
             'po_number' => 'po_number',
             'discount_value' => 'discount',
             'discount_type' => 'discount_type',
+            'currency_id' => 'currency_id',
             'start_date' => 'date',
             'note_to_client' => 'notes',
             'terms' => 'terms',
             'footer' => 'footer'
         ] as $field => $billField) {
-            if (isset($data[$field])) {
+            if (array_key_exists($field, $data)) {
                 $billData[$billField] = $data[$field];
             }
         }

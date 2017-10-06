@@ -30,7 +30,7 @@ class WebController extends AbstractController
         if (auth()->check()) {
             $user = auth()->user();
             // Logout it out, if that's a guest account
-            if ($user->guest_key) {
+            if (false && $user->guest_key) {
                 // Revoke issued access token
                 $this->authService->logout();
                 // Also delete guest account, because there is no way for
@@ -39,7 +39,7 @@ class WebController extends AbstractController
             }
             else {
                 // User is authenticated, and is not a guest, we can safely pass preloaded data
-                $data['preloadedJson']['data'] = json_encode($this->accountService->fetchDataForUser());
+                $data['preloadedJson']['data'] = $this->accountService->fetchDataForUser();
             }
         }
         return view('front-end.index', $data);

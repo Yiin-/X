@@ -8,6 +8,7 @@ use App\Infrastructure\Persistence\Repository;
 use App\Domain\Service\Currency\CurrencyRateService;
 use App\Domain\Model\Authentication\User\UserRepository;
 use App\Domain\Model\Documents\Quote\QuoteRepository;
+use App\Domain\Model\Documents\Product\ProductRepository;
 use App\Domain\Model\Documents\Shared\Traits\FillsUserData;
 
 class InvoiceRepository extends AbstractDocumentRepository
@@ -16,17 +17,20 @@ class InvoiceRepository extends AbstractDocumentRepository
 
     protected $repository;
     protected $userRepository;
+    protected $productRepository;
     protected $currencyRateService;
 
     public function __construct(
         UserRepository $userRepository,
         QuoteRepository $quoteRepository,
-        CurrencyRateService $currencyRateService
+        CurrencyRateService $currencyRateService,
+        ProductRepository $productRepository
     ) {
         $this->repository = new Repository(Invoice::class);
         $this->userRepository = $userRepository;
         $this->quoteRepository = $quoteRepository;
         $this->currencyRateService = $currencyRateService;
+        $this->productRepository = $productRepository;
     }
 
     public function fillMissingData(&$data, &$protectedData)

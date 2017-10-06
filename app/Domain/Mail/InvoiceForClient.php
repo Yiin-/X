@@ -8,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Domain\Model\Documents\Invoice\Invoice;
 
-class InvoiceForClient extends Mailable
+class InvoiceForClient extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

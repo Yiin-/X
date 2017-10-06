@@ -13,6 +13,11 @@
     "axios": "^0.16.2",
     "bootstrap-sass": "^3.3.7",
     "cross-env": "^5.0.1",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.2.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
     "jquery": "^3.1.1",
     "laravel-mix": "^1.0",
     "lodash": "^4.17.4",
@@ -20,7 +25,9 @@
   },
   "dependencies": {
     "benchmark": "^2.1.4",
+    "express": "^4.16.1",
     "html-pdf-chrome": "^0.3.0",
-    "microtime": "^2.1.6"
+    "microtime": "^2.1.6",
+    "redis": "^2.8.0"
   }
 }

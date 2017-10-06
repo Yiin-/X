@@ -4,6 +4,8 @@ namespace App\Application\Providers;
 
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Client\ClientPolicy;
+use App\Domain\Model\Documents\Credit\Credit;
+use App\Domain\Model\Documents\Credit\CreditPolicy;
 use App\Domain\Model\Documents\Expense\Expense;
 use App\Domain\Model\Documents\Expense\ExpensePolicy;
 use App\Domain\Model\Documents\Invoice\Invoice;

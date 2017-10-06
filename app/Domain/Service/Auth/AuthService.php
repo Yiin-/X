@@ -141,7 +141,7 @@ class AuthService
             null,
             null,
             false,
-            false
+            true
         );
 
         return [

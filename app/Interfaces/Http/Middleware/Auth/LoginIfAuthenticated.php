@@ -32,10 +32,10 @@ class LoginIfAuthenticated
          * We're doing it, so we can know if user is authenticated already,
          * before serving application back to the user.
          */
-        if (request()->hasCookie('refreshToken')) {
+        if (request()->hasCookie('_accessToken')) {
             try {
-                $authData = $this->authService->attemptRefresh();
-                $request->headers->set('Authorization', 'Bearer ' . $authData['access_token']);
+                // $authData = $this->authService->attemptRefresh();
+                $request->headers->set('Authorization', 'Bearer ' . request()->cookie('_accessToken'));
 
                 return $this->authenticate->handle($request, $next, 'api');
             }
