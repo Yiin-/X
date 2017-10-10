@@ -28,14 +28,14 @@ class ExpenseController extends DocumentController
                 "{$this->getResourceName()}.client_uuid" => 'required|exists:clients,uuid',
                 // "{$this->getResourceName()}.category_uuid" => 'required|exists:expense_categories,uuid',
                 "{$this->getResourceName()}.amount" => 'required',
-                "{$this->getResourceName()}.currency_id" => 'required|exists:currencies,id',
+                "{$this->getResourceName()}.currency_code" => 'required|exists:currencies,code',
                 "{$this->getResourceName()}.date" => 'nullable|date'
             ],
             static::VALIDATION_RULES_PATCH => [
                 $this->getResourceName() => 'required|array',
                 "{$this->getResourceName()}.vendor_uuid" => 'exists:vendors,uuid',
                 "{$this->getResourceName()}.client_uuid" => 'exists:clients,uuid',
-                "{$this->getResourceName()}.currency_id" => 'exists:currencies,id',
+                "{$this->getResourceName()}.currency_code" => 'exists:currencies,code',
                 "{$this->getResourceName()}.date" => 'nullable|date'
             ]
         ];
@@ -51,7 +51,7 @@ class ExpenseController extends DocumentController
             "{$this->getResourceName()}.client_uuid" => 'client',
             "{$this->getResourceName()}.category_uuid" => 'category',
             "{$this->getResourceName()}.amount" => 'expense\'s amount',
-            "{$this->getResourceName()}.currency_id" => 'expense\'s currency',
+            "{$this->getResourceName()}.currency_code" => 'expense\'s currency',
             "{$this->getResourceName()}.date" => 'expense\'s date'
         ];
     }

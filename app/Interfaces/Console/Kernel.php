@@ -6,6 +6,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 use App\Application\Jobs\UpdateCurrencyRates;
+use App\Application\Jobs\SendMarkedInvoices;
 
 class Kernel extends ConsoleKernel
 {
@@ -27,6 +28,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->job(new UpdateCurrencyRates)->hourly();
+        $schedule->job(new SendMarkedInvoices)->everyMinute();
     }
 
     /**

@@ -26,13 +26,13 @@ class ProductController extends DocumentController
                 $this->getResourceName() => 'required|array',
                 "{$this->getResourceName()}.name" => 'required',
                 "{$this->getResourceName()}.price" => 'required|numeric',
-                "{$this->getResourceName()}.currency_id" => 'required|exists:currencies,id',
+                "{$this->getResourceName()}.currency_code" => 'required|exists:currencies,code',
                 "{$this->getResourceName()}.qty" => 'nullable|numeric'
             ],
             static::VALIDATION_RULES_PATCH => [
                 $this->getResourceName() => 'required|array',
                 "{$this->getResourceName()}.price" => 'numeric',
-                "{$this->getResourceName()}.currency_id" => 'exists:currencies,id',
+                "{$this->getResourceName()}.currency_code" => 'exists:currencies,code',
                 "{$this->getResourceName()}.qty" => 'nullable|numeric'
             ]
         ];
@@ -46,7 +46,7 @@ class ProductController extends DocumentController
         return [
             "{$this->getResourceName()}.name" => 'product\'s name',
             "{$this->getResourceName()}.price" => 'product\'s price',
-            "{$this->getResourceName()}.currency_id" => 'product\'s currency',
+            "{$this->getResourceName()}.currency_code" => 'product\'s currency',
             "{$this->getResourceName()}.qty" => 'product\'s quantity'
         ];
     }

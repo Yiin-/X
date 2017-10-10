@@ -14,7 +14,7 @@ class Credit extends AbstractDocument
     protected $fillable = [
         'client_uuid',
         'amount',
-        'currency_id',
+        'currency_code',
         'balance',
         'credit_date',
         'credit_number'
@@ -54,6 +54,6 @@ class Credit extends AbstractDocument
 
     public function currency()
     {
-        return $this->belongsTo(Currency::class);
+        return $this->belongsTo(Currency::class, 'currency_code', 'code');
     }
 }

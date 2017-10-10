@@ -26,7 +26,7 @@ class ClientController extends DocumentController
                 $this->getResourceName() => 'required|array',
                 "{$this->getResourceName()}.name" => 'required',
                 "{$this->getResourceName()}.country_id" => 'nullable|exists:countries,id',
-                "{$this->getResourceName()}.currency_id" => 'nullable|exists:currencies,id',
+                "{$this->getResourceName()}.currency_code" => 'nullable|exists:currencies,code',
                 "{$this->getResourceName()}.language_id" => 'nullable|exists:languages,id',
                 "{$this->getResourceName()}.company_size_id" => 'nullable|exists:company_sizes,id',
                 "{$this->getResourceName()}.industry_id" => 'nullable|exists:industries,id',
@@ -45,7 +45,7 @@ class ClientController extends DocumentController
         return [
             "{$this->getResourceName()}.name" => 'client\'s name',
             "{$this->getResourceName()}.country_id" => 'client\'s country',
-            "{$this->getResourceName()}.currency_id" => 'client\'s currency',
+            "{$this->getResourceName()}.currency_code" => 'client\'s currency',
             "{$this->getResourceName()}.language_id" => 'client\'s language',
             "{$this->getResourceName()}.company_size_id" => 'client\'s company size',
             "{$this->getResourceName()}.industry_id" => 'client\'s industry',

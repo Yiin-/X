@@ -178,6 +178,7 @@ return [
          */
         Laravel\Passport\PassportServiceProvider::class,
         Webpatser\Countries\CountriesServiceProvider::class,
+        Swap\Laravel\SwapServiceProvider::class
 
     ],
 

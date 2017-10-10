@@ -12,15 +12,9 @@ class InvoiceForClient extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $noteToClient;
-    public $poNumber;
-    public $date;
-    public $items;
-    public $subTotal;
-    public $grandTotal;
-    public $discount;
-    public $tax;
-    public $footerText;
+    public $invoice;
+    public $client;
+    public $company;
 
     /**
      * Create a new message instance.
@@ -29,15 +23,9 @@ class InvoiceForClient extends Mailable implements ShouldQueue
      */
     public function __construct(Invoice $invoice)
     {
-        $this->noteToClient = $invoice->bill->notes;
-        $this->poNumber = $invoice->bill->po_number;
-        $this->date = $invoice->bill->date;
-        $this->items = $invoice->bill->items;
-        $this->subTotal = $invoice->subTotal();
-        $this->grandTotal = $invoice->amount();
-        $this->discount = $invoice->discount();
-        $this->tax = $invoice->taxes();
-        $this->footerText = $invoice->bill->footer;
+        $this->invoice = $invoice;
+        $this->client = $invoice->client;
+        $this->company = $invoice->company;
     }
 
     /**
@@ -47,6 +35,10 @@ class InvoiceForClient extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        return $this->markdown('emails.invoices.default');
+        return $this->markdown('emails.invoice.default')
+            ->attach(storage_path($this->invoice->pdfs()->latest()->path_to_pdf), [
+                'as' => $this->invoice->bill->number . '.pdf',
+                'mime' => 'application/pdf'
+            ]);
     }
 }

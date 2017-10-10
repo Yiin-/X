@@ -36,6 +36,7 @@ class SendInvoice implements ShouldQueue
      */
     public function __construct(Invoice $invoice)
     {
+        $invoice->loadMissing(['client', 'bill', 'company']);
         $this->invoice = $invoice;
     }
 
@@ -66,5 +67,10 @@ class SendInvoice implements ShouldQueue
         // Send an invoice
         Mail::to($client->primary_email)
             ->send(new InvoiceForClient($this->invoice));
+    }
+
+    public function failed(Exception $exception)
+    {
+        \Log::error($exception->getMessage());
     }
 }

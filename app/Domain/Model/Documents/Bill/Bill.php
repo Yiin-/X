@@ -22,12 +22,16 @@ class Bill extends AbstractDocument
         'discount_type',
         'date',
         'due_date',
-        'currency_id',
+        'currency_code',
         'notes',
         'terms',
         'footer',
         'billable_type',
         'billable_uuid'
+    ];
+
+    protected $touches = [
+        'billable'
     ];
 
     protected $dispatchesEvents = [];

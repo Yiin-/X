@@ -156,15 +156,17 @@ class AuthService
      */
     public function logout()
     {
-        $accessToken = auth()->user()->token();
+        if (auth()->check()) {
+            $accessToken = auth()->user()->token();
 
-        DB::table('oauth_refresh_tokens')
-            ->where('access_token_id', $accessToken->id)
-            ->update([
-                'revoked' => true
-            ]);
+            DB::table('oauth_refresh_tokens')
+                ->where('access_token_id', $accessToken->id)
+                ->update([
+                    'revoked' => true
+                ]);
 
-        $accessToken->revoke();
+            $accessToken->revoke();
+        }
 
         Cookie::queue(Cookie::forget(self::REFRESH_TOKEN));
     }

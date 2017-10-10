@@ -11,7 +11,7 @@ use App\Domain\Mail\InvoiceForClient;
 use App\Domain\Model\Documents\Invoice\Invoice;
 use App\Domain\Constants\Pdf\Statuses;
 use Illuminate\Support\Facades\Mail;
-use dawood\phpChrome\Chrome;
+use GuzzleHttp\Client;
 
 class GenerateInvoicePdf implements ShouldQueue
 {
@@ -27,7 +27,7 @@ class GenerateInvoicePdf implements ShouldQueue
     public function handle()
     {
         // Render Invoice HTML
-        $html = view('emails.invoices.default.invoice', [
+        $html = view('pdfs.invoice.default.invoice', [
             'noteToClient' => $this->invoice->bill->notes,
             'poNumber'     => $this->invoice->bill->po_number,
             'date'         => $this->invoice->bill->date,
@@ -39,18 +39,26 @@ class GenerateInvoicePdf implements ShouldQueue
             'footerText'   => $this->invoice->bill->footer,
         ]);
 
-        // Run chrome
-        $chrome = new Chrome(null, env('CHROME_PATH'));
-        $chrome->setHtml($html);
-
-        $pathToFile = 'app/pdfs/invoices/' . $invoice->uuid . '/' . Carbon::now()->toDateTimeString() . 'pdf';
+        $pathToFile = 'app/pdfs/invoices/' . $this->invoice->uuid . '/' . \Carbon\Carbon::now()->format('Y-m-d H-i-s') . '.pdf';
         $path = storage_path($pathToFile);
 
-        $chrome->getPdf($path);
+        $httpClient = new Client;
 
-        $invoice->pdfs()->create([
-            'path_to_pdf' => $path,
-            'status' => Statuses\CREATED::class
-        ]);
+        try {
+            $response = $httpClient->request('POST', config('node-server.url.html_to_pdf'), [
+                'json' => [
+                    'save_to_path' => $path,
+                    'html' => (string)$html
+                ]
+            ]);
+
+            $this->invoice->pdfs()->create([
+                'path_to_pdf' => $pathToFile,
+                'status' => Statuses::CREATED
+            ]);
+        }
+        catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        }
     }
 }

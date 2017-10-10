@@ -42,9 +42,8 @@ class CreateTables extends Migration
             $table->string('code');
             $table->string('name');
             $table->string('symbol');
-            $table->integer('precision');
             $table->string('iso_3166_2')->nullable();
-            $table->decimal('eur_rate', 15, 6)->default(1);
+            $table->integer('precision');
 
             $table->timestamps();
         });
@@ -148,10 +147,7 @@ class CreateTables extends Migration
             $table->string('name');
             $table->decimal('price', 13, 3);
 
-            $table->integer('currency_id')->unsigned()->nullable();
-            $table->foreign('currency_id')
-                ->references('id')->on('currencies')
-                ->onDelete('set null')->onUpdate('cascade');
+            $table->string('currency_code');
 
             $table->decimal('qty', 13, 3)->nullable();
             $table->text('description')->nullable();
@@ -200,10 +196,7 @@ class CreateTables extends Migration
                 ->references('id')->on('countries')
                 ->onDelete('set null')->onUpdate('cascade');
 
-            $table->integer('currency_id')->unsigned()->nullable();
-            $table->foreign('currency_id')
-                ->references('id')->on('currencies')
-                ->onDelete('set null')->onUpdate('cascade');
+            $table->string('currency_code');
 
             $table->integer('language_id')->unsigned()->nullable();
             $table->foreign('language_id')
@@ -257,10 +250,7 @@ class CreateTables extends Migration
             $table->date('date')->nullable();
             $table->date('due_date')->nullable();
 
-            $table->integer('currency_id')->unsigned();
-            $table->foreign('currency_id')
-                ->references('id')->on('currencies')
-                ->onDelete('restrict')->onUpdate('cascade');
+            $table->string('currency_code');
 
             $table->text('notes')->nullable();
             $table->text('terms')->nullable();
@@ -422,10 +412,7 @@ class CreateTables extends Migration
             $table->date('credit_date');
             $table->string('credit_number')->nullable();
 
-            $table->integer('currency_id')->unsigned();
-            $table->foreign('currency_id')
-                ->references('id')->on('currencies')
-                ->onDelete('restrict')->onUpdate('cascade');
+            $table->string('currency_code');
 
             $table->timestamps();
             $table->timestamp('archived_at')->nullable();
@@ -485,10 +472,7 @@ class CreateTables extends Migration
                 ->references('id')->on('countries')
                 ->onDelete('set null')->onUpdate('cascade');
 
-            $table->integer('currency_id')->unsigned()->nullable();
-            $table->foreign('currency_id')
-                ->references('id')->on('currencies')
-                ->onDelete('set null')->onUpdate('cascade');
+            $table->string('currency_code');
 
             $table->timestamps();
             $table->timestamp('archived_at')->nullable();
@@ -526,10 +510,7 @@ class CreateTables extends Migration
 
             $table->decimal('amount', 13, 3);
 
-            $table->integer('currency_id')->unsigned()->nullable();
-            $table->foreign('currency_id')
-                ->references('id')->on('currencies')
-                ->onDelete('set null')->onUpdate('cascade');
+            $table->string('currency_code');
 
             $table->string('expensable_type')->nullable();
             $table->string('expensable_uuid')->nullable();
@@ -568,10 +549,7 @@ class CreateTables extends Migration
             $table->decimal('amount', 13, 3);
             $table->decimal('refunded', 13, 3)->default(0);
 
-            $table->integer('currency_id')->unsigned()->nullable();
-            $table->foreign('currency_id')
-                ->references('id')->on('currencies')
-                ->onDelete('set null')->onUpdate('cascade');
+            $table->string('currency_code');
 
             $table->integer('payment_type_id')->unsigned()->nullable();
             $table->foreign('payment_type_id')

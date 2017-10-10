@@ -25,7 +25,7 @@ class Vendor extends AbstractDocument
         'postal_code',
         'state',
         'country_id',
-        'currency_id',
+        'currency_code',
         // 'notes'
     ];
 
@@ -74,7 +74,7 @@ class Vendor extends AbstractDocument
 
     public function currency()
     {
-        return $this->belongsTo(Currency::class);
+        return $this->belongsTo(Currency::class, 'currency_code', 'code');
     }
 
     public function contacts()

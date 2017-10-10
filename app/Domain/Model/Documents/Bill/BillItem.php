@@ -11,6 +11,7 @@ class BillItem extends AbstractDocument
     protected $fillable = [
         'bill_id',
         'product_uuid',
+        'name',
         'cost',
         'qty',
         'discount',
@@ -18,10 +19,15 @@ class BillItem extends AbstractDocument
         'index'
     ];
 
+    protected $touches = [
+        'bill'
+    ];
+
     public function transform()
     {
         return [
             'product' => $this->product ? $this->product->transform() : null,
+            'name' => $this->name,
             'cost' => $this->cost,
             'discount' => $this->discount,
             'qty' => $this->qty,
@@ -49,7 +55,7 @@ class BillItem extends AbstractDocument
 
     public function getFinalPriceAttribute()
     {
-        return $this->tax + $cost_before_tax;
+        return $this->tax + $this->cost_before_tax;
     }
 
     public function bill()

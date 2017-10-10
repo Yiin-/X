@@ -115,6 +115,7 @@ class Invoice extends AbstractDocument
             'invoice_date' => $this->bill->date,
             'due_date' => $this->bill->due_date,
             'partial' => $this->bill->partial,
+            'currency_code' => $this->bill->currency_code,
             'invoice_number' => $this->bill->number,
             'po_number' => $this->bill->po_number,
             'discount_type' => $this->bill->discount_type,

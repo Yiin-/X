@@ -19,7 +19,7 @@ class Payment extends AbstractDocument
         'invoice_uuid',
         'amount',
         'refunded',
-        'currency_id',
+        'currency_code',
         'payment_type_id',
         'payment_date',
         'payment_reference'
@@ -74,6 +74,6 @@ class Payment extends AbstractDocument
 
     public function currency()
     {
-        return $this->belongsTo(Currency::class);
+        return $this->belongsTo(Currency::class, 'currency_code', 'code');
     }
 }

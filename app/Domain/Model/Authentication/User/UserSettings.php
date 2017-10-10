@@ -9,12 +9,12 @@ use App\Domain\Model\Documents\Passive\Language;
 class UserSettings extends Model
 {
     protected $fillable = [
-        'currency_id',
+        'currency_code',
         'locale'
     ];
 
     public function currency()
     {
-        return $this->belongsTo(Currency::class);
+        return $this->belongsTo(Currency::class, 'currency_code', 'code');
     }
 }

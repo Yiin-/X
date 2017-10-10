@@ -113,7 +113,7 @@ class AccountService
          * Create a new user to manage created account
          * @var \App\Domain\Model\Authentication\User\User
          */
-        \Log::debug('creating account: ' . $userEmail . ':' . $userPassword);
+        \Log::debug('creating account: ' . $userEmail);
         $user = $this->userRepository->create([
             'username' => $userEmail,
             'password' => $userPassword
@@ -151,31 +151,31 @@ class AccountService
         /**
          * Create permissions to manage all company documents
          */
-        foreach (
-            [
-                Client::class,
-                Credit::class,
-                Expense::class,
-                ExpenseCategory::class,
-                Product::class,
-                Vendor::class,
-                Payment::class,
-                Invoice::class,
-                RecurringInvoice::class,
-                Quote::class,
-                TaxRate::class,
-                Project::class,
-                TaskList::class,
-                Task::class,
-            ] as $documentClass
-        ) {
-            foreach (Actions::LIST as $action) {
-                $rootRole->permissions()->create([
-                    'type' => $action,
-                    'permissible_type' => $documentClass
-                ]);
-            }
-        }
+        // foreach (
+        //     [
+        //         Client::class,
+        //         Credit::class,
+        //         Expense::class,
+        //         ExpenseCategory::class,
+        //         Product::class,
+        //         Vendor::class,
+        //         Payment::class,
+        //         Invoice::class,
+        //         RecurringInvoice::class,
+        //         Quote::class,
+        //         TaxRate::class,
+        //         Project::class,
+        //         TaskList::class,
+        //         Task::class,
+        //     ] as $documentClass
+        // ) {
+        //     foreach (Actions::LIST as $action) {
+        //         $rootRole->permissions()->create([
+        //             'type' => $action,
+        //             'permissible_type' => $documentClass
+        //         ]);
+        //     }
+        // }
 
         /**
          * Assign role to user
@@ -186,8 +186,26 @@ class AccountService
          * Set default settings for user
          */
         $user->settings()->create([
-            'currency_id' => Currency::whereCode('EUR')->first()->id,
+            'currency_code' => Currency::whereCode('EUR')->first()->id,
             'locale' => 'en'
+        ]);
+
+        /**
+         * Default user preferences
+         */
+        $user->preferences()->createMany([
+            [
+                'key' => 'invoice_number_pattern',
+                'value' => '{counter}',
+            ],
+            [
+                'key' => 'recurring_invoice_number_pattern',
+                'value' => 'R{counter}'
+            ],
+            [
+                'key' => 'quote_number_pattern',
+                'value' => 'Q{counter}'
+            ]
         ]);
 
         /**

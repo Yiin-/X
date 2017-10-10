@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Domain\Constants\Invoice\Statuses;
 use App\Domain\Mail\InvoiceForClient;
+use App\Domain\Model\Documents\Invoice\InvoiceRepository;
 
 class SendMarkedInvoices implements ShouldQueue
 {

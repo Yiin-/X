@@ -26,13 +26,13 @@ class CreditController extends DocumentController
                 $this->getResourceName() => 'required|array',
                 "{$this->getResourceName()}.client_uuid" => 'required|exists:clients,uuid',
                 "{$this->getResourceName()}.amount" => 'required',
-                "{$this->getResourceName()}.currency_id" => 'required|exists:currencies,id',
+                "{$this->getResourceName()}.currency_code" => 'required|exists:currencies,code',
                 "{$this->getResourceName()}.credit_date" => 'nullable|date'
             ],
             static::VALIDATION_RULES_PATCH => [
                 $this->getResourceName() => 'required|array',
                 "{$this->getResourceName()}.client_uuid" => 'exists:clients,uuid',
-                "{$this->getResourceName()}.currency_id" => 'exists:currencies,id',
+                "{$this->getResourceName()}.currency_code" => 'exists:currencies,code',
                 "{$this->getResourceName()}.credit_date" => 'nullable|date'
             ]
         ];
@@ -46,7 +46,7 @@ class CreditController extends DocumentController
         return [
             "{$this->getResourceName()}.client_uuid" => 'client',
             "{$this->getResourceName()}.amount" => 'credit\'s amount',
-            "{$this->getResourceName()}.currency_id" => 'credit\'s currency',
+            "{$this->getResourceName()}.currency_code" => 'credit\'s currency',
             "{$this->getResourceName()}.credit_date" => 'credit\'s date'
         ];
     }

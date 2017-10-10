@@ -170,7 +170,7 @@
       </thead>
       <tbody>
         @foreach ($items as $item)
-            @include ('emails.invoices.default.item-row', ['item' => $item])
+            @include ('pdfs.invoice.default.item-row', ['item' => $item])
         @endforeach
 
         <!-- Summary -->

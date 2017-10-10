@@ -28,7 +28,7 @@ $factory->define(App\Domain\Model\Documents\Client\Client::class, function (Fake
         'language_id' => 1,
         'company_size_id' => $faker->randomElement(App\Domain\Model\Documents\Passive\CompanySize::all()->pluck('id')->toArray()),
         'payment_terms' => $faker->randomElement([7, 14, 15, 30, 60, 90, 0]),
-        'currency_id' => $faker->randomElement([1, 2, 3]),
+        'currency_code' => $faker->randomElement(['EUR', 'USD', 'GBP']),
 
         'contacts' => factory(App\Domain\Model\Documents\Client\ClientContact::class, $faker->numberBetween(1, 3))->make()
     ];
@@ -69,7 +69,7 @@ $factory->define(App\Domain\Model\Documents\Vendor\Vendor::class, function (Fake
         'country_id' => $faker->randomElement(App\Domain\Model\Documents\Passive\Country::all()->pluck('id')->toArray()),
         'postal_code' => $faker->postcode,
         'notes' => $faker->text,
-        'currency_id' => $faker->randomElement([1, 2, 3]),
+        'currency_code' => $faker->randomElement(['EUR', 'USD', 'GBP']),
 
         'contacts' => factory(App\Domain\Model\Documents\Vendor\VendorContact::class, $faker->numberBetween(1, 3))->make()
     ];
@@ -112,7 +112,8 @@ $factory->define(App\Domain\Model\Documents\Product\Product::class, function (Fa
             'newspaper', 'blouse', 'desk', 'controller', 'charger', 'scotch tape', 'toilet', 'toothbrush', 'box', 'blanket'
         ])),
         'price' => $faker->randomFloat(2, 0.5, 60),
-        'currency_id' => 3,
+        'currency_code' => 'EUR',
+        'identification_number' => $faker->randomElement([$faker->ean13, $faker->ean8, $faker->isbn13, $faker->isbn10]),
         'qty' => $faker->numberBetween(0, 200),
         'description' => $faker->text
     ];

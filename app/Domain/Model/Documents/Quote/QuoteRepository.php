@@ -30,7 +30,7 @@ class QuoteRepository extends AbstractDocumentRepository
             'po_number' => $data['po_number'],
             'partial' => $data['partial'],
             'discount' => $data['discount_value'],
-            'currency_id' => $data['currency_id'],
+            'currency_code' => $data['currency_code'],
             'discount_type' => $data['discount_type'],
             'date' => $data['quote_date'],
             'due_date' => $data['due_date'],
@@ -42,6 +42,7 @@ class QuoteRepository extends AbstractDocumentRepository
         foreach ($data['items'] as $index => $item) {
             $bill->items()->create([
                 'product_uuid' => $item['product_uuid'],
+                'name' => $item['name'],
                 'cost' => $item['cost'],
                 'qty' => $item['qty'],
                 'discount' => $item['discount'],
@@ -61,7 +62,7 @@ class QuoteRepository extends AbstractDocumentRepository
             'partial' => 'partial',
             'discount' => 'discount',
             'discount_type' => 'discount_type',
-            'currency_id' => 'currency_id',
+            'currency_code' => 'currency_code',
             'date' => 'date',
             'due_date' => 'due_date',
             'notes' => 'notes',
@@ -80,6 +81,7 @@ class QuoteRepository extends AbstractDocumentRepository
             foreach ($data['items'] as $index => $item) {
                 $quote->bill->items()->create([
                     'product_uuid' => $item['product_uuid'],
+                    'name' => $item['name'],
                     'cost' => $item['cost'],
                     'qty' => $item['qty'],
                     'discount' => $item['discount'],

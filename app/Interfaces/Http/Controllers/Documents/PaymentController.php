@@ -27,7 +27,7 @@ class PaymentController extends DocumentController
                 "{$this->getResourceName()}.client_uuid" => 'required|exists:clients,uuid',
                 "{$this->getResourceName()}.invoice_uuid" => 'required|exists:invoices,uuid',
                 "{$this->getResourceName()}.amount" => 'required',
-                "{$this->getResourceName()}.currency_id" => 'required|exists:currencies,id',
+                "{$this->getResourceName()}.currency_code" => 'required|exists:currencies,code',
                 "{$this->getResourceName()}.payment_type_id" => 'nullable|exists:payment_types,id',
                 "{$this->getResourceName()}.payment_date" => 'nullable|date'
             ],
@@ -35,7 +35,7 @@ class PaymentController extends DocumentController
                 $this->getResourceName() => 'required|array',
                 "{$this->getResourceName()}.client_uuid" => 'exists:clients,uuid',
                 "{$this->getResourceName()}.invoice_uuid" => 'exists:invoices,uuid',
-                "{$this->getResourceName()}.currency_id" => 'exists:currencies,id',
+                "{$this->getResourceName()}.currency_code" => 'exists:currencies,code',
                 "{$this->getResourceName()}.payment_type_id" => 'nullable|exists:payment_types,id',
                 "{$this->getResourceName()}.payment_date" => 'nullable|date'
             ]
@@ -51,7 +51,7 @@ class PaymentController extends DocumentController
             "{$this->getResourceName()}.client_uuid" => 'client',
             "{$this->getResourceName()}.invoice_uuid" => 'invoice',
             "{$this->getResourceName()}.amount" => 'payment\'s amount',
-            "{$this->getResourceName()}.currency_id" => 'currency',
+            "{$this->getResourceName()}.currency_code" => 'currency',
             "{$this->getResourceName()}.payment_type_id" => 'payment\'s type',
             "{$this->getResourceName()}.payment_date" => 'payment\'s date'
         ];

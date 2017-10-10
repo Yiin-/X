@@ -45,7 +45,7 @@ class RecurringInvoiceRepository extends AbstractDocumentRepository
             'po_number' => $data['po_number'],
             'discount' => $data['discount_value'],
             'discount_type' => $data['discount_type'],
-            'currency_id' => $data['currency_id'],
+            'currency_code' => $data['currency_code'],
             'date' => $data['start_date'],
             'notes' => $data['note_to_client'],
             'terms' => $data['terms'],
@@ -55,6 +55,7 @@ class RecurringInvoiceRepository extends AbstractDocumentRepository
         foreach ($data['items'] as $index => $item) {
             $bill->items()->create([
                 'product_uuid' => $item['product_uuid'],
+                'name' => $item['name'],
                 'cost' => $item['cost'],
                 'qty' => $item['qty'],
                 'discount' => $item['discount'],
@@ -72,7 +73,7 @@ class RecurringInvoiceRepository extends AbstractDocumentRepository
             'po_number' => 'po_number',
             'discount_value' => 'discount',
             'discount_type' => 'discount_type',
-            'currency_id' => 'currency_id',
+            'currency_code' => 'currency_code',
             'start_date' => 'date',
             'note_to_client' => 'notes',
             'terms' => 'terms',
@@ -90,6 +91,7 @@ class RecurringInvoiceRepository extends AbstractDocumentRepository
             foreach ($data['items'] as $index => $item) {
                 $recurringInvoice->bill->items()->create([
                     'product_uuid' => $item['product_uuid'],
+                    'name' => $item['name'],
                     'cost' => $item['cost'],
                     'qty' => $item['qty'],
                     'discount' => $item['discount'],

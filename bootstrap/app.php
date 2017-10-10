@@ -42,6 +42,7 @@ $app->singleton(
 );
 
 include_once app_path('Domain/Helpers/naming.php');
+include_once app_path('Domain/Helpers/bills.php');
 
 /*
 |--------------------------------------------------------------------------

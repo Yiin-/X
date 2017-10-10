@@ -26,12 +26,12 @@ class VendorController extends DocumentController
                 $this->getResourceName() => 'required|array',
                 "{$this->getResourceName()}.company_name" => 'required',
                 "{$this->getResourceName()}.country_id" => 'nullable|exists:countries,id',
-                "{$this->getResourceName()}.currency_id" => 'nullable|exists:currencies,id'
+                "{$this->getResourceName()}.currency_code" => 'nullable|exists:currencies,code'
             ],
             static::VALIDATION_RULES_PATCH => [
                 $this->getResourceName() => 'required|array',
                 "{$this->getResourceName()}.country_id" => 'nullable|exists:countries,id',
-                "{$this->getResourceName()}.currency_id" => 'nullable|exists:currencies,id'
+                "{$this->getResourceName()}.currency_code" => 'nullable|exists:currencies,code'
             ]
         ];
         $rules[static::VALIDATION_RULES_UPDATE] = $rules[static::VALIDATION_RULES_CREATE];
@@ -44,7 +44,7 @@ class VendorController extends DocumentController
         return [
             "{$this->getResourceName()}.company_name" => 'company name',
             "{$this->getResourceName()}.country_id" => 'vendor\'s country',
-            "{$this->getResourceName()}.currency_id" => 'vendor\'s currency'
+            "{$this->getResourceName()}.currency_code" => 'vendor\'s currency'
         ];
     }
 }

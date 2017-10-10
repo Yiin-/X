@@ -5,6 +5,7 @@ Route::post('demo', 'Auth\AuthController@demo');
 
 // Register a new account
 Route::post('register', 'Auth\AuthController@register');
+Route::post('register/validate', 'Auth\AuthController@validateField');
 
 // Login to registered account
 Route::post('login', 'Auth\AuthController@login');

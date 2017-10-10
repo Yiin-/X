@@ -17,7 +17,7 @@ class Expense extends AbstractDocument
         'vendor_uuid',
         'client_uuid',
         'amount',
-        'currency_id',
+        'currency_code',
         'date'
     ];
 

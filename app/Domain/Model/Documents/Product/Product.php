@@ -6,6 +6,7 @@ use App\Domain\Model\Documents\Passive\Currency;
 use App\Domain\Model\Documents\Shared\AbstractDocument;
 use App\Domain\Model\Documents\TaxRate\TaxRate;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use League\Fractal;
 
 class Product extends AbstractDocument
 {
@@ -13,12 +14,13 @@ class Product extends AbstractDocument
 
     protected $fillable = [
         'name',
-        'price',
-        'currency_id',
         'qty',
-        'tax_rate_uuid',
         'description',
-        'identification_number'
+        'identification_number',
+
+        'price',
+        'currency_code',
+        'tax_rate_uuid'
     ];
 
     protected $hidden = [
@@ -28,29 +30,12 @@ class Product extends AbstractDocument
 
     public function transform()
     {
-        return [
-            'uuid' => $this->uuid,
-
-            'name' => $this->name,
-            'price' => $this->price,
-            'currency' => $this->currency,
-            'description' => $this->description,
-            'qty' => $this->qty,
-            'is_service' => $this->qty === null,
-            'identification_number' => $this->identification_number,
-
-            'tax_rate' => $this->taxRate,
-
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
-            'archived_at' => $this->archived_at
-        ];
+        return (new Fractal\Manager)->createData(new Fractal\Resource\Item($this, new ProductTransformer))->toArray()['data'];
     }
 
     public function currency()
     {
-        return $this->belongsTo(Currency::class);
+        return $this->belongsTo(Currency::class, 'currency_code', 'code');
     }
 
     public function taxRate()

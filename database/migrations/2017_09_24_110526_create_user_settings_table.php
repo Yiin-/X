@@ -18,8 +18,8 @@ class CreateUserSettingsTable extends Migration
 
             $table->string('user_uuid');
             $table->string('locale')->default('en');
-            $table->integer('currency_id')->unsigned();
-            $table->foreign('currency_id')
+            $table->integer('currency_code')->unsigned();
+            $table->foreign('currency_code')
                 ->references('id')->on('currencies')
                 ->onDelete('restrict')->onUpdate('cascade');
 

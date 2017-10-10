@@ -47,6 +47,21 @@ class User extends AbstractDocument implements
         ];
     }
 
+    public function invoice_number_pattern()
+    {
+        return $this->preferences()->where('key', 'invoice_number_pattern')->first()->value;
+    }
+
+    public function recurring_invoice_number_pattern()
+    {
+        return $this->preferences()->where('key', 'recurring_invoice_number_pattern')->first()->value;
+    }
+
+    public function quote_number_pattern()
+    {
+        return $this->preferences()->where('key', 'quote_number_pattern')->first()->value;
+    }
+
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'user_role');

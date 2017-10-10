@@ -30,7 +30,7 @@ class ActivityListener
 
     public function documentWasSaved(DocumentWasSaved $event)
     {
-        \Log::debug('documentWasSaved');
+        // \Log::debug('documentWasSaved');
     }
 
     public function documentWasDeleted(DocumentWasDeleted $event)

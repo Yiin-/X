@@ -3,6 +3,7 @@
 namespace App\Interfaces\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
+use Validator;
 use App\Interfaces\Http\Controllers\AbstractController;
 use App\Domain\Service\Auth\AuthService;
 use App\Interfaces\Http\Requests\Auth\RegisterRequest;
@@ -18,6 +19,18 @@ class AuthController extends AbstractController
         AuthService $authService
     ) {
         $this->authService = $authService;
+    }
+
+    public function validateField(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'company_name' => 'sometimes|required',
+            'email' => 'sometimes|required|email',
+            'site_address' => 'sometimes|required|unique:accounts',
+            'password' => 'sometimes|required|confirmed'
+        ]);
+
+        return $validator->errors();
     }
 
     public function register(RegisterRequest $request)

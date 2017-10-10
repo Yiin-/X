@@ -19,7 +19,7 @@ class RecurringExpense extends AbstractDocument
         // 'category_uuid',
 
         'amount',
-        'currency_id',
+        'currency_code',
 
         'start_date',
         'end_date',

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Model\Documents\Invoice;
 
+use App\Domain\Constants\Invoice\Statuses;
 use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Shared\AbstractDocumentRepository;
 use App\Infrastructure\Persistence\Repository;
@@ -33,6 +34,13 @@ class InvoiceRepository extends AbstractDocumentRepository
         $this->productRepository = $productRepository;
     }
 
+    public function getMarkedToBeSent()
+    {
+        return $this->repository->newQuery()
+            ->where('status', Statuses::PENDING)
+            ->get();
+    }
+
     public function fillMissingData(&$data, &$protectedData)
     {
         if (isset($data['quote_uuid'])) {
@@ -51,7 +59,7 @@ class InvoiceRepository extends AbstractDocumentRepository
             'partial' => $data['partial'],
             'discount' => $data['discount_value'],
             'discount_type' => $data['discount_type'],
-            'currency_id' => $data['currency_id'],
+            'currency_code' => $data['currency_code'],
             'date' => $data['invoice_date'],
             'due_date' => $data['due_date'],
             'notes' => $data['note_to_client'],
@@ -62,20 +70,10 @@ class InvoiceRepository extends AbstractDocumentRepository
         foreach ($data['items'] as $index => $item) {
             $product = $this->productRepository->find($item['product_uuid']);
 
-            $itemCost = $item['cost'];
-
-            if ($product) {
-                // Convert product price to invoice currency
-                $itemCost = $this->currencyRateService->convert(
-                    $item['cost'],
-                    $product->currency_id,
-                    $data['currency_id']
-                );
-            }
-
             $bill->items()->create([
                 'product_uuid' => $item['product_uuid'],
-                'cost' => $itemCost,
+                'name' => $item['product_name'],
+                'cost' => $item['cost'],
                 'qty' => $item['qty'],
                 'discount' => $item['discount'],
                 'tax_rate_uuid' => $item['tax_rate_uuid'],
@@ -96,7 +94,7 @@ class InvoiceRepository extends AbstractDocumentRepository
             'discount_type' => 'discount_type',
             'invoice_date' => 'date',
             'due_date' => 'due_date',
-            'currency_id' => 'currency_id',
+            'currency_code' => 'currency_code',
             'note_to_client' => 'notes',
             'terms' => 'terms',
             'footer' => 'footer'
@@ -113,6 +111,7 @@ class InvoiceRepository extends AbstractDocumentRepository
             foreach ($data['items'] as $index => $item) {
                 $invoice->bill->items()->create([
                     'product_uuid' => $item['product_uuid'],
+                    'name' => $item['product_name'],
                     'cost' => $item['cost'],
                     'qty' => $item['qty'],
                     'discount' => $item['discount'],
@@ -121,5 +120,10 @@ class InvoiceRepository extends AbstractDocumentRepository
                 ]);
             }
         }
+    }
+
+    public function saved($invoice)
+    {
+        $invoice->touch();
     }
 }

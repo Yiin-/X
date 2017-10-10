@@ -32,7 +32,7 @@ class Client extends AbstractDocument
         'postal_code',
         'payment_terms',
         'country_id',
-        'currency_id',
+        'currency_code',
         'language_id',
         'company_size_id',
         'industry_id'
@@ -79,6 +79,7 @@ class Client extends AbstractDocument
             // Relationships
             'country' => $this->country,
             'contacts' => $this->exists ? $this->contacts->map(function ($contact) { return $contact->transform(); }) : $this->contacts,
+            'currency_code' => $this->currency_code,
             'currency' => $this->currency,
             'language' => $this->language,
             'company_size' => $this->company_size,
@@ -103,7 +104,7 @@ class Client extends AbstractDocument
 
     public function currency()
     {
-        return $this->belongsTo(Currency::class);
+        return $this->belongsTo(Currency::class, 'currency_code', 'code');
     }
 
     public function language()
