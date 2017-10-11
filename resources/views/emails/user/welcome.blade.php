@@ -6,7 +6,7 @@
 Just one last thing, we need to confirm your email address. To do that, simply
 click the button below.
 
-@component('mail::button', ['url' => route('user.confirmation', $user->confirmation_token)])
+@component('mail::button', ['url' => '//' . route('user.confirmation', $user->confirmation_token)])
 Confirm Email
 @endcomponent
 
