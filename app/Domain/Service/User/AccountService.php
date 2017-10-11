@@ -106,21 +106,23 @@ class AccountService
          */
         $profile = $this->profileRepository->create([
             'first_name' => $firstName,
-            'last_name' => $lastName
+            'last_name' => $lastName,
+            'email' => $userEmail
         ]);
 
         /**
          * Create a new user to manage created account
          * @var \App\Domain\Model\Authentication\User\User
          */
-        \Log::debug('creating account: ' . $userEmail);
+        \Log::debug('Creating user account: ' . $userEmail);
         $user = $this->userRepository->create([
             'username' => $userEmail,
             'password' => $userPassword
         ], [
             'profile_uuid' => $profile->uuid,
             'account_uuid' => $account->uuid,
-            'guest_key' => $guestKey
+            'guest_key' => $guestKey,
+            'confirmation_token' => str_random(32)
         ]);
 
         /**

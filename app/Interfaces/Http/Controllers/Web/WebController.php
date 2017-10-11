@@ -20,6 +20,15 @@ class WebController extends AbstractController
         $this->authService = $authService;
     }
 
+    public function confirmUser(UserRepository $userRepository, $token)
+    {
+        // Confirm user
+        if ($user = $userRepository->where('confirmation_token', $token)->first()) {
+            $user->update([ 'confirmation_token' => null ]);
+        }
+        return $this->serveApplication();
+    }
+
     public function serveApplication()
     {
         $data = [

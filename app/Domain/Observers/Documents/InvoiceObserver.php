@@ -9,7 +9,6 @@ class InvoiceObserver
 {
     public function saved(Invoice $invoice)
     {
-        \Log::debug('saved. ' . ($invoice->isDirty() ? 'dirty' : 'wtf'));
         // Invoice was not changed in any way
         if (!$invoice->isDirty()) {
             return;

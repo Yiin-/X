@@ -34,7 +34,13 @@ class User extends AbstractDocument implements
     protected $hidden = [
         'account_uuid',
         'password',
-        'remember_token'
+        'remember_token',
+        'confirmation_token'
+    ];
+
+    protected $appends = [
+        'email',
+        'full_name'
     ];
 
     protected $dispatchesEvents = [];
@@ -125,6 +131,11 @@ class User extends AbstractDocument implements
             \App\Domain\Model\Documents\Profile\Profile::class,
             \App\Domain\Model\Features\VatChecker\VatCheck::class
         ])->orderBy('id', 'desc');
+    }
+
+    public function getEmailAttribute()
+    {
+        return $this->profile->email;
     }
 
     public function getFullNameAttribute()

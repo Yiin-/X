@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Event;
 use App\Domain\Listeners\DocumentPermissionsListener;
 use App\Domain\Listeners\ActivityListener;
 use \App\Domain\Model\Documents\Invoice\Invoice;
+use \App\Domain\Model\Authentication\User\User;
 use \App\Domain\Observers\Documents\InvoiceObserver;
+use \App\Domain\Observers\Authentication\UserObserver;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -32,5 +34,6 @@ class EventServiceProvider extends ServiceProvider
         parent::boot();
 
         Invoice::observe(InvoiceObserver::class);
+        User::observe(UserObserver::class);
     }
 }
