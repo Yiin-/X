@@ -26,8 +26,10 @@ class UserRepository extends AbstractDocumentRepository
     public function findByUsername($siteAddress, $username)
     {
         return $this->repository->newQuery()
-                    ->whereHas('account', function ($query) use ($siteAddress) {
-                        $query->where('site_address', $siteAddress);
+                    ->when($username === 'demo', function ($query) {
+                        return $query->whereHas('account', function ($query) use ($siteAddress) {
+                            $query->where('site_address', $siteAddress);
+                        });
                     })
                     ->where('username', $username)
                     ->first();

@@ -62,7 +62,7 @@ class AuthService
 
         if (!is_null($user)) {
             $data = $this->proxy('password', [
-                'username' => $username . '@' . $siteAddress,
+                'username' => $user->uuid,
                 'password' => $password
             ]);
 

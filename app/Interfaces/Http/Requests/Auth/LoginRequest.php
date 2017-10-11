@@ -14,7 +14,7 @@ class LoginRequest extends FormRequest
     public function rules()
     {
         return [
-            'site_address' => 'required|exists:accounts',
+            'site_address' => 'nullable|exists:accounts',
             'username' => 'required',
             'password' => 'required'
         ];

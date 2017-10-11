@@ -161,16 +161,8 @@ class User extends AbstractDocument implements
         return $query;
     }
 
-    public function findForPassport($username)
+    public function findForPassport($uuid)
     {
-        if (preg_match('/(.*)@(.*)$/', $username, $matches)) {
-            $username = $matches[1];
-            $siteAddress = $matches[2];
-
-            return $this->whereHas('account', function ($query) use ($siteAddress) {
-                $query->where('site_address', $siteAddress);
-            })->where('username', $username)->first();
-        }
-        return null;
+       return $this->find($uuid);
     }
 }

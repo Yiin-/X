@@ -15,10 +15,9 @@ class RegisterRequest extends FormRequest
     {
         return [
             'company_name'  => 'required',
-            'company_email' => 'required|email',
             'site_address'  => 'required|unique:accounts',
-            'email'         => 'required|email',
-            'password'      => 'required|confirmed',
+            'email'         => 'required|email|unique:users,username',
+            'password'      => 'required|confirmed'
         ];
     }
 }
