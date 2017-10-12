@@ -67,10 +67,23 @@ class AuthService
             ]);
 
             $data['user'] = $user;
+            $data['user']['site_address'] = $user->account->site_address;
             $data['user']['company'] = $user->account->uuid;
             $data['user']['profile'] = $user->profile;
             $data['user']['settings'] = $user->settings;
             $data['user']['preferences'] = $user->preferences;
+
+            /**
+             * If requested site address is not the same as user account
+             * save temporary auth for that user, and forward it
+             * back to the browser, so it can redirect user to the
+             * correct site address, and server will know that user is
+             * it based on that temporary code. Once it is authenticated,
+             * code is reseted.
+             */
+            // if ($siteAddress !== $user->account->site_address) {
+            //     cookie('_accessToken', $data['accessTokens'])
+            // }
 
             if ($isGuest) {
                 $data['user']['guest_key'] = $siteAddress;
@@ -105,7 +118,7 @@ class AuthService
      * @param array $data the data to send to the server
      * @return array
      */
-    public function proxy($grantType, array $data = [])
+    public function proxy($grantType, array $data = [], $domain = null)
     {
         $data = array_merge($data, [
             'client_id'     => env('PASSWORD_CLIENT_ID'),
@@ -124,13 +137,15 @@ class AuthService
 
         $data = json_decode($response->getContent());
 
+        $domain = parse_url(config('app.url'))['host'];
+
         // Create a refresh token cookie
         Cookie::queue(
             self::REFRESH_TOKEN,
             $data->refresh_token,
             864000, // 10 days
             null,
-            null,
+            $domain,
             false,
             true // HttpOnly
         );
@@ -139,7 +154,7 @@ class AuthService
             $data->access_token,
             864000,
             null,
-            null,
+            $domain,
             false,
             true
         );
@@ -168,6 +183,8 @@ class AuthService
             $accessToken->revoke();
         }
 
-        Cookie::queue(Cookie::forget(self::REFRESH_TOKEN));
+        $domain = parse_url(config('app.url'))['host'];
+        Cookie::queue(Cookie::forget(self::REFRESH_TOKEN, null, $domain));
+        Cookie::queue(Cookie::forget('_accessToken', null, $domain));
     }
 }

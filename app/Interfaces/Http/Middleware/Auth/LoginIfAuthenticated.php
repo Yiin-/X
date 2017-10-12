@@ -35,6 +35,7 @@ class LoginIfAuthenticated
         if (request()->hasCookie('_accessToken')) {
             try {
                 // $authData = $this->authService->attemptRefresh();
+
                 $request->headers->set('Authorization', 'Bearer ' . request()->cookie('_accessToken'));
 
                 return $this->authenticate->handle($request, $next, 'api');

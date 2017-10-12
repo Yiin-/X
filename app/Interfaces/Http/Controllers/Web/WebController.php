@@ -47,6 +47,14 @@ class WebController extends AbstractController
                 $user->account->delete();
             }
             else {
+                $data['preloadedJson']['access_token'] = request()->cookie('_accessToken');
+                $data['preloadedJson']['user'] = $user;
+                $data['preloadedJson']['user']['site_address'] = $user->account->site_address;
+                $data['preloadedJson']['user']['company'] = $user->account->uuid;
+                $data['preloadedJson']['user']['profile'] = $user->profile;
+                $data['preloadedJson']['user']['settings'] = $user->settings;
+                $data['preloadedJson']['user']['preferences'] = $user->preferences;
+
                 // User is authenticated, and is not a guest, we can safely pass preloaded data
                 $data['preloadedJson']['data'] = $this->accountService->fetchDataForUser();
             }
