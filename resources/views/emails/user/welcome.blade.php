@@ -10,6 +10,4 @@ click the button below.
 Confirm Email
 @endcomponent
 
-<br>
-{{ config('app.name') }}
 @endcomponent

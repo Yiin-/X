@@ -25,6 +25,8 @@ class AuthController extends AbstractController
     {
         $validator = Validator::make($request->all(), [
             'company_name' => 'sometimes|required',
+            'first_name' => 'sometimes|required',
+            'last_name' => 'sometimes|required',
             'email' => 'sometimes|required|email|unique:users,username',
             'site_address' => 'sometimes|required|unique:accounts',
             'password' => 'sometimes|required|confirmed'
