@@ -30,8 +30,8 @@
     <script src="/socket.io.js"></script>
 
 @if (config('app.env') === 'production')
-    <script type=text/javascript src=/static/js/manifest.js></script>
-    <script type=text/javascript src=/static/js/vendor.js></script>
+    <script type=text/javascript src=/static/js/manifest.js?{{ str_random() }}></script>
+    <script type=text/javascript src=/static/js/vendor.js?{{ str_random() }}></script>
     <script type=text/javascript src=/static/js/app.js?{{ str_random() }}></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-107566913-1"></script>
     <script>
