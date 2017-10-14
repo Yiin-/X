@@ -74,16 +74,6 @@ class AuthController extends AbstractController
         return response()->json($data);
     }
 
-    public function demo(DemoRequest $request)
-    {
-        if ($request->guest_key) {
-            return $this->authService->attemptLogin($request->guest_key, 'demo', 'demo');
-        }
-        else {
-            return $this->authService->registerDemoAccount();
-        }
-    }
-
     public function refresh(Request $request)
     {
         return response()->json($this->authService->attemptRefresh());
