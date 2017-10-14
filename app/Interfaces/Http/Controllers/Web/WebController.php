@@ -90,6 +90,14 @@ class WebController extends AbstractController
                 $user->account->delete();
             }
             else {
+                // TODO: Rewrite this mess or move somewhere else
+                $scheme = request()->getScheme();
+                $host = request()->getHttpHost();
+                preg_match('/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i', $host, $matches)[1];
+                if (!array_key_exists(1, $matches) || $matches[1] !== $user->account->site_address) {
+                    preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', config('app.url'), $regs);
+                    return redirect($scheme . '://' . $user->account->site_address . '.' . $regs['domain'] . request()->getRequestUri());
+                }
                 $data['preloadedJson']['access_token'] = request()->cookie('_accessToken');
                 $data['preloadedJson']['user'] = $user;
                 $data['preloadedJson']['user']['site_address'] = $user->account->site_address;
