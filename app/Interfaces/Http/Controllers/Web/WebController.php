@@ -6,6 +6,7 @@ use League\OAuth2\Server\Grant\PasswordGrant;
 use Illuminate\Http\Request;
 use App\Interfaces\Http\Controllers\AbstractController;
 use App\Domain\Model\Authentication\Account\AccountRepository;
+use App\Domain\Model\Authentication\User\UserRepository;
 use App\Domain\Service\User\AccountService;
 use App\Domain\Service\Auth\AuthService;
 
@@ -25,7 +26,7 @@ class WebController extends AbstractController
     public function confirmUser(UserRepository $userRepository, $token)
     {
         // Confirm user
-        if ($user = $userRepository->where('confirmation_token', $token)->first()) {
+        if ($user = $userRepository->newQuery()->where('confirmation_token', $token)->first()) {
             $user->update([ 'confirmation_token' => null ]);
         }
         return $this->serveApplication();
