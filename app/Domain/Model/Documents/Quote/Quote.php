@@ -3,45 +3,25 @@
 namespace App\Domain\Model\Documents\Quote;
 
 use App\Domain\Constants\Bill\DiscountTypes;
-use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Bill\BillItem;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Invoice\Invoice;
-use App\Domain\Model\Documents\Shared\AbstractDocument;
+use App\Domain\Model\Documents\Shared\BillableDocument;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Quote extends AbstractDocument
+class Quote extends BillableDocument
 {
     use SoftDeletes;
 
     protected $fillable = [
-        'client_uuid'
+        'client_uuid',
+        'status'
     ];
 
     protected $hidden = [
         'user_uuid',
         'company_uuid'
     ];
-
-    public function calcAmount()
-    {
-        $amount = 0;
-
-        foreach ($this->bill->items as $item) {
-            $amount += $item->final_price;
-        }
-
-        switch ($this->bill->discount_type) {
-            case DiscountTypes::FLAT:
-                $amount -= $this->bill->discount;
-                break;
-            case DiscountTypes::PERCENTAGE:
-                $amount -= $amount * ($this->bill->discount / 100);
-                break;
-        }
-
-        return $amount;
-    }
 
     public function transform()
     {
@@ -53,15 +33,15 @@ class Quote extends AbstractDocument
                 'invoice' => $this->invoice ? $this->invoice->uuid : null
             ],
 
-            'amount' => $this->calcAmount(),
+            'amount' => +$this->amount(),
 
             'quote_date' => $this->bill->date,
             'due_date' => $this->bill->due_date,
-            'partial' => $this->bill->partial,
+            'partial' => +$this->bill->partial,
             'quote_number' => $this->bill->number,
             'po_number' => $this->bill->po_number,
             'discount_type' => $this->bill->discount_type,
-            'discount_value' => $this->bill->discount,
+            'discount_value' => +$this->bill->discount,
             'items' => $this->bill->items->map(function (BillItem $item) {
                 return $item->transform();
             }),
@@ -81,11 +61,6 @@ class Quote extends AbstractDocument
     public function client()
     {
         return $this->belongsTo(Client::class);
-    }
-
-    public function bill()
-    {
-        return $this->morphOne(Bill::class, 'billable', null, 'billable_uuid');
     }
 
     public function invoice()

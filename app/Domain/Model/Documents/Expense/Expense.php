@@ -37,7 +37,7 @@ class Expense extends AbstractDocument
                 'invoice' => $this->invoice ? $this->invoice->uuid : null
             ],
 
-            'amount' => $this->amount,
+            'amount' => +$this->amount,
             'currency' => $this->currency,
             'date' => (new \Carbon\Carbon($this->date))->toDateString(),
 

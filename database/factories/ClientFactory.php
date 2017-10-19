@@ -125,6 +125,10 @@ $factory->define(App\Domain\Model\Documents\Product\Product::class, function (Fa
 $factory->define(App\Domain\Model\Documents\Invoice\Invoice::class, function (Faker $faker) {
     $clients = App\Domain\Model\Documents\Client\Client::all()->pluck('uuid')->toArray();
     return [
-        'client_uuid' => count($clients) ? $faker->randomElement($clients) : null
+        'client_uuid' => count($clients) ? $faker->randomElement($clients) : null,
+        'partial' => $faker->randomFloat(20, 0.5, 600),
+        'currency_code' => 'EUR',
+        'invoice_number' => 'I00' . $faker->numberBetween(100, 999),
+        'po_number' => 'PO' . $faker->numberBetween(10000, 99999)
     ];
 });

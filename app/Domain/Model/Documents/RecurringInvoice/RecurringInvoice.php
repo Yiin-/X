@@ -6,15 +6,16 @@ use App\Domain\Constants\Bill\DiscountTypes;
 use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Bill\BillItem;
 use App\Domain\Model\Documents\Client\Client;
-use App\Domain\Model\Documents\Shared\AbstractDocument;
+use App\Domain\Model\Documents\Shared\BillableDocument;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class RecurringInvoice extends AbstractDocument
+class RecurringInvoice extends BillableDocument
 {
     use SoftDeletes;
 
     protected $fillable = [
         'client_uuid',
+        'start_date',
         'end_date',
         'due_date',
         'frequency_value',
@@ -29,32 +30,14 @@ class RecurringInvoice extends AbstractDocument
     ];
 
     protected $dates = [
+        'start_date',
+        'end_date',
         'last_sent_at',
         'created_at',
         'updated_at',
         'archived_at',
         'deleted_at'
     ];
-
-    public function calcAmount()
-    {
-        $amount = 0;
-
-        foreach ($this->bill->items as $item) {
-            $amount += $item->final_price;
-        }
-
-        switch ($this->bill->discount_type) {
-            case DiscountTypes::FLAT:
-                $amount -= $this->bill->discount;
-                break;
-            case DiscountTypes::PERCENTAGE:
-                $amount -= $amount * ($this->bill->discount / 100);
-                break;
-        }
-
-        return $amount;
-    }
 
     public function transform()
     {
@@ -65,9 +48,9 @@ class RecurringInvoice extends AbstractDocument
                 'client' => $this->client_uuid
             ],
 
-            'amount' => $this->calcAmount(),
+            'amount' => +$this->amount(),
 
-            'start_date' => $this->bill->date,
+            'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'due_date' => $this->due_date,
             'frequency' => $this->frequency,
@@ -103,10 +86,5 @@ class RecurringInvoice extends AbstractDocument
     public function client()
     {
         return $this->belongsTo(Client::class);
-    }
-
-    public function bill()
-    {
-        return $this->morphOne(Bill::class, 'billable', null, 'billable_uuid');
     }
 }

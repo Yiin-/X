@@ -197,6 +197,10 @@ class AccountService
          */
         $user->preferences()->createMany([
             [
+                'key' => 'date_format',
+                'value' => 'M j, Y'
+            ],
+            [
                 'key' => 'invoice_number_pattern',
                 'value' => '{counter}',
             ],

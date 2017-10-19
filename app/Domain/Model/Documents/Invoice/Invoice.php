@@ -2,16 +2,15 @@
 
 namespace App\Domain\Model\Documents\Invoice;
 
-use App\Domain\Constants\Bill\DiscountTypes;
 use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Bill\BillItem;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Payment\Payment;
 use App\Domain\Model\Documents\Pdf\Pdf;
-use App\Domain\Model\Documents\Shared\AbstractDocument;
+use App\Domain\Model\Documents\Shared\BillableDocument;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Invoice extends AbstractDocument
+class Invoice extends BillableDocument
 {
     use SoftDeletes;
 
@@ -25,69 +24,17 @@ class Invoice extends AbstractDocument
         'company_uuid'
     ];
 
-    public function pdfs()
-    {
-        return $this->morphMany(Pdf::class, 'pdfable');
-    }
-
-    public function subTotal()
-    {
-        $amount = 0;
-
-        foreach ($this->bill->items as $item) {
-            $amount += $item->cost;
-        }
-
-        return $amount;
-    }
-
-    public function discount()
-    {
-        $amount = 0;
-
-        foreach ($this->bill->items as $item) {
-            $amount += $item->discount;
-        }
-
-        return $amount;
-    }
-
-    public function taxes()
-    {
-        $amount = 0;
-
-        foreach ($this->bill->items as $item) {
-            $amount += $item->tax;
-        }
-
-        return $amount;
-    }
-
-    public function amount()
-    {
-        $amount = 0;
-
-        foreach ($this->bill->items as $item) {
-            $amount += $item->final_price;
-        }
-
-        switch ($this->bill->discount_type) {
-            case DiscountTypes::FLAT:
-                $amount -= $this->bill->discount;
-                break;
-            case DiscountTypes::PERCENTAGE:
-                $amount -= $amount * ($this->bill->discount / 100);
-                break;
-        }
-
-        return round($amount, 2);
-    }
-
+    /**
+     * Paid in amount
+     */
     public function paidIn()
     {
         return round($this->payments()->sum('amount') + $this->bill->partial, 2);
     }
 
+    /**
+     * Left to pay amount
+     */
     public function balance()
     {
         return round($this->amount() - $this->paidIn());
@@ -108,18 +55,18 @@ class Invoice extends AbstractDocument
                 }),
             ],
 
-            'amount' => $amount,
-            'paid_in' => $paid_in,
-            'balance' => $amount - $paid_in,
+            'amount' => +$amount,
+            'paid_in' => +$paid_in,
+            'balance' => +($amount - $paid_in),
 
             'invoice_date' => $this->bill->date,
             'due_date' => $this->bill->due_date,
-            'partial' => $this->bill->partial,
+            'partial' => +$this->bill->partial,
             'currency_code' => $this->bill->currency_code,
             'invoice_number' => $this->bill->number,
             'po_number' => $this->bill->po_number,
             'discount_type' => $this->bill->discount_type,
-            'discount_value' => $this->bill->discount,
+            'discount_value' => +$this->bill->discount,
             'items' => $this->bill->items->map(function (BillItem $item) {
                 return $item->transform();
             }),
@@ -149,10 +96,5 @@ class Invoice extends AbstractDocument
     public function payments()
     {
         return $this->hasMany(Payment::class);
-    }
-
-    public function bill()
-    {
-        return $this->morphOne(Bill::class, 'billable', null, 'billable_uuid');
     }
 }

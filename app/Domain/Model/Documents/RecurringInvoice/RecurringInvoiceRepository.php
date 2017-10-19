@@ -2,23 +2,83 @@
 
 namespace App\Domain\Model\Documents\RecurringInvoice;
 
+use App\Infrastructure\Persistence\Repository;
+use App\Domain\Service\Documents\BillableDocumentService;
 use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Shared\AbstractDocumentRepository;
-use App\Infrastructure\Persistence\Repository;
-use App\Domain\Model\Authentication\User\UserRepository;
 use App\Domain\Model\Documents\Shared\Traits\FillsUserData;
+use App\Domain\Constants\RecurringInvoice\Statuses;
+use Carbon\Carbon;
 
 class RecurringInvoiceRepository extends AbstractDocumentRepository
 {
     use FillsUserData;
 
     protected $repository;
-    protected $userRepository;
+    protected $billableDocumentService;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(BillableDocumentService $billableDocumentService)
     {
         $this->repository = new Repository(RecurringInvoice::class);
-        $this->userRepository = $userRepository;
+        $this->billableDocumentService = $billableDocumentService;
+    }
+
+    public function getActiveAndReadyToBeSent()
+    {
+        $active = [];
+
+        $today = today();
+
+        $recurringInvoices = $this->repository->newQuery()
+            ->where('status', Statuses::ACTIVE)
+            ->where('start_date', '<=', $today)
+            ->where(function ($query) use ($today) {
+                $query->whereNull('end_date')->orWhere('end_date', '>=', $today);
+            })
+            ->get();
+
+        /**
+         * Loop through each of active recurring invoice
+         */
+        foreach ($recurringInvoices as $recurringInvoice) {
+            /**
+             * Try to get either start_date or last date recurring invoice was sent
+             */
+            try {
+                if ($recurringInvoice->last_sent_at) {
+                    $date = Carbon::parse($recurringInvoice->last_sent_at);
+                } else {
+                    // $date = Carbon::parse($recurringInvoice->bill->date);
+                    $active [] = $recurringInvoice;
+                    continue;
+                }
+            }
+            catch (\InvalidArgumentException $e) {
+                // Skip this recurring invoice, if we couldn't get the starting date
+                continue;
+            }
+
+            /**
+             * Add interval period to the starting date and if it's today, we can
+             * safely assume that invoice should be sent today.
+             */
+            switch ($recurringInvoice->frequency_type) {
+                case 'week':
+                    $date->addWeeks($recurringInvoice->frequency_value);
+                    break;
+                case 'month':
+                    $date->addMonths($recurringInvoice->frequency_value);
+                    break;
+                case 'year':
+                    $date->addYears($recurringInvoice->frequency_value);
+                    break;
+            }
+
+            if ($date->isToday()) {
+                $active [] = $recurringInvoice;
+            }
+        }
+        return $active;
     }
 
     public function adjustData(&$data)
@@ -31,74 +91,23 @@ class RecurringInvoiceRepository extends AbstractDocumentRepository
         }
     }
 
-    /**
-     * TODO: throw custom exception, if user is not defined
-     * @param $data
-     * @param array $protectedData
-     * @return mixed
-     */
     public function savingNew(&$recurringInvoice, &$data, &$protectedData)
     {
-        $bill = Bill::create([
-            'billable_type' => get_class($recurringInvoice),
-            'billable_uuid' => $recurringInvoice->uuid,
-            'po_number' => $data['po_number'],
-            'discount' => $data['discount_value'],
-            'discount_type' => $data['discount_type'],
-            'currency_code' => $data['currency_code'],
-            'date' => $data['start_date'],
-            'notes' => $data['note_to_client'],
-            'terms' => $data['terms'],
-            'footer' => $data['footer']
-        ]);
-
-        foreach ($data['items'] as $index => $item) {
-            $bill->items()->create([
-                'product_uuid' => $item['product_uuid'],
-                'name' => $item['name'],
-                'cost' => $item['cost'],
-                'qty' => $item['qty'],
-                'discount' => $item['discount'],
-                'tax_rate_uuid' => $item['tax_rate_uuid'] ?? null,
-                'index' => $index
-            ]);
-        }
+        $this->billableDocumentService->createBill($recurringInvoice, $data);
+        $this->billableDocumentService->setBillItems($recurringInvoice, $data['items']);
     }
 
     public function updated(&$recurringInvoice, &$data, &$protectedData)
     {
-        $billData = [];
-
-        foreach ([
-            'po_number' => 'po_number',
-            'discount_value' => 'discount',
-            'discount_type' => 'discount_type',
-            'currency_code' => 'currency_code',
-            'start_date' => 'date',
-            'note_to_client' => 'notes',
-            'terms' => 'terms',
-            'footer' => 'footer'
-        ] as $field => $billField) {
-            if (array_key_exists($field, $data)) {
-                $billData[$billField] = $data[$field];
-            }
-        }
-        $recurringInvoice->bill->update($billData);
+        $this->billableDocumentService->updateBill($recurringInvoice, $data);
 
         if (isset($data['items'])) {
-            $recurringInvoice->bill->items()->delete();
-
-            foreach ($data['items'] as $index => $item) {
-                $recurringInvoice->bill->items()->create([
-                    'product_uuid' => $item['product_uuid'],
-                    'name' => $item['name'],
-                    'cost' => $item['cost'],
-                    'qty' => $item['qty'],
-                    'discount' => $item['discount'],
-                    'tax_rate_uuid' => $item['tax_rate_uuid'],
-                    'index' => $index
-                ]);
-            }
+            $this->billableDocumentService->setBillItems($recurringInvoice, $data['items']);
         }
+    }
+
+    public function saved($recurringInvoice)
+    {
+        $recurringInvoice->touch();
     }
 }

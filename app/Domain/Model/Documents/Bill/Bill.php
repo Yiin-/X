@@ -34,7 +34,16 @@ class Bill extends AbstractDocument
         'billable'
     ];
 
+    protected $dates = [
+        'date'
+    ];
+
     protected $dispatchesEvents = [];
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class, 'currency_code', 'code');
+    }
 
     public function billable()
     {
@@ -48,6 +57,18 @@ class Bill extends AbstractDocument
 
     public function transform()
     {
-        return [];
+        return [
+            'number' => $this->number,
+            'po_number' => $this->po_number,
+            'partial' => $this->partial,
+            'discount' => $this->discount,
+            'discount_type' => $this->discount_type,
+            'date' => $this->date,
+            'due_date' => $this->due_date,
+            'currency_code' => $this->currency_code,
+            'notes' => $this->notes,
+            'terms' => $this->terms,
+            'footer' => $this->footer
+        ];
     }
 }

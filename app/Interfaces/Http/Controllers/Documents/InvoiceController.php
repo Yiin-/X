@@ -26,12 +26,13 @@ class InvoiceController extends DocumentController
                 $this->getResourceName() => 'required|array',
                 "{$this->getResourceName()}.quote_uuid" => 'nullable|exists:quotes,uuid',
                 "{$this->getResourceName()}.client_uuid" => 'required|exists:clients,uuid',
+                "{$this->getResourceName()}.invoice_number" => 'required',
                 "{$this->getResourceName()}.invoice_date" => 'nullable|date',
                 "{$this->getResourceName()}.due_date" => 'nullable|date',
                 "{$this->getResourceName()}.partial" => 'nullable|numeric',
                 "{$this->getResourceName()}.currency_code" => 'nullable|exists:currencies,code',
                 "{$this->getResourceName()}.items" => "array",
-                "{$this->getResourceName()}.items.*.product_uuid" => 'exists:products,uuid'
+                "{$this->getResourceName()}.items.*.product_uuid" => 'nullable|exists:products,uuid'
                 // "{$this->getResourceName()}.discount.type" => '',
             ],
             static::VALIDATION_RULES_PATCH => [
@@ -41,7 +42,7 @@ class InvoiceController extends DocumentController
                 "{$this->getResourceName()}.partial" => 'nullable|numeric',
                 "{$this->getResourceName()}.currency_code" => 'nullable|exists:currencies,code',
                 "{$this->getResourceName()}.items" => "array",
-                "{$this->getResourceName()}.items.*.product_uuid" => 'exists:products,uuid'
+                "{$this->getResourceName()}.items.*.product_uuid" => 'nullable|exists:products,uuid'
             ]
         ];
         $rules[static::VALIDATION_RULES_UPDATE] = $rules[static::VALIDATION_RULES_CREATE];
@@ -54,8 +55,26 @@ class InvoiceController extends DocumentController
         return [
             "{$this->getResourceName()}.client_uuid" => 'client',
             "{$this->getResourceName()}.invoice_date" => 'invoice\'s date',
+            "{$this->getResourceName()}.invoice_number" => 'invoice number',
             "{$this->getResourceName()}.due_date" => 'due date',
             "{$this->getResourceName()}.partial" => 'partial'
         ];
+    }
+
+    public function preview()
+    {
+        $invoice = \App\Domain\Model\Documents\Invoice\Invoice::first();
+
+        return view('pdfs.invoice.default.invoice', [
+            'noteToClient' => $invoice->bill->notes,
+            'poNumber'     => $invoice->bill->po_number,
+            'date'         => $invoice->bill->date,
+            'items'        => $invoice->bill->items,
+            'subTotal'     => $invoice->subTotal(),
+            'grandTotal'   => $invoice->amount(),
+            'discount'     => $invoice->discount(),
+            'tax'          => $invoice->taxes(),
+            'footerText'   => $invoice->bill->footer
+        ]);
     }
 }

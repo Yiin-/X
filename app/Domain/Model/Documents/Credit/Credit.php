@@ -34,9 +34,9 @@ class Credit extends AbstractDocument
                 'client' => $this->client_uuid,
             ],
 
-            'amount' => $this->amount,
+            'amount' => +$this->amount,
             'currency' => $this->currency,
-            'balance' => $this->balance,
+            'balance' => +$this->balance,
             'credit_date' => $this->credit_date,
             'credit_number' => $this->credit_number,
 

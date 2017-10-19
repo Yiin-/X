@@ -2,8 +2,5 @@
 # New invoice from {{ $company->name }}
 
 ### Invoice Number: {{ $invoice->bill->number }}
-### Date: {{ $invoice->bill->date }}
-
-<br>
-{{ config('app.name') }}
+### Date: {{ $invoice->bill->date->format('d-m-Y') }}
 @endcomponent

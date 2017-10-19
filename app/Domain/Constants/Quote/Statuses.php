@@ -5,6 +5,7 @@ namespace App\Domain\Constants\Quote;
 class Statuses
 {
     const DRAFT = 'draft';
+    const PENDING = 'pending';
     const SENT = 'sent';
     const VIEWED = 'viewed';
     const APPROVED = 'approved';
@@ -12,6 +13,7 @@ class Statuses
 
     const LIST = [
         self::DRAFT,
+        self::PENDING,
         self::SENT,
         self::VIEWED,
         self::APPROVED,

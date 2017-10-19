@@ -6,6 +6,10 @@ use BadMethodCallException;
 
 class AbstractDocumentRepository
 {
+    public function createRaw($data, $protectedData = [])
+    {
+        return $this->repository->create($data, $protectedData);
+    }
 
     /**
      * Create a document

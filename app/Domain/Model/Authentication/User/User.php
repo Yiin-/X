@@ -28,7 +28,8 @@ class User extends AbstractDocument implements
     use HasApiTokens, Authenticatable, Authorizable, CanResetPassword;
 
     protected $fillable = [
-        'username'
+        'username',
+        'taskbar'
     ];
 
     protected $hidden = [

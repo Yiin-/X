@@ -42,8 +42,8 @@ class Payment extends AbstractDocument
                 'invoice' => $this->invoice_uuid
             ],
 
-            'amount' => $this->amount,
-            'refunded' => $this->refunded,
+            'amount' => +$this->amount,
+            'refunded' => +$this->refunded,
             'currency' => $this->currency,
             'method_id' => $this->payment_type_id,
             'method' => $this->paymentType ? $this->paymentType->name : '',

@@ -7,6 +7,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Domain\Model\Documents\Invoice\Invoice;
+use App\Domain\Constants\Invoice\Statuses;
 
 class InvoiceForClient extends Mailable implements ShouldQueue
 {
@@ -35,6 +36,11 @@ class InvoiceForClient extends Mailable implements ShouldQueue
      */
     public function build()
     {
+        if ($this->invoice->status === Statuses::PENDING) {
+            $this->invoice->update([
+                'status' => Statuses::SENT
+            ]);
+        }
         return $this->markdown('emails.invoice.default')
             ->attach(storage_path($this->invoice->pdfs()->latest()->path_to_pdf), [
                 'as' => $this->invoice->bill->number . '.pdf',

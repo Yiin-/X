@@ -14,7 +14,7 @@ class InvoiceObserver
             return;
         }
 
-        \Log::debug('dispatching GenerateInvoicePdf for invoice ' . $invoice->bill->number);
+        \Log::debug('Generating pdf for invoice #' . $invoice->bill->number);
         GenerateInvoicePdf::dispatch($invoice);
     }
 }

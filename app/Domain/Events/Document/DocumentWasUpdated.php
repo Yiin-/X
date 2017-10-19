@@ -23,7 +23,7 @@ class DocumentWasUpdated
         $this->document = $document;
 
         // if (!$document->wasRecentlyCreated) {
-        //     $this->broadcastToUsers($document, false);
+        $this->broadcastToUsers($document);
         // }
     }
 }

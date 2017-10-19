@@ -272,7 +272,7 @@ class CreateTables extends Migration
                 ->references('id')->on('bills')
                 ->onDelete('cascade')->onUpdate('cascade');
 
-            $table->string('product_uuid');
+            $table->string('product_uuid')->nullable();
             $table->foreign('product_uuid')
                 ->references('uuid')->on('products')
                 ->onDelete('cascade')->onUpdate('cascade');

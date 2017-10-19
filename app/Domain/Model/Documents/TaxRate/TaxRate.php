@@ -28,7 +28,7 @@ class TaxRate extends AbstractDocument
             'uuid' => $this->uuid,
 
             'name' => $this->name,
-            'rate' => $this->rate,
+            'rate' => +$this->rate,
             'is_inclusive' => $this->is_inclusive,
 
             'created_at' => $this->created_at->toDateString()

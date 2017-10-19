@@ -28,9 +28,9 @@ class BillItem extends AbstractDocument
         return [
             'product' => $this->product ? $this->product->transform() : null,
             'name' => $this->name,
-            'cost' => $this->cost,
-            'discount' => $this->discount,
-            'qty' => $this->qty,
+            'cost' => +$this->cost,
+            'discount' => +$this->discount,
+            'qty' => +$this->qty,
             'tax_rate' => $this->taxRate,
             'index' => $this->index
         ];

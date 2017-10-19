@@ -19,9 +19,8 @@ Route::post('logout', 'Auth\AuthController@logout');
 // Check if token still valid
 Route::post('heartbeat', 'Auth\AuthController@heartbeat');
 
-Route::middleware('web-auth')->post('test', function () {
-    return auth()->user();
-});
+// Pdf generation
+Route::get('pdf-preview', 'Documents\InvoiceController@preview');
 
 /**
  * Routes that requires for user to be authenticated
@@ -156,6 +155,13 @@ Route::middleware('auth:api')->group(function () {
         Route::put('projects/{project}/task-lists', 'CRM\ProjectController@updateTaskList');
         Route::post('projects/{project}/task-lists/{taskList}/tasks', 'CRM\ProjectController@storeTask');
         Route::put('projects/{project}/task-lists/{taskList}/tasks', 'CRM\ProjectController@updateTask');
+    });
+
+    /**
+     * User data
+     */
+    Route::prefix('user')->group(function () {
+        Route::post('taskbar', 'Auth\UserController@saveTaskbarState');
     });
 
     /**

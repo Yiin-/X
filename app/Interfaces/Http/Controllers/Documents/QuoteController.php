@@ -25,11 +25,11 @@ class QuoteController extends DocumentController
             static::VALIDATION_RULES_CREATE => [
                 $this->getResourceName() => 'required|array',
                 "{$this->getResourceName()}.client_uuid" => 'required|exists:clients,uuid',
+                "{$this->getResourceName()}.quote_number" => 'nullable|required',
                 "{$this->getResourceName()}.quote_date" => 'nullable|date',
                 "{$this->getResourceName()}.due_date" => 'nullable|date',
                 "{$this->getResourceName()}.partial" => 'nullable|numeric',
-                "{$this->getResourceName()}.items" => "array",
-                "{$this->getResourceName()}.items.*.product_uuid"
+                "{$this->getResourceName()}.items" => "array"
                 // "{$this->getResourceName()}.discount.type" => '',
             ],
             static::VALIDATION_RULES_PATCH => [
@@ -38,8 +38,7 @@ class QuoteController extends DocumentController
                 "{$this->getResourceName()}.quote_date" => 'nullable|date',
                 "{$this->getResourceName()}.due_date" => 'nullable|date',
                 "{$this->getResourceName()}.partial" => 'nullable|numeric',
-                "{$this->getResourceName()}.items" => "array",
-                "{$this->getResourceName()}.items.*.product_uuid"
+                "{$this->getResourceName()}.items" => "array"
             ]
         ];
         $rules[static::VALIDATION_RULES_UPDATE] = $rules[static::VALIDATION_RULES_CREATE];
@@ -51,6 +50,7 @@ class QuoteController extends DocumentController
     {
         return [
             "{$this->getResourceName()}.client_uuid" => 'client',
+            "{$this->getResourceName()}.quote_number" => 'quote number',
             "{$this->getResourceName()}.quote_date" => 'quote\'s date',
             "{$this->getResourceName()}.due_date" => 'due date',
             "{$this->getResourceName()}.partial" => 'partial'

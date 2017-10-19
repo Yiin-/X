@@ -151,7 +151,7 @@
     <div class="header">
       <div class="logo"></div>
       <div class="title">
-        Invoice
+        Quote
       </div>
     </div>
 
@@ -176,7 +176,7 @@
       </thead>
       <tbody>
         @foreach ($items as $item)
-            @include ('pdfs.invoice.default.item-row', ['item' => $item])
+            @include ('pdfs.quote.default.item-row', ['item' => $item])
         @endforeach
 
         <!-- Summary -->

@@ -9,7 +9,7 @@ trait FillsUserData
         if (!isset($protectedData['user_uuid'])) {
             $protectedData['user_uuid'] = auth()->id();
         }
-        $user = $this->userRepository->find($protectedData['user_uuid']);
+        $user = app(\App\Domain\Model\Authentication\User\UserRepository::class)->find($protectedData['user_uuid']);
 
         if (!isset($protectedData['company_uuid'])) {
             // TODO: Pick current selected company, not the first one

@@ -14,11 +14,11 @@ class ProductTransformer extends Fractal\TransformerAbstract
             'uuid' => $product->uuid,
 
             'name' => $product->name,
-            'qty' => $product->qty,
+            'qty' => +$product->qty,
             'identification_number' => $product->identification_number,
             'description' => $product->description,
 
-            'price' => $product->price,
+            'price' => +$product->price,
             'currency_code' => $product->currency_code,
             'tax_rate' => $product->taxRate,
 

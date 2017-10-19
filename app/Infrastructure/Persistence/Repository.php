@@ -95,7 +95,7 @@ class Repository
         $document = $this->find($uuid);
 
         if ($document) {
-            $document->forceDelete();
+            $document->delete();
         }
 
         return $document;
@@ -130,7 +130,7 @@ class Repository
     {
         $documents = $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get();
 
-        $this->newQuery()->whereIn('uuid', $uuids)->forceDelete();
+        $this->newQuery()->whereIn('uuid', $uuids)->delete();
 
         return $documents;
     }

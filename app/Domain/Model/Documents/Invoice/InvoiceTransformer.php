@@ -23,9 +23,9 @@ class InvoiceTransformer extends Fractal\TransformerAbstract
                 }),
             ],
 
-            'amount' => (float)$amount,
-            'paid_in' => (float)$paid_in,
-            'balance' => (float)$amount - (float)$paid_in,
+            'amount' => +$amount,
+            'paid_in' => +$paid_in,
+            'balance' => +$amount - +$paid_in,
 
             'invoice_date' => $invoice->bill->date,
             'due_date' => $invoice->bill->due_date,

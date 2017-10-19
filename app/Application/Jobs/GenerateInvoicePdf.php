@@ -30,13 +30,14 @@ class GenerateInvoicePdf implements ShouldQueue
         $html = view('pdfs.invoice.default.invoice', [
             'noteToClient' => $this->invoice->bill->notes,
             'poNumber'     => $this->invoice->bill->po_number,
-            'date'         => $this->invoice->bill->date,
+            'date'         => \Carbon\Carbon::parse($this->invoice->bill->date)->format('d/m/Y'),
             'items'        => $this->invoice->bill->items,
             'subTotal'     => $this->invoice->subTotal(),
             'grandTotal'   => $this->invoice->amount(),
             'discount'     => $this->invoice->discount(),
             'tax'          => $this->invoice->taxes(),
             'footerText'   => $this->invoice->bill->footer,
+            'currencySymbol' => $this->invoice->bill->currency->symbol
         ]);
 
         $pathToFile = 'app/pdfs/invoices/' . $this->invoice->uuid . '/' . \Carbon\Carbon::now()->format('Y-m-d H-i-s') . '.pdf';
