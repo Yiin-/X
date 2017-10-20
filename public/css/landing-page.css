@@ -96,7 +96,7 @@ body {
 
 @media (min-width: 880px) {
     #intro {
-        height: 760px;
+        height: 765px;
     }
 }
 
@@ -111,7 +111,7 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    transform: skewY(-12deg);
+    transform: skewY(-11.9deg);
     transform-origin: 0;
     background: linear-gradient(135deg,#5866c2,#723be1);
 }
@@ -142,7 +142,8 @@ main header {
 #intro h1 {
     font-size: 32px;
     font-weight: 400;
-    color: #fff
+    color: #fff;
+    margin-left:-4px;
 }
 
 @media (min-width: 880px) {
@@ -183,7 +184,7 @@ main header {
 #intro li:first-child a {
     margin-right: 23px;
     color: #fff;
-    background: #3ecf8e;
+    background: #5bc26e;
     text-shadow: 0 1px 3px rgba(36,180,126,.4);
 }
 
@@ -205,7 +206,7 @@ main header {
     background: #fff;
     border-radius: 4px;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: .025em;
     color: #6772e5;
@@ -268,6 +269,6 @@ ul {
 }
 
 .typedElement {
-    color: #3ecf8e;
+    color: #67d67b;
     font-weight: 700;
 }

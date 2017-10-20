@@ -56,8 +56,12 @@
                           Built for <span class="typedElement"></span>
                         </h1>
                         <p class="commonText commonText--body">
-                          Stripe is the best software platform for running an internet business.
-                          We handle billions of dollars every year for forward-thinking businesses around the world.
+                        An evolutionary successor to Sage and Salesforce,
+                        designed with efficiency and comfortable user experience in mind,
+                        Overseer is the cloud accounting and project management
+                        platform of the future.
+
+
                         </p>
                         <ul>
                             <li>
@@ -91,7 +95,7 @@ var typed = new Typed('.typedElement', {
         "You"
    ],
     typeSpeed: 50,
-    backDelay: 2000,
+    backDelay: 1000,
     backSpeed: 30,
     showCursor: true,
     loop: true
