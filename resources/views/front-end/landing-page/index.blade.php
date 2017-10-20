@@ -366,6 +366,11 @@ ul {
 .commonText {
     font-size: 17px;
 }
+
+.typedElement {
+    color: #3ecf8e;
+    font-weight: 700;
+}
 </style>
 </body>
 </html>
