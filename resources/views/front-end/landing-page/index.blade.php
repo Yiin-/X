@@ -92,13 +92,17 @@ var typed = new Typed('.typedElement', {
         "Office Administrators",
         "Project Managers",
         "Business",
-        "You"
+        "You."
    ],
     typeSpeed: 50,
     backDelay: 1000,
     backSpeed: 30,
     showCursor: true,
-    loop: true
+    loop: false,
+
+    onComplete() {
+        document.getElementsByClassName('typed-cursor')[0].style.display = 'none';
+    }
 });
 </script>
 </body>
