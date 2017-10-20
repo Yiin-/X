@@ -76,7 +76,7 @@
                             </li>
                         </ul>
                     </div>
-                </section>
+                <div class="mainImage"></div>
             </header>
         </main>
     </div>

@@ -356,6 +356,16 @@ ul
     font-size: 17px;
 }
 
+.mainImage {
+    background-image: url(/images/svg/1.svg);
+    background-repeat: no-repeat;
+    position: absolute;
+    width: 1214px;
+    height: 107%;
+    right: -46px;
+    filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.2));
+}
+
 .typedElement
 {
     font-weight: 700;
