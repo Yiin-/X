@@ -22,6 +22,13 @@ Route::post('heartbeat', 'Auth\AuthController@heartbeat');
 // Pdf generation
 Route::get('pdf-preview', 'Documents\InvoiceController@preview');
 
+// Pdf
+Route::prefix('storage', function () {
+    Route::prefix('pdf', function () {
+        Route::get('/{pdf}', 'Documents\StorageController@pdf');
+    });
+});
+
 /**
  * Routes that requires for user to be authenticated
  */

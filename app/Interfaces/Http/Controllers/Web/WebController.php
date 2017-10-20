@@ -9,9 +9,12 @@ use App\Domain\Model\Authentication\Account\AccountRepository;
 use App\Domain\Model\Authentication\User\UserRepository;
 use App\Domain\Service\User\AccountService;
 use App\Domain\Service\Auth\AuthService;
+use App\Interfaces\Http\Controllers\Web\Traits\ManageSubdomains;
 
 class WebController extends AbstractController
 {
+    use ManageSubdomains;
+
     private $accountService;
     private $accountRepository;
     private $authService;
@@ -90,13 +93,12 @@ class WebController extends AbstractController
                 $user->account->delete();
             }
             else {
-                // TODO: Rewrite this mess or move somewhere else
-                $scheme = request()->getScheme();
-                $host = request()->getHttpHost();
-                preg_match('/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i', $host, $matches)[1];
-                if (!array_key_exists(1, $matches) || $matches[1] !== $user->account->site_address) {
-                    preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', config('app.url'), $regs);
-                    return redirect($scheme . '://' . $user->account->site_address . '.' . $regs['domain'] . request()->getRequestUri());
+                if (// if it's demo account, subdomain should be "demo"
+                    // ($user->guest_key && $this->getSubdomain() !== 'demo') ||
+                    // else it should be user account site_address
+                    (!$user->guest_key && $this->getSubdomain() !== $user->account->site_address)
+                ) {
+                    return $this->redirectToUserAccount($user);
                 }
                 $data['preloadedJson']['access_token'] = request()->cookie('_accessToken');
                 $data['preloadedJson']['user'] = $user;

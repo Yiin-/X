@@ -55,6 +55,8 @@ class Invoice extends BillableDocument
                 }),
             ],
 
+            'pdfs' => $this->pdfs,
+
             'amount' => +$amount,
             'paid_in' => +$paid_in,
             'balance' => +($amount - $paid_in),
