@@ -1,0 +1,273 @@
+@font-face {
+    font-family: 'Overseer';
+
+    src: url('/fonts/Lintel ExtraBold.ttf') format('truetype');
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    font-size: 62.5%;
+    font-family: Camphor,Open Sans,Segoe UI,sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "pnum";
+    font-variant-numeric: proportional-nums;
+}
+
+.nav {
+    font-family: Camphor,Open Sans,Segoe UI,sans-serif;
+    position: absolute;
+    left: 0;
+    top: 10px;
+    right: 0;
+    z-index: 500;
+    height: 50px;
+    perspective: 2000px;
+}
+
+.nav a {
+    text-decoration: none;
+    color: #6772e5;
+    transition: color .1s
+}
+
+.nav .navSection {
+    padding: 0;
+    margin: 0
+}
+
+.nav .navSection {
+    list-style: none
+}
+
+.navSection a {
+    font-size: 17px;
+    font-weight: 400;
+    height: 50px;
+    line-height: 50px;
+    white-space: nowrap;
+    padding: 0 25px;
+    color: #fff;
+}
+
+.navSection--logo {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.navSection--logo a {
+    padding-left: 20px;
+    font-family: Overseer, sans-serif;
+    font-size: 28px;
+    line-height: 50px;
+    color: #ffffff !important;
+}
+
+.navSection--primary {
+    display: flex;
+    justify-content: center;
+}
+
+.navSection--secondary {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+}
+
+.navSection .loginLink {
+    font-weight: 500;
+}
+
+@media (min-width: 670px) {
+    #intro {
+        display: flex;
+        align-items: center;
+        height: 600px;
+    }
+}
+
+@media (min-width: 880px) {
+    #intro {
+        height: 760px;
+    }
+}
+
+#intro {
+    position: relative;
+}
+
+.gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    transform: skewY(-12deg);
+    transform-origin: 0;
+    background: linear-gradient(135deg,#5866c2,#723be1);
+}
+
+.content {
+    flex-grow: 1;
+}
+
+main {
+    position: relative;
+    overflow: hidden;
+    display: block;
+}
+
+main header {
+    position: relative;
+}
+
+.gradient::after {
+    background: white;
+    width: 100%;
+    height: 600px;
+    bottom: -493px;
+    transform: skewY(-12deg);
+}
+
+
+#intro h1 {
+    font-size: 32px;
+    font-weight: 400;
+    color: #fff
+}
+
+@media (min-width: 880px) {
+    #intro h1 {
+        font-size:40px
+    }
+}
+
+#intro p {
+    max-width: 500px;
+    margin-top: 20px;
+    color: #d9fcff;
+}
+
+@media (min-width: 670px) {
+    #intro p {
+        max-width:60%
+    }
+}
+
+@media (min-width: 880px) {
+    #intro p {
+        max-width:50%
+    }
+}
+
+#intro ul {
+    display: flex;
+    margin-top: 40px
+}
+
+@media (min-width: 670px) {
+    #intro ul {
+        margin-top:65px
+    }
+}
+
+#intro li:first-child a {
+    margin-right: 23px;
+    color: #fff;
+    background: #3ecf8e;
+    text-shadow: 0 1px 3px rgba(36,180,126,.4);
+}
+
+#intro li:last-child a {
+    padding: 0px 30px;
+}
+
+#intro p {
+    color: #e6e4f6;
+}
+
+.commonButton {
+    white-space: nowrap;
+    display: inline-block;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 14px;
+    box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+    background: #fff;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .025em;
+    color: #6772e5;
+    text-decoration: none;
+    transition: all .15s ease;
+}
+
+.commonButton:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 7px 14px rgba(50,50,93,.1),0 3px 6px rgba(0,0,0,.08)
+}
+
+.commonButton:first-child:hover {
+    color: #7795f8;
+}
+.commonButton:first-child:active {
+    color: #555abf;
+}
+
+.commonButton:active {
+    background-color: #f6f9fc;
+    transform: translateY(1px);
+    box-shadow: 0 4px 6px rgba(50,50,93,.11),0 1px 3px rgba(0,0,0,.08)
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#intro ul {
+    display: flex;
+    margin-top: 65px;
+}
+
+.container {
+    position: relative;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 20px;
+    width: 100%;
+}
+
+#intro .container {
+    padding-top: 70px;
+    padding-bottom: 100px;
+}
+
+@media (min-width: 670px) {
+    #intro .container {
+        margin-top: -7%;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+}
+
+.commonText {
+    font-size: 17px;
+}
+
+.typedElement {
+    color: #3ecf8e;
+    font-weight: 700;
+}
