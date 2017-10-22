@@ -379,3 +379,18 @@ ul
 
     transform: translateY(-4px);
 }
+
+@media screen and (max-width: 1750px) {
+    .mainImage {width: 1100px;top: 40px;}
+}
+@media screen and (max-width: 1500px) {
+    .mainImage {width: 900px;top: 100px;}
+}
+@media screen and (max-width: 1250px) {
+    .mainImage {right: -115px;}
+}
+@media screen and (max-width: 1100px) {
+    .mainImage {
+        display: none;
+    }
+}
