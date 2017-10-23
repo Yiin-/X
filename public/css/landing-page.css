@@ -7,7 +7,7 @@
 
 body
 {
-    font-family: Camphor,Open Sans,Segoe UI,sans-serif;
+    font-family: Camphor, Open Sans, Segoe UI,sans-serif;
     font-size: 62.5%;
     font-weight: 400;
     font-style: normal;
@@ -364,6 +364,7 @@ ul
     height: 107%;
     right: -46px;
     filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.2));
+    pointer-events: none;
 }
 
 .typedElement
