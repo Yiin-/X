@@ -13,7 +13,7 @@ class Vendor extends AbstractDocument
     use SoftDeletes;
 
     protected $fillable = [
-        'company_name',
+        'name',
         'registration_number',
         'vat_number',
         'website',
@@ -41,7 +41,7 @@ class Vendor extends AbstractDocument
         return [
             'uuid' => $this->uuid,
 
-            'company_name' => $this->company_name,
+            'name' => $this->name,
             'registration_number' => $this->registration_number,
             'vat_number' => $this->vat_number,
             'website' => $this->website,
@@ -59,6 +59,8 @@ class Vendor extends AbstractDocument
 
             'contacts' => $this->exists ? $this->contacts->map(function ($contact) { return $contact->transform(); }) : $this->contacts,
             'expenses' => $this->expenses()->sum('amount'),
+
+            'is_disabled' => $this->is_disabled,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

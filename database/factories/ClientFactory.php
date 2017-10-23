@@ -56,7 +56,7 @@ $factory->define(App\Domain\Model\Documents\Vendor\Vendor::class, function (Fake
     $faker->addProvider(new \Faker\Provider\en_US\Address($faker));
 
     return [
-        'company_name' => $faker->company,
+        'name' => $faker->company,
         'registration_number' => $faker->numberBetween(100000, 500000),
         'vat_number' => $faker->randomElement(['IE9700053D', 'IE6336982T', 'IE6336982T', 'IE6346967G']),
         'website' => $faker->domainName,

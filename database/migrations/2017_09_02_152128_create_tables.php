@@ -454,7 +454,7 @@ class CreateTables extends Migration
                 ->references('uuid')->on('companies')
                 ->onDelete('cascade')->onUpdate('cascade');
 
-            $table->string('company_name');
+            $table->string('name');
             $table->string('registration_number')->nullable();
             $table->string('vat_number')->nullable();
             $table->string('website')->nullable();

@@ -48,12 +48,10 @@ class Invoice extends BillableDocument
         return [
             'uuid' => $this->uuid,
 
-            'relationships' => [
-                'client' => $this->client_uuid,
-                'payments' => $this->payments->map(function (Payment $payment) {
-                    return $payment->uuid;
-                }),
-            ],
+            'client' => [ 'uuid' => $this->client_uuid ],
+            'payments' => $this->payments->map(function (Payment $payment) {
+                return [ 'uuid' => $payment->uuid ];
+            }),
 
             'pdfs' => $this->pdfs,
 
@@ -64,7 +62,7 @@ class Invoice extends BillableDocument
             'invoice_date' => $this->bill->date,
             'due_date' => $this->bill->due_date,
             'partial' => +$this->bill->partial,
-            'currency_code' => $this->bill->currency_code,
+            'currency' => $this->bill->currency,
             'invoice_number' => $this->bill->number,
             'po_number' => $this->bill->po_number,
             'discount_type' => $this->bill->discount_type,
@@ -77,6 +75,8 @@ class Invoice extends BillableDocument
             'footer' => $this->bill->footer,
 
             'status' => $this->status,
+
+            'is_disabled' => $this->is_disabled,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

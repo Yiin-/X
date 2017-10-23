@@ -153,12 +153,24 @@ abstract class DocumentController extends AbstractController
     }
 
     /**
+     * UnArchive entity
+     * @param  string $uuid
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function unarchive($uuid)
+    {
+        // $this->authorize('archive', $this->repository->find($uuid));
+
+        return response()->json($this->repository->unarchive($uuid)->transform());
+    }
+
+    /**
      * Batch actions
      */
     public function deleteBatch(Request $request)
     {
         return response()->json(
-            $this->repository->deleteBatch($request->get('uuids', []))->map(function ($document) {
+            $this->repository->deleteBatch($request->get('keys', []))->map(function ($document) {
                 return $document->transform();
             })
         );
@@ -167,7 +179,7 @@ abstract class DocumentController extends AbstractController
     public function restoreBatch(Request $request)
     {
         return response()->json(
-            $this->repository->restoreBatch($request->get('uuids', []))->map(function ($document) {
+            $this->repository->restoreBatch($request->get('keys', []))->map(function ($document) {
                 return $document->transform();
             })
         );
@@ -176,7 +188,7 @@ abstract class DocumentController extends AbstractController
     public function archiveBatch(Request $request)
     {
         return response()->json(
-            $this->repository->archiveBatch($request->get('uuids', []))->map(function ($document) {
+            $this->repository->archiveBatch($request->get('keys', []))->map(function ($document) {
                 return $document->transform();
             })
         );
@@ -185,7 +197,7 @@ abstract class DocumentController extends AbstractController
     public function unarchiveBatch(Request $request)
     {
         return response()->json(
-            $this->repository->unarchiveBatch($request->get('uuids', []))->map(function ($document) {
+            $this->repository->unarchiveBatch($request->get('keys', []))->map(function ($document) {
                 return $document->transform();
             })
         );

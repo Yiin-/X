@@ -30,6 +30,14 @@ class Payment extends AbstractDocument
         'company_uuid'
     ];
 
+    protected $dates = [
+        'payment_date',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'archived_at'
+    ];
+
     protected $touches = ['invoice'];
 
     public function transform($exclude = [])
@@ -37,18 +45,17 @@ class Payment extends AbstractDocument
         return [
             'uuid' => $this->uuid,
 
-            'relationships' => [
-                'client' => $this->client_uuid,
-                'invoice' => $this->invoice_uuid
-            ],
+            'client' => [ 'uuid' => $this->client_uuid ],
+            'invoice' => [ 'uuid' => $this->invoice_uuid ],
 
             'amount' => +$this->amount,
             'refunded' => +$this->refunded,
             'currency' => $this->currency,
-            'method_id' => $this->payment_type_id,
-            'method' => $this->paymentType ? $this->paymentType->name : '',
+            'payment_type' => $this->paymentType,
             'payment_date' => $this->payment_date,
             'payment_reference' => $this->payment_reference,
+
+            'is_disabled' => $this->is_disabled,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

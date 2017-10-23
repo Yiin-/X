@@ -32,6 +32,7 @@ class Repository
     public function getVisible($userUuid = null)
     {
         return $this->newQuery()
+            ->withTrashed()
             ->visible($userUuid)
             ->orderBy('id', 'desc')
             ->get()
@@ -114,13 +115,17 @@ class Repository
     {
         $document = $this->find($uuid);
 
-        if ($document->archived_at) {
-            $document->archived_at = null;
-        }
-        else {
-            $document->archived_at = $document->freshTimestamp();
-        }
+        $document->archived_at = $document->freshTimestamp();
+        $document->save();
 
+        return $document;
+    }
+
+    public function unarchive($uuid)
+    {
+        $document = $this->find($uuid);
+
+        $document->archived_at = null;
         $document->save();
 
         return $document;
@@ -128,9 +133,9 @@ class Repository
 
     public function deleteBatch($uuids)
     {
-        $documents = $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get();
-
         $this->newQuery()->whereIn('uuid', $uuids)->delete();
+
+        $documents = $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get();
 
         return $documents;
     }

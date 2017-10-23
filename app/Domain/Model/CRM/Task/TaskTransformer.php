@@ -12,7 +12,9 @@ class TaskTransformer extends DocumentTransformer
             'name' => $task->name,
             'is_completed' => $task->is_completed,
 
-            'user' => $task->user->transform()
+            'user' => $task->user->transform(),
+
+            'is_disabled' => false
         ];
     }
 }

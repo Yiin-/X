@@ -24,7 +24,7 @@ class VendorController extends DocumentController
         $rules = [
             static::VALIDATION_RULES_CREATE => [
                 $this->getResourceName() => 'required|array',
-                "{$this->getResourceName()}.company_name" => 'required',
+                "{$this->getResourceName()}.name" => 'required',
                 "{$this->getResourceName()}.country_id" => 'nullable|exists:countries,id',
                 "{$this->getResourceName()}.currency_code" => 'nullable|exists:currencies,code'
             ],
@@ -42,7 +42,7 @@ class VendorController extends DocumentController
     public function getValidationAttributes()
     {
         return [
-            "{$this->getResourceName()}.company_name" => 'company name',
+            "{$this->getResourceName()}.name" => 'company name',
             "{$this->getResourceName()}.country_id" => 'vendor\'s country',
             "{$this->getResourceName()}.currency_code" => 'vendor\'s currency'
         ];

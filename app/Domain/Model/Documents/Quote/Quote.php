@@ -28,16 +28,15 @@ class Quote extends BillableDocument
         return [
             'uuid' => $this->uuid,
 
-            'relationships' => [
-                'client' => $this->client_uuid,
-                'invoice' => $this->invoice ? $this->invoice->uuid : null
-            ],
+            'client' => [ 'uuid' => $this->client_uuid ],
+            'invoice' => [ 'uuid' => $this->invoice ? $this->invoice->uuid : null ],
 
             'amount' => +$this->amount(),
 
             'quote_date' => $this->bill->date,
             'due_date' => $this->bill->due_date,
             'partial' => +$this->bill->partial,
+            'currency' => $this->bill->currency,
             'quote_number' => $this->bill->number,
             'po_number' => $this->bill->po_number,
             'discount_type' => $this->bill->discount_type,
@@ -50,6 +49,8 @@ class Quote extends BillableDocument
             'footer' => $this->bill->footer,
 
             'status' => $this->status,
+
+            'is_disabled' => $this->is_disabled,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

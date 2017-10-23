@@ -44,9 +44,7 @@ class RecurringInvoice extends BillableDocument
         return [
             'uuid' => $this->uuid,
 
-            'relationships' => [
-                'client' => $this->client_uuid
-            ],
+            'client' => [ 'uuid' => $this->client_uuid ],
 
             'amount' => +$this->amount(),
 
@@ -54,6 +52,8 @@ class RecurringInvoice extends BillableDocument
             'end_date' => $this->end_date,
             'due_date' => $this->due_date,
             'frequency' => $this->frequency,
+            'frequency_type' => $this->frequency_type,
+            'frequency_value' => $this->frequency_value,
 
             'po_number' => $this->bill->po_number,
             'discount_type' => $this->bill->discount_type,
@@ -66,6 +66,8 @@ class RecurringInvoice extends BillableDocument
             'footer' => $this->bill->footer,
 
             'status' => $this->status,
+
+            'is_disabled' => $this->is_disabled,
 
             'last_sent_at' => $this->created_at,
             'created_at' => $this->created_at,

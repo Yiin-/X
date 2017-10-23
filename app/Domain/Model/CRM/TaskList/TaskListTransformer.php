@@ -15,7 +15,9 @@ class TaskListTransformer extends DocumentTransformer
 
             'tasks' => $taskList->tasks->map(function ($task) {
                 return (new TaskTransformer)->transform($task);
-            })
+            }),
+
+            'is_disabled' => false
         ];
     }
 }

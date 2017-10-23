@@ -19,10 +19,11 @@ class ProductTransformer extends Fractal\TransformerAbstract
             'description' => $product->description,
 
             'price' => +$product->price,
-            'currency_code' => $product->currency_code,
+            'currency' => $product->currency,
             'tax_rate' => $product->taxRate,
 
             'is_service' => $product->qty === null,
+            'is_disabled' => $product->is_disabled,
 
             'created_at' => $product->created_at,
             'updated_at' => $product->updated_at,

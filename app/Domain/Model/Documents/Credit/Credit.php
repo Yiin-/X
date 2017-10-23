@@ -25,20 +25,28 @@ class Credit extends AbstractDocument
         'company_uuid'
     ];
 
+    protected $dates = [
+        'credit_date',
+        'created_at',
+        'updated_at',
+        'archived_at',
+        'deleted_at'
+    ];
+
     public function transform()
     {
         return [
             'uuid' => $this->uuid,
 
-            'relationships' => [
-                'client' => $this->client_uuid,
-            ],
+            'client' => [ 'uuid' => $this->client_uuid ],
 
             'amount' => +$this->amount,
             'currency' => $this->currency,
             'balance' => +$this->balance,
             'credit_date' => $this->credit_date,
             'credit_number' => $this->credit_number,
+
+            'is_disabled' => $this->is_disabled,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

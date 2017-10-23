@@ -85,6 +85,8 @@ class Client extends AbstractDocument
             'company_size' => $this->company_size,
             'industry' => $this->industry,
 
+            'is_disabled' => $this->is_disabled,
+
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'archived_at' => $this->archived_at,

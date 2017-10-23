@@ -48,7 +48,7 @@ class PaymentRepository extends AbstractDocumentRepository
                     'amount' => $data['amount'] - $invoiceBalance,
                     'currency_code' => $data['currency_code'],
                     'credit_date' => \Carbon\Carbon::now()->toDateString(),
-                    'credit_number' => 'Credit created by payment ' . ($data['payment_reference'] ?? '')
+                    'credit_number' => 'Credit created by payment ' . ($data['payment_reference'] ?? '<payment has no reference>')
                 ]);
                 $data['amount'] = $invoiceBalance;
             }

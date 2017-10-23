@@ -26,20 +26,28 @@ class Expense extends AbstractDocument
         'company_uuid'
     ];
 
+    protected $dates = [
+        'date',
+        'created_at',
+        'updated_at',
+        'archived_at',
+        'deleted_at'
+    ];
+
     public function transform()
     {
         return [
             'uuid' => $this->uuid,
 
-            'relationships' => [
-                'vendor' => $this->vendor_uuid,
-                'client' => $this->client_uuid,
-                'invoice' => $this->invoice ? $this->invoice->uuid : null
-            ],
+            'vendor' => [ 'uuid' => $this->vendor_uuid ],
+            'client' => [ 'uuid' => $this->client_uuid ],
+            'invoice' => [ 'uuid' => $this->invoice ? $this->invoice->uuid : null ],
 
             'amount' => +$this->amount,
             'currency' => $this->currency,
             'date' => (new \Carbon\Carbon($this->date))->toDateString(),
+
+            'is_disabled' => $this->is_disabled,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

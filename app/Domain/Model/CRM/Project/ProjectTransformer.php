@@ -14,9 +14,7 @@ class ProjectTransformer extends DocumentTransformer
             'name' => $project->name,
             'description' => $project->description,
 
-            'relationships' => [
-                'client' => $project->client_uuid
-            ],
+            'client' => [ 'uuid' => $project->client_uuid ],
 
             'taskLists' => $project->taskLists->map(function ($taskList) {
                 return (new TaskListTransformer)->transform($taskList);

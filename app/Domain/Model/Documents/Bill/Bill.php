@@ -35,7 +35,8 @@ class Bill extends AbstractDocument
     ];
 
     protected $dates = [
-        'date'
+        'date',
+        'due_date'
     ];
 
     protected $dispatchesEvents = [];
