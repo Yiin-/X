@@ -11,6 +11,7 @@ class Profile extends AbstractDocument
         'first_name',
         'last_name',
         'email',
+        'website',
         'phone',
         'job_position'
     ];
@@ -22,13 +23,14 @@ class Profile extends AbstractDocument
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
             'email' => $this->email,
+            'website' => $this->website,
             'phone' => $this->phone,
             'job_position' => $this->job_position
         ];
     }
 
-    public function users()
+    public function user()
     {
-        return $this->hasMany(User::class);
+        return $this->hasOne(User::class);
     }
 }

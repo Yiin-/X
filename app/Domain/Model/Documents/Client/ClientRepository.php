@@ -39,6 +39,6 @@ class ClientRepository extends AbstractDocumentRepository
             ]);
         }
 
-        return $client;
+        $client->load('contacts');
     }
 }

@@ -17,7 +17,7 @@ class PassiveDataService
         return [
             'companySizes' => CompanySize::all(),
             'countries' => Country::all(),
-            'currencies' => Currency::all(),
+            'currencies' => Currency::whereHas('rates')->with('rates')->get(),
             'industries' => Industry::all(),
             'languages' => Language::all(),
             'timezones' => Timezone::all(),

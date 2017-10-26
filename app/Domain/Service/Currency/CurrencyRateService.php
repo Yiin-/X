@@ -13,25 +13,17 @@ class CurrencyRateService
     public function __construct()
     {
         $this->httpClient = new Client;
-        $this->cacheCurrencies();
     }
 
-    public function cacheCurrencies()
-    {
-        $this->currencyById = Currency::all()->mapWithKeys(function ($currency) {
-            return [$currency->id => $currency];
-        });
-    }
-
-    public function fetchRates()
+    public function fetchRates($base)
     {
         try {
-            $res = $this->httpClient->request('GET', 'http://api.fixer.io/latest?base=EUR');
+            $res = $this->httpClient->request('GET', 'http://api.fixer.io/latest?base=' . $base);
 
             return json_decode($res->getBody())->rates;
-        } catch (RequestException $e) {
-            Log::error('Currency update request failed:');
-            Log::error($e->getMessage());
+        } catch (\Exception $e) {
+            \Log::error('CurrencyRateService: ' . $base . ' rates update failed:');
+            \Log::error($e->getMessage());
         }
 
         return [];
@@ -44,45 +36,15 @@ class CurrencyRateService
      */
     public function updateRates()
     {
-        $rates = $this->fetchRates();
+        foreach (Currency::all() as $currency) {
+            $rates = $this->fetchRates($currency->code);
 
-        foreach  ($rates as $code => $rate) {
-            Currency::where('code', $code)->update([
-                'eur_rate' => $rate
-            ]);
+            foreach ($rates as $code => $rate) {
+                $currency->rates()->updateOrCreate([
+                    'to' => $code,
+                    'rate' => $rate
+                ]);
+            }
         }
-        $this->cacheCurrencies();
-    }
-
-    public function getCurrency($id)
-    {
-        if (array_key_exists($id, $this->currencyById)) {
-            return $this->currencyById[$id];
-        }
-    }
-
-    /**
-     * Convert currency
-     * @param  float $amount Amount of currency, to convert
-     * @param  string $from   Currency id, the amount is currency presented as.
-     * @param  string $to     Currency id, the amount should be presented as.
-     * @return float          Calculated amount in specified currency
-     */
-    public function convert($amount, $from, $to)
-    {
-        if ($from === $to) {
-            return $amount;
-        }
-
-        $fromRate = $this->getCurrency($from)->eur_rate;
-        $toRate = $this->getCurrency($to)->eur_rate;
-
-        // if amount is not presented in euros yet, do it now
-        if ($from->code !== 'EUR') {
-            $amount = bcmul($fromRate, $amount, 6);
-        }
-
-        // convert amount to desired currency
-        return bcdiv($amount, $toRate, 6);
     }
 }

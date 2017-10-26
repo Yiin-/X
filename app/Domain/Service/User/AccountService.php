@@ -188,7 +188,7 @@ class AccountService
          * Set default settings for user
          */
         $user->settings()->create([
-            'currency_code' => Currency::whereCode('EUR')->first()->id,
+            'currency_code' => Currency::whereCode('EUR')->first()->code,
             'locale' => 'en'
         ]);
 

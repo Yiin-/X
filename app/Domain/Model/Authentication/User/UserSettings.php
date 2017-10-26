@@ -13,6 +13,10 @@ class UserSettings extends Model
         'locale'
     ];
 
+    protected $with = [
+        'currency'
+    ];
+
     public function currency()
     {
         return $this->belongsTo(Currency::class, 'currency_code', 'code');

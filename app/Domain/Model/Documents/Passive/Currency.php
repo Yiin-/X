@@ -11,7 +11,11 @@ class Currency extends Model
         'code',
         'symbol',
         'precision',
-        'iso_3166_2',
-        'eur_rate'
+        'iso_3166_2'
     ];
+
+    public function rates()
+    {
+        return $this->hasMany(CurrencyRate::class, 'base', 'code');
+    }
 }

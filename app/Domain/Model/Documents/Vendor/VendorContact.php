@@ -17,6 +17,7 @@ class VendorContact extends AbstractDocument
             'first_name' => $this->profile->first_name,
             'last_name' => $this->profile->last_name,
             'email' => $this->profile->email,
+            'website' => $this->profile->website,
             'phone' => $this->profile->phone,
             'job_position' => $this->profile->job_position
         ];

@@ -196,7 +196,7 @@ class CreateTables extends Migration
                 ->references('id')->on('countries')
                 ->onDelete('set null')->onUpdate('cascade');
 
-            $table->string('currency_code');
+            $table->string('currency_code')->nullable();
 
             $table->integer('language_id')->unsigned()->nullable();
             $table->foreign('language_id')

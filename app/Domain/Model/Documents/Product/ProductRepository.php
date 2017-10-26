@@ -19,4 +19,13 @@ class ProductRepository extends AbstractDocumentRepository
         $this->repository = new Repository(Product::class);
         $this->userRepository = $userRepository;
     }
+
+    public function adjustData(&$data)
+    {
+        if ($data['is_service']) {
+            $data['qty'] = null;
+        } else {
+            $data['qty'] = !$data['qty'] ? 0 : $data['qty'];
+        }
+    }
 }

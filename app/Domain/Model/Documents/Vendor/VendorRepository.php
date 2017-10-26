@@ -39,6 +39,6 @@ class VendorRepository extends AbstractDocumentRepository
             ]);
         }
 
-        return $vendor;
+        $vendor->load('contacts');
     }
 }

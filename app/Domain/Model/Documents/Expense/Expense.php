@@ -45,7 +45,7 @@ class Expense extends AbstractDocument
 
             'amount' => +$this->amount,
             'currency' => $this->currency,
-            'date' => (new \Carbon\Carbon($this->date))->toDateString(),
+            'date' => $this->date,
 
             'is_disabled' => $this->is_disabled,
 
@@ -93,6 +93,6 @@ class Expense extends AbstractDocument
      */
     public function currency()
     {
-        return $this->belongsTo(Currency::class);
+        return $this->belongsTo(Currency::class, 'currency_code', 'code');
     }
 }
