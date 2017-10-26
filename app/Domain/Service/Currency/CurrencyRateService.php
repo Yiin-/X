@@ -41,7 +41,8 @@ class CurrencyRateService
 
             foreach ($rates as $code => $rate) {
                 $currency->rates()->updateOrCreate([
-                    'to' => $code,
+                    'to' => $code
+                ], [
                     'rate' => $rate
                 ]);
             }
