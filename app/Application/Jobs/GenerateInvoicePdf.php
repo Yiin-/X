@@ -40,7 +40,8 @@ class GenerateInvoicePdf implements ShouldQueue
             'currencySymbol' => $this->invoice->bill->currency->symbol
         ]);
 
-        $pathToFile = 'app/pdfs/invoices/' . $this->invoice->uuid . '/' . \Carbon\Carbon::now()->format('Y-m-d H-i-s') . '.pdf';
+        $filename = \Carbon\Carbon::now()->format('Y-m-d H-i-s') . '.pdf';
+        $pathToFile = 'app/pdfs/invoices/' . $this->invoice->uuid . '/' . $filename;
         $path = storage_path($pathToFile);
 
         $httpClient = new Client;
@@ -54,6 +55,7 @@ class GenerateInvoicePdf implements ShouldQueue
             ]);
 
             $this->invoice->pdfs()->create([
+                'filename' => $filename,
                 'path_to_pdf' => $pathToFile,
                 'status' => Statuses::CREATED
             ]);

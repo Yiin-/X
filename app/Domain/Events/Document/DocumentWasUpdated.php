@@ -22,8 +22,6 @@ class DocumentWasUpdated
         $this->user = auth()->user();
         $this->document = $document;
 
-        // if (!$document->wasRecentlyCreated) {
-        $this->broadcastToUsers($document);
-        // }
+        $this->broadcastToOtherUsers($document);
     }
 }

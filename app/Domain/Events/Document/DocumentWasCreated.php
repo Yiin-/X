@@ -22,6 +22,6 @@ class DocumentWasCreated
         $this->user = auth()->user();
         $this->document = $document;
 
-        $this->broadcastToUsers($document);
+        $this->broadcastToOtherUsers($document);
     }
 }
