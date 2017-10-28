@@ -17,7 +17,7 @@
     <meta name=theme-color content=#ffffff>
 
 @if (config('app.env') === 'production')
-    <link href=/static/css/app.css rel=stylesheet>
+    <link href=/static/css/app.css?{{ filemtime(public_path('static/css/app.css')) }} rel=stylesheet>
 @endif
 
 @isset ($preloadedJson)
@@ -32,9 +32,9 @@
     <script src="/socket.io.js"></script>
 
 @if (config('app.env') === 'production')
-    <script type=text/javascript src=/static/js/manifest.js?{{ str_random() }}></script>
-    <script type=text/javascript src=/static/js/vendor.js?{{ str_random() }}></script>
-    <script type=text/javascript src=/static/js/app.js?{{ str_random() }}></script>
+    <script type=text/javascript src=/static/js/manifest.js?{{ filemtime(public_path('static/js/manifest.js')) }}></script>
+    <script type=text/javascript src=/static/js/vendor.js?{{ filemtime(public_path('static/js/vendor.js')) }}></script>
+    <script type=text/javascript src=/static/js/app.js?{{ filemtime(public_path('static/js/app.js')) }}></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-107566913-1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];

@@ -21,10 +21,10 @@ app.post('/html_to_pdf', (req, res) => {
       if (err) return
 
       fs.writeFile(path, pdf.toBuffer())
-      res.send()
+      res.status(200).send()
     })
   }).catch((e) => {
-    res.send(e, 500)
+    res.status(500).send(e)
   })
 })
 

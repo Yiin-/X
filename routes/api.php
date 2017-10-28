@@ -22,13 +22,6 @@ Route::post('heartbeat', 'Auth\AuthController@heartbeat');
 // Pdf generation
 Route::get('pdf-preview', 'Documents\InvoiceController@preview');
 
-// Pdf
-Route::prefix('storage', function () {
-    Route::prefix('pdf', function () {
-        Route::get('/{pdf}', 'Documents\StorageController@pdf');
-    });
-});
-
 function genDocumentRoutes($name, $controller) {
     Route::post($name . '/{uuid}/archive', "{$controller}@archive");
     Route::post($name . '/{uuid}/unarchive', "{$controller}@unarchive");

@@ -53,7 +53,9 @@ class Invoice extends BillableDocument
                 return [ 'uuid' => $payment->uuid ];
             }),
 
-            'pdfs' => $this->pdfs,
+            'pdfs' => $this->pdfs->map(function (Pdf $pdf) {
+                return $pdf->transform();
+            }),
 
             'amount' => +$amount,
             'paid_in' => +$paid_in,

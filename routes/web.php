@@ -4,6 +4,13 @@
  * Serve a front-end application.
  */
 Route::middleware('web-auth')->group(function () {
+    // Pdf
+    Route::prefix('storage')->group(function () {
+        Route::prefix('pdf')->group(function () {
+            Route::get('/{id}/{document}', 'Documents\StorageController@pdf');
+        });
+    });
+
     /**
      * Landing page
      */

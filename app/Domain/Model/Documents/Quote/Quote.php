@@ -8,6 +8,7 @@ use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Invoice\Invoice;
 use App\Domain\Model\Documents\Shared\BillableDocument;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Domain\Model\Documents\Pdf\Pdf;
 
 class Quote extends BillableDocument
 {
@@ -30,6 +31,10 @@ class Quote extends BillableDocument
 
             'client' => [ 'uuid' => $this->client_uuid ],
             'invoice' => [ 'uuid' => $this->invoice ? $this->invoice->uuid : null ],
+
+            'pdfs' => $this->pdfs->map(function (Pdf $pdf) {
+                return $pdf->transform();
+            }),
 
             'amount' => +$this->amount(),
 

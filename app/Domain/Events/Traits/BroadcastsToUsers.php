@@ -8,7 +8,12 @@ use App\Domain\Model\Authentication\User\User;
 
 trait BroadcastsToUsers
 {
-    public function broadcastToUsers($document, $toOthers = true)
+    public function broadcastToOtherUsers($document)
+    {
+        return $this->broadcastToUsers($document, true);
+    }
+
+    public function broadcastToUsers($document, $toOthers = false)
     {
         /**
          * Get list of users, who has permission to view this document...
