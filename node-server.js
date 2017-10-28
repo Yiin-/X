@@ -9,7 +9,8 @@ const slash = require('slash')
 app.use(bodyParser.json())
 
 const options = {
-  completionTrigger: new htmlPdf.CompletionTrigger.Timer(500)
+  completionTrigger: new htmlPdf.CompletionTrigger.Timer(500),
+  port: 9222
 }
 
 app.post('/html_to_pdf', (req, res) => {
