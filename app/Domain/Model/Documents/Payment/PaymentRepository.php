@@ -43,13 +43,14 @@ class PaymentRepository extends AbstractDocumentRepository
             $invoiceBalance = $invoice->balance();
 
             if ($data['amount'] > $invoiceBalance) {
-                $this->creditRepository->create([
+                $credit = $this->creditRepository->create([
                     'client_uuid' => $data['client_uuid'],
                     'amount' => $data['amount'] - $invoiceBalance,
                     'currency_code' => $data['currency_code'],
                     'credit_date' => \Carbon\Carbon::now()->toDateString(),
                     'credit_number' => 'Credit created by payment ' . ($data['payment_reference'] ?? '<payment has no reference>')
                 ]);
+
                 $data['amount'] = $invoiceBalance;
             }
         }

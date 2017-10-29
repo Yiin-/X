@@ -227,7 +227,7 @@ class AccountService
             'documents' => $this->documentsService->getAll($user),
             'crm' => $this->crmService->getAll($user),
             'system' => $this->systemService->getAll($user)
-            // 'features' => $this->featuresService->getAll()
+            // 'features' => $this->featuresService->getAll($user)
         ];
     }
 }
