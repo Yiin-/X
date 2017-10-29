@@ -13,7 +13,7 @@
     <meta name=apple-mobile-web-app-title content=Overseer>
     <meta name=application-name content=Overseer>
     <meta name=theme-color content=#ffffff>
-    <link rel="stylesheet" type="text/css" href="/css/landing-page.css">
+    <link rel="stylesheet" type="text/css" href="/css/landing-page.css?{{ filemtime(public_path('/css/landing-page.css')) }}">
 </head>
 <body>
 <div class="gradient"></div>
