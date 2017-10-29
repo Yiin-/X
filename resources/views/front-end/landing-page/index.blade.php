@@ -24,6 +24,7 @@
                 <a href="/">
                     overseer
                 </a>
+                <span class="demo">Alpha Build v0.9.8</span>
             </div>
             <div class="navSection navSection--primary">
                 <a href="">

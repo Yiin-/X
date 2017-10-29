@@ -46,11 +46,6 @@ class Client extends AbstractDocument
 
     public function transform()
     {
-        $vatStatus = VatCheck::where([
-            'country_code' => mb_substr($this->vat_number ?? '', 0, 2),
-            'number' => mb_substr($this->vat_number ?? '', 2)
-        ])->first();
-
         return [
             // ID
             'uuid' => $this->uuid,
@@ -59,7 +54,11 @@ class Client extends AbstractDocument
             'name' => $this->name,
             'registration_number' => $this->registration_number,
             'vat_number' => $this->vat_number,
-            'vat_status' => $vatStatus ? $vatStatus->status : null,
+            'vat_number_checks' => VatCheck::whereRaw('CONCAT(country_code, number) = ?', [$this->vat_number])
+                ->get()
+                ->map(function (VatCheck $vatCheck) {
+                    return $vatCheck->transform();
+                }),
 
             'website' => $this->website,
             'phone' => $this->phone,

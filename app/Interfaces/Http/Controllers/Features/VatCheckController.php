@@ -52,7 +52,7 @@ class VatCheckController extends AbstractController
 
             return response()->json($data, 500);
         }
-        if ($result->name !== '---') {
+        if ($result->name !== '' && $result->name !== '---' && $result->address !== '') {
             $data = auth()->user()->vatChecks()->create([
                 'status' => \App\Domain\Constants\VatCheck\Statuses::VALID,
                 'name' => $result->name,

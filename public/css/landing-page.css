@@ -72,6 +72,15 @@ body
     color: #fff !important;
 }
 
+.navSection--logo .demo {
+    position: absolute;
+    top: 34px;
+    left: 21px;
+    color: #67d67b;
+    font-size: 13px;
+    font-weight: bolder;
+}
+
 .navSection--primary
 {
     display: flex;

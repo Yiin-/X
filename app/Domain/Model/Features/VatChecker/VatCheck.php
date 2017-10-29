@@ -21,6 +21,15 @@ class VatCheck extends AbstractDocument
 
     public function transform()
     {
-        return [];
+        return [
+            'name' => $this->name,
+            'address' => $this->address,
+            'status' => $this->status,
+            'country_code' => $this->country_code,
+            'number' => $this->number,
+            'message' => $this->message,
+
+            'created_at' => $this->created_at
+        ];
     }
 }
