@@ -14,13 +14,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // $this->app->singleton(\App\Service\Model\Auth\AuthService::class, function ($app) {
-        //     return new \App\Service\Model\Auth\AuthService(
-        //         $app->make(\Optimus\ApiConsumer\Router::class),
-        //         $app->make(\App\Domain\Service\User\AccountService),
-        //         $app->make(\App\Domain\Model\Authentication\User\UserRepository)
-        //     );
-        // });
+        //
     }
 
     /**

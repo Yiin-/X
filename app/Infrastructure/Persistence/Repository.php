@@ -56,6 +56,11 @@ class Repository
         return $document;
     }
 
+    public function findActive($uuid)
+    {
+        return $this->newQuery()->where('is_disabled', false)->find($uuid);
+    }
+
     public function create(array $data, $protectedData = [], $save = true)
     {
         $document = new $this->documentClass;

@@ -10,23 +10,27 @@ trait DisablesChildren
     {
         if ($document->isForceDeleting()) {
             foreach ($this->children as $childrenRelationship) {
-                $document->{$childrenRelationship}()->delete();
+                foreach ($document->{$childrenRelationship} as $relatedDocument) {
+                    $relatedDocument->forceDelete();
+                }
             }
         } else {
             foreach ($this->children as $childrenRelationship) {
-                $document->{$childrenRelationship}()->update([
-                    'is_disabled' => true
-                ]);
+                foreach ($document->{$childrenRelationship} as $relatedDocument) {
+                    $relatedDocument->is_disabled = true;
+                    $relatedDocument->save();
+                }
             }
         }
     }
 
     public function restoring(AbstractDocument $document)
     {
-        foreach ($this->children as $$childrenRelationship) {
-            $document->{$childrenRelationship}()->update([
-                'is_disabled' => false
-            ]);
+        foreach ($this->children as $childrenRelationship) {
+            foreach ($document->{$childrenRelationship} as $relatedDocument) {
+                $relatedDocument->is_disabled = false;
+                $relatedDocument->save();
+            }
         }
     }
 }

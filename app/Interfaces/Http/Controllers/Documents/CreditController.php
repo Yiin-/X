@@ -26,7 +26,7 @@ class CreditController extends DocumentController
                 $this->getResourceName() => 'required|array',
                 "{$this->getResourceName()}.client_uuid" => 'required|exists:clients,uuid',
                 "{$this->getResourceName()}.credit_number" => 'required',
-                "{$this->getResourceName()}.amount" => 'required',
+                "{$this->getResourceName()}.balance" => 'required',
                 "{$this->getResourceName()}.currency_code" => 'required|exists:currencies,code',
                 "{$this->getResourceName()}.credit_date" => 'nullable|date'
             ],
@@ -46,7 +46,7 @@ class CreditController extends DocumentController
     {
         return [
             "{$this->getResourceName()}.client_uuid" => 'client',
-            "{$this->getResourceName()}.amount" => 'credit\'s amount',
+            "{$this->getResourceName()}.balance" => 'credit\'s amount',
             "{$this->getResourceName()}.currency_code" => 'credit\'s currency',
             "{$this->getResourceName()}.credit_number" => 'credit number',
             "{$this->getResourceName()}.credit_date" => 'credit\'s date'

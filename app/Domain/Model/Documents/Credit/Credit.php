@@ -64,4 +64,9 @@ class Credit extends AbstractDocument
     {
         return $this->belongsTo(Currency::class, 'currency_code', 'code');
     }
+
+    public function applications()
+    {
+        return $this->hasMany(AppliedCredit::class);
+    }
 }

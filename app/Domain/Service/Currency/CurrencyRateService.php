@@ -4,6 +4,7 @@ namespace App\Domain\Service\Currency;
 
 use GuzzleHttp\Client;
 use App\Domain\Model\Documents\Passive\Currency;
+use Redis;
 
 class CurrencyRateService
 {
@@ -13,6 +14,20 @@ class CurrencyRateService
     public function __construct()
     {
         $this->httpClient = new Client;
+    }
+
+    public function convert($amount, $from, $to)
+    {
+        if ($from === $to) {
+            return $amount;
+        }
+
+        $rate = Redis::get('currency-rate:' . $from . ':' . $to);
+
+        if ($rate) {
+            return $amount * $rate;
+        }
+        throw new \Exception('Could not find conversion rate ' . $from . ' -> ' . $to);
     }
 
     public function fetchRates($base)
@@ -37,15 +52,20 @@ class CurrencyRateService
     public function updateRates()
     {
         foreach (Currency::all() as $currency) {
+            echo 'Fetching rates for ' . $currency->code . PHP_EOL;
             $rates = $this->fetchRates($currency->code);
 
-            foreach ($rates as $code => $rate) {
-                $currency->rates()->updateOrCreate([
-                    'to' => $code
-                ], [
-                    'rate' => $rate
-                ]);
-            }
+            Redis::pipeline(function ($pipe) use ($currency, $rates) {
+                foreach ($rates as $code => $rate) {
+                    $pipe->set("currency-rate:{$currency->code}:$code", $rate);
+
+                    $currency->rates()->updateOrCreate([
+                        'to' => $code
+                    ], [
+                        'rate' => $rate
+                    ]);
+                }
+            });
         }
     }
 }

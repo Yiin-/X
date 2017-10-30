@@ -73,18 +73,6 @@ class AuthService
             $data['user']['settings'] = $user->settings;
             $data['user']['preferences'] = $user->preferences;
 
-            /**
-             * If requested site address is not the same as user account
-             * save temporary auth for that user, and forward it
-             * back to the browser, so it can redirect user to the
-             * correct site address, and server will know that user is
-             * it based on that temporary code. Once it is authenticated,
-             * code is reseted.
-             */
-            // if ($siteAddress !== $user->account->site_address) {
-            //     cookie('_accessToken', $data['accessTokens'])
-            // }
-
             if ($isGuest) {
                 $data['user']['guest_key'] = $siteAddress;
             }

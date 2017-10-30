@@ -22,6 +22,6 @@ class CreditRepository extends AbstractDocumentRepository
 
     public function fillDefaultData(&$data, &$protectedData)
     {
-        $data['balance'] = $data['amount'];
+        $data['amount'] = $data['balance'];
     }
 }

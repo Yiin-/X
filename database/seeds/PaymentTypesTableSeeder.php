@@ -19,7 +19,7 @@ class PaymentTypesTableSeeder extends Seeder
         $gatewayTypePayPal = GatewayType::where('alias', 'paypal')->first()->id;
 
         $paymentTypes = [
-            ['name' => 'Apply Credit'],
+            ['name' => 'Not specified'],
             ['name' => 'Bank Transfer', 'gateway_type_id' => $gatewayTypeBankTransfer],
             ['name' => 'Cash'],
             ['name' => 'Debit', 'gateway_type_id' => $gatewayTypeCreditCard],

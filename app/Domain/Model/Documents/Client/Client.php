@@ -12,6 +12,12 @@ use App\Domain\Model\Documents\Passive\Country;
 use App\Domain\Model\Documents\Passive\Currency;
 use App\Domain\Model\Documents\Passive\Industry;
 use App\Domain\Model\Documents\Passive\Language;
+use App\Domain\Model\Documents\Invoice\Invoice;
+use App\Domain\Model\Documents\Payment\Payment;
+use App\Domain\Model\Documents\Credit\Credit;
+use App\Domain\Model\Documents\Quote\Quote;
+use App\Domain\Model\Documents\Expense\Expense;
+use App\Domain\Model\CRM\Project\Project;
 use App\Domain\Model\Features\VatChecker\VatCheck;
 
 class Client extends AbstractDocument
@@ -122,6 +128,37 @@ class Client extends AbstractDocument
     {
         return $this->belongsTo(Industry::class);
     }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function credits()
+    {
+        return $this->hasMany(Credit::class);
+    }
+
+    public function quotes()
+    {
+        return $this->hasMany(Quote::class);
+    }
+
+    public function expenses()
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+
 
     public function hasPrimaryEmail()
     {
