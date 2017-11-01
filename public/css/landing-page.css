@@ -315,3 +315,30 @@ ul
 
     transform: translateY(-4px);
 }
+
+.supportArea {
+    position: fixed;
+    width: 100%;
+    bottom: 18px;
+    right: 36px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.supportLogo {
+    height: 106px;
+    width: 106px;
+    background-repeat: no-repeat;
+}
+
+.supportLogo:not(:last-child) {
+    margin-right: 10px;
+}
+
+.supportLogo--kickstarter {
+    background-image: url(/images/svg/kickstarter.svg);
+}
+
+.supportLogo--indiegogo {
+    background-image: url(/images/svg/indiegogo.svg);
+}

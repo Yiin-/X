@@ -6,6 +6,7 @@ use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Passive\Currency;
 use App\Domain\Model\Documents\Shared\AbstractDocument;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Domain\Model\Documents\Credit\AppliedCredit;
 
 class Bill extends AbstractDocument
 {
@@ -54,6 +55,11 @@ class Bill extends AbstractDocument
     public function items()
     {
         return $this->hasMany(BillItem::class)->orderBy('index', 'asc');
+    }
+
+    public function appliedCredits()
+    {
+        return $this->hasMany(AppliedCredit::class);
     }
 
     public function transform()

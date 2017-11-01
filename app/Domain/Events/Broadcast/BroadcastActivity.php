@@ -8,6 +8,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use App\Domain\Model\Authentication\User\User;
 use App\Domain\Model\System\ActivityLog\Activity;
+use App\Domain\Model\System\ActivityLog\ActivityTransformer;
 
 class BroadcastActivity implements ShouldBroadcast
 {
@@ -26,7 +27,7 @@ class BroadcastActivity implements ShouldBroadcast
     {
         $this->event = $event;
         $this->user = $user;
-        $this->activity = $activity;
+        $this->activity = (new ActivityTransformer)->transform($activity);
     }
 
     /**

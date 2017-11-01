@@ -3,6 +3,7 @@
 namespace App\Domain\Service\Documents;
 
 use App\Domain\Model\Documents\Product\ProductRepository;
+use App\Domain\Model\Documents\Credit\CreditRepository;
 use App\Domain\Model\Documents\Shared\BillableDocument;
 use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Bill\BillItem;
@@ -12,9 +13,12 @@ use App\Domain\Model\Documents\RecurringInvoice\RecurringInvoice;
 
 class BillableDocumentService
 {
-    public function __construct(ProductRepository $productRepository)
-    {
+    public function __construct(
+        ProductRepository $productRepository,
+        CreditRepository $creditRepository
+    ) {
         $this->productRepository = $productRepository;
+        $this->creditRepository = $creditRepository;
     }
 
     /**
@@ -121,6 +125,76 @@ class BillableDocumentService
             'terms' => 'terms',
             'footer' => 'footer'
         ];
+    }
+
+    /**
+     * Apply credits for billable document EXCEPT if it's quote.
+     * In case it's quote, we just create applied credit entries,
+     * but do not actually modify the balance of the credits.
+     * @param  BillableDocument $document       Document for whom we are applying the credits
+     * @param  array            $appliedCredits Array of credit data
+     */
+    public function applyCredits(BillableDocument $document, array $appliedCredits)
+    {
+        /**
+         * Go though each of the applied credit
+         */
+        $document->bill->appliedCredits()->whereNotIn('credit_uuid', array_map(function ($appliedCredit) {
+            return $appliedCredit['credit_uuid'];
+        }, $appliedCredits))->get()->each(function ($appliedCredit) {
+            $appliedCredit->credit->balance += convert_currency($appliedCredit->amount, $appliedCredit->currency_code, $appliedCredit->credit->currency_code);
+            $appliedCredit->delete();
+        });
+
+        foreach ($appliedCredits as $creditToApply) {
+            $credit = $this->creditRepository->find($creditToApply['credit_uuid']);
+
+            if (!$credit) {
+                continue;
+            }
+
+            $currencyCode = $document->bill->currency_code;
+
+            $amountToApplyInBillCurrency = $creditToApply['amount'];
+            $amountToApplyInCreditCurrency = convert_currency($amountToApplyInBillCurrency, $currencyCode, $credit->currency_code);
+
+            if (
+                !$document->wasRecentlyCreated &&
+                $appliedCredit = $document->bill->appliedCredits()->where('credit_uuid', $credit->uuid)->first()
+            ) {
+                /**
+                 * Adjust credit
+                 */
+                $differenceInBillCurrency = $creditToApply['amount'] - convert_currency($appliedCredit->amount, $appliedCredit->currency_code, $currencyCode);
+                $differenceInCreditCurency = convert_currency($differenceInBillCurrency, $currencyCode, $credit->currency_code);
+
+                if (!($document instanceof Quote)) {
+                    $credit->balance -= $differenceInCreditCurency;
+                    $credit->save();
+                }
+
+                $appliedCredit->amount = $creditToApply['amount'];
+                $appliedCredit->currency_code = $currencyCode;
+                $appliedCredit->save();
+            }
+            else {
+                /**
+                 * Create new applied credit
+                 */
+                if (!($document instanceof Quote)) {
+                    $credit->balance -= $amountToApplyInCreditCurrency;
+                    $credit->save();
+                }
+
+                $document->bill->appliedCredits()->create([
+                    'credit_uuid' => $credit->uuid,
+                    'amount' => $amountToApplyInBillCurrency,
+                    'currency_code' => $currencyCode
+                ]);
+            }
+        }
+        $document->bill->load(['appliedCredits']);
+        $document->load(['bill']);
     }
 
     /**

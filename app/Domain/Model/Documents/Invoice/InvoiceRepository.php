@@ -53,6 +53,7 @@ class InvoiceRepository extends AbstractDocumentRepository
     {
         $this->billableDocumentService->createBill($invoice, $data);
         $this->billableDocumentService->setBillItems($invoice, $data['items']);
+        $this->billableDocumentService->applyCredits($invoice, $data['applied_credits']);
     }
 
     public function updated(&$invoice, &$data, &$protectedData)
@@ -61,6 +62,9 @@ class InvoiceRepository extends AbstractDocumentRepository
 
         if (isset($data['items'])) {
             $this->billableDocumentService->setBillItems($invoice, $data['items']);
+        }
+        if (isset($data['applied_credits'])) {
+            $this->billableDocumentService->applyCredits($invoice, $data['applied_credits']);
         }
     }
 

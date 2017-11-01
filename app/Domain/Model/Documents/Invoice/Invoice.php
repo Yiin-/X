@@ -29,7 +29,13 @@ class Invoice extends BillableDocument
      */
     public function paidIn()
     {
-        return round($this->payments()->sum('amount') + $this->bill->partial, 2);
+        return round(
+            $this->payments()->sum('amount')
+            + $this->bill->partial
+            + $this->bill->appliedCredits->reduce(function ($sum, $appliedCredit) {
+                return $sum + convert_currency($appliedCredit->amount, $appliedCredit->currency_code, $this->bill->currency_code);
+            }, 0)
+        , 2);
     }
 
     /**
@@ -56,6 +62,8 @@ class Invoice extends BillableDocument
             'pdfs' => $this->pdfs->map(function (Pdf $pdf) {
                 return $pdf->transform();
             }),
+
+            'applied_credits' => $this->bill->appliedCredits,
 
             'amount' => +$amount,
             'paid_in' => +$paid_in,

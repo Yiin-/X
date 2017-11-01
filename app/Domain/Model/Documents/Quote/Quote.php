@@ -36,6 +36,8 @@ class Quote extends BillableDocument
                 return $pdf->transform();
             }),
 
+            'applied_credits' => $this->bill->appliedCredits,
+
             'amount' => +$this->amount(),
 
             'quote_date' => $this->bill->date,

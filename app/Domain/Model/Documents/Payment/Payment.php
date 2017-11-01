@@ -8,7 +8,6 @@ use App\Domain\Model\Documents\Invoice\Invoice;
 use App\Domain\Model\Documents\Passive\PaymentType;
 use App\Domain\Model\Documents\Passive\Currency;
 use App\Domain\Model\Documents\Shared\AbstractDocument;
-use App\Domain\Model\Documents\Credit\AppliedCredit;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Payment extends AbstractDocument
@@ -48,7 +47,6 @@ class Payment extends AbstractDocument
 
             'client_uuid' => $this->client_uuid,
             'invoice_uuid' => $this->invoice_uuid,
-            'applied_credits' => $this->appliedCredits,
 
             'amount' => +$this->amount,
             'refunded' => +$this->refunded,
@@ -74,11 +72,6 @@ class Payment extends AbstractDocument
     public function invoice()
     {
         return $this->belongsTo(Invoice::class);
-    }
-
-    public function appliedCredits()
-    {
-        return $this->hasMany(AppliedCredit::class);
     }
 
     public function paymentType()

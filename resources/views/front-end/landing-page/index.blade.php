@@ -83,6 +83,10 @@
                 </section>
             </header>
         </main>
+        <div class="supportArea">
+            <div class="supportLogo supportLogo--kickstarter"></div>
+            <div class="supportLogo supportLogo--indiegogo"></div>
+        </div>
     </div>
 </div>
 
