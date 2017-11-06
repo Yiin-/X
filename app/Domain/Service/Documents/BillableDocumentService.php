@@ -10,6 +10,7 @@ use App\Domain\Model\Documents\Bill\BillItem;
 use App\Domain\Model\Documents\Quote\Quote;
 use App\Domain\Model\Documents\Invoice\Invoice;
 use App\Domain\Model\Documents\RecurringInvoice\RecurringInvoice;
+use App\Domain\Constants\Pdf\Statuses as PdfStatus;
 
 class BillableDocumentService
 {
@@ -19,6 +20,124 @@ class BillableDocumentService
     ) {
         $this->productRepository = $productRepository;
         $this->creditRepository = $creditRepository;
+    }
+
+    public function genPdf(BillableDocument $document, $shouldSave = true)
+    {
+        $html = $this->genHtml($document);
+        $documentName = resource_name($document);
+
+        $filename = \Carbon\Carbon::now()->format('Y-m-d H-i-s') . '.pdf';
+        $relativePath = "app/pdfs/{$documentName}/" . $document->uuid;
+        $pathToFile = $relativePath . DIRECTORY_SEPARATOR . $filename;
+
+        $absolutePath = storage_path($relativePath);
+
+        list($success, $pdf) = generate_pdf($html, $absolutePath, $filename);
+
+        if (!$success) {
+            \Log::error(method_exists($pdf, 'getError') ? $pdf->getError() : $pdf->getMessage());
+            return false;
+        }
+        else {
+            if ($shouldSave) {
+                return $document->pdfs()->create([
+                    'filename' => $filename,
+                    'path_to_pdf' => $pathToFile,
+                    'status' => PdfStatus::CREATED
+                ]);
+            }
+            else {
+                return $pdf;
+            }
+        }
+    }
+
+    public function genHtml(BillableDocument $document)
+    {
+        if ($document instanceof Invoice) {
+            return $this->genInvoiceHtml($document);
+        }
+        else if ($document instanceof Quote) {
+            return $this->genQuoteHtml($document);
+        }
+        return '';
+    }
+
+    public function genInvoiceHtml(Invoice $invoice)
+    {
+        return view('pdfs.invoice.default.invoice', $this->getInvoicePdfFields($invoice));
+    }
+
+    public function genQuoteHtml(Quote $quote)
+    {
+        return view('pdfs.quote.default.quote', $this->getQuotePdfFields($quote));
+    }
+
+    public function getInvoicePdfFields(Invoice $invoice)
+    {
+        $fields = array_merge($this->getCommonPdfFields($invoice), [
+            // Invoice data
+            'invoiceNumber' => $invoice->bill->number,
+            'poNumber'      => $invoice->bill->po_number,
+
+            // Summary
+            'paidIn'        => $invoice->paidIn(['exclude_payments' => true])
+        ]);
+
+        return $fields;
+    }
+
+    public function getQuotePdfFields(Quote $quote)
+    {
+        return array_merge($this->getCommonPdfFields($quote), [
+            // Quote data
+            'quoteNumber' => $quote->bill->number,
+            'poNumber'    => $quote->bill->po_number,
+            'dueData'     => $quote->bill->due_date,
+
+            // Summary
+            'paidIn'      => $quote->paidIn()
+        ]);
+    }
+
+    public function getCommonPdfFields(BillableDocument $document)
+    {
+        return [
+            // User data
+            'userCompanyName' => $document->company->name,
+            'userCompanyEmail' => $document->company->email,
+
+            // Bill data
+            'items'          => $document->bill->items,
+            'date'           => \Carbon\Carbon::parse($document->bill->date)->format('F j, Y'),
+
+            // Summary
+            'subTotal'       => $document->subTotal(),
+            'grandTotal'     => $document->amount(),
+            'discount'       => $document->discount(),
+            'tax'            => $document->taxes(),
+
+            // Misc
+            'currencySymbol' => $document->bill->currency->symbol,
+            'currencyCode'   => $document->bill->currency->code,
+
+            // Texts
+            'footerText'     => $document->bill->footer,
+            'noteToClient'   => $document->bill->notes,
+
+
+            'clientName' => $document->client->name,
+            'clientAddress1' => $document->client->address1,
+            'clientAddress2' => $document->client->address2,
+            'clientCountry' => $document->client->country->name,
+            'clientEmail' => $document->client->email,
+            'userCompanyName' => $document->company->name,
+            'userAddress1' => '',
+            'userAddress2' => '',
+            'userCountry' => '',
+            'userCompanyEmail' => $document->company->email
+        ];
     }
 
     /**
@@ -143,6 +262,7 @@ class BillableDocumentService
             return $appliedCredit['credit_uuid'];
         }, $appliedCredits))->get()->each(function ($appliedCredit) {
             $appliedCredit->credit->balance += convert_currency($appliedCredit->amount, $appliedCredit->currency_code, $appliedCredit->credit->currency_code);
+            $appliedCredit->credit->save();
             $appliedCredit->delete();
         });
 
@@ -232,7 +352,8 @@ class BillableDocumentService
             }
             // If not, assign id of newly created product to the item
             $item['product_uuid'] = $this->productRepository->create([
-                'name' => $item['product_name'],
+                'name' => $item['name'],
+                'identification_number' => $item['identification_number'],
                 'price' => $item['cost'],
                 'qty' => $item['qty'],
                 'discount' => $item['discount'],
@@ -252,7 +373,8 @@ class BillableDocumentService
 
         foreach ([
             'product_uuid' => 'product_uuid',
-            'name' => 'product_name',
+            'name' => 'name',
+            'identification_number' => 'identification_number',
             'cost' => 'cost',
             'qty' => 'qty',
             'discount' => 'discount',

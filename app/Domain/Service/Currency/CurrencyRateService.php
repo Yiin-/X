@@ -25,7 +25,7 @@ class CurrencyRateService
         $rate = Redis::get('currency-rate:' . $from . ':' . $to);
 
         if ($rate) {
-            return $amount * $rate;
+            return bcmul($amount, $rate, 2);
         }
         throw new \Exception('Could not find conversion rate ' . $from . ' -> ' . $to);
     }

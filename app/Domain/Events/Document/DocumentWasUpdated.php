@@ -19,6 +19,8 @@ class DocumentWasUpdated
      */
     public function __construct(AbstractDocument $document)
     {
+        $document->loadRelationships();
+
         $this->user = auth()->user();
         $this->document = $document;
 

@@ -78,4 +78,11 @@ class Bill extends AbstractDocument
             'footer' => $this->footer
         ];
     }
+
+    public function getAppliedCreditsSumAttribute()
+    {
+        return $this->appliedCredits->reduce(function ($sum, $appliedCredit) {
+            return bcadd($sum, convert_currency($appliedCredit->amount, $appliedCredit->currency_code, $this->currency_code), 2);
+        }, 0);
+    }
 }

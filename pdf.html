@@ -1,47 +1,30 @@
-{{--
-    List of variables used in this template
-    ----------------------------------------
-    -- Invoice info
-    $invoiceNumber
-    $poNumber
-    $date
-    $dueDate
-
-    -- Currency
-    $currencySymbol
-    $currencyCode
-
-    -- Summary
-    $subTotal
-    $discount
-    $tax
-    $paidIn
-    $grandTotal
-
-    -- Client info
-    $clientName
-    $clientAddress1
-    $clientAddress2
-    $clientCountry
-    $clientEmail
-
-    -- User info
-    $userCompanyName
-    $userAddress1
-    $userAddress2
-    $userCountry
-    $userCompanyEmail
-    $noteToClient
---}}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css?family=Lato:400,400i,700,700i,900,900i&amp;subset=latin-ext" rel="stylesheet">
     <style type="text/css" media="all">
+        @font-face {
+            font-family: 'CalibreWeb';
+            src: url('file:///C:/Users/stani/Projects/Overseer/Web/X/public/fonts/CalibreWeb-Regular.eot');
+            src: url('file:///C:/Users/stani/Projects/Overseer/Web/X/public/fonts/CalibreWeb-Regular.eot') format("embedded-opentype"),
+                url('file:///C:/Users/stani/Projects/Overseer/Web/X/public/fonts/CalibreWeb-Regular.woff2') format("woff2"),
+                url('file:///C:/Users/stani/Projects/Overseer/Web/X/public/fonts/CalibreWeb-Regular.woff') format("woff");
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face{
+            font-family: 'CalibreWeb';
+            src: url('file:///C:/Users/stani/Projects/Overseer/Web/X/public/fonts/CalibreWeb-Semibold.eot');
+            src: url('file:///C:/Users/stani/Projects/Overseer/Web/X/public/fonts/CalibreWeb-Semibold.eot') format("embedded-opentype"),
+                url('file:///C:/Users/stani/Projects/Overseer/Web/X/public/fonts/CalibreWeb-Semibold.woff2') format("woff2"),
+                url('file:///C:/Users/stani/Projects/Overseer/Web/X/public/fonts/CalibreWeb-Semibold.woff') format("woff");
+            font-weight: bold;
+            font-style: normal;
+        }
+
         body {
-            font: 11pt 'Lato';
+            font: 11pt 'CalibreWeb';
             background: #f5f5f5;
         }
 
@@ -57,7 +40,7 @@
         .page {
             width: 21cm;
             min-height: 29.7cm;
-            padding-bottom: 294px;
+            padding-bottom: calc(362px + 2cm);
             margin: 1cm auto;
             background: white;
             position: relative;
@@ -67,7 +50,7 @@
         .heading {
             height: 226px;
             background: #f4f5f9;
-            padding: 1cm 50px;
+            padding: 1cm 2cm;
             display: flex;
             justify-content: space-between;
         }
@@ -81,7 +64,7 @@
         .footer .column {
             justify-content: flex-start;
             color: #9da0a7;
-            font-size: 14px;
+            font-size: 16px;
         }
 
 
@@ -108,8 +91,6 @@
 
         .invoiceMeta span {
             color: #999;
-            margin-top: 10px;
-            font-size: 14px;
         }
 
         h1 {
@@ -118,23 +99,19 @@
         }
 
         .subTitle {
-            color: #929292;
-            font-size: 14px;
-            margin-top: 12px;
+            color: #9da0a7;
+            font-size: 1.15em;
         }
 
         .totalAmount,
         .totalValue {
             color: #38c174;
-            font-size: 19px;
+            font-size: 1.6em;
             font-weight: 400;
-        }
-        .currencyCode {
-            font-size: 15px;
         }
 
         .itemsList {
-            font-size: 16px;
+            font-size: 1.4em;
         }
 
         .item {
@@ -142,19 +119,13 @@
             justify-content: space-between;
             align-items: center;
             height: 97px;
-            padding: 0 50px;
+            padding: 0 2cm;
             border-bottom: 1px solid #eee;
-        }
-
-        .qty {
-            font-size: 0.9em;
-            color: #888;
         }
 
         .itemDescription {
             font-size: 0.9em;
             color: #888;
-            margin-top: 7px;
         }
 
 
@@ -163,13 +134,13 @@
         }
 
         .summary {
-            padding: 41px 50px;
+            padding: 41px 2cm;
             text-align: right;
             float: right;
         }
 
         .total {
-            padding: 0 50px;
+            padding: 0 2cm;
             display: flex;
             justify-content: flex-end;
             align-items: center;
@@ -185,11 +156,10 @@
         }
 
         .summaryItem {
-            line-height: 31px;
         }
 
         .summaryItemValue {
-            font-size: 15px;
+            font-size: 18px;
             vertical-align: middle;
             padding-left: 25px;
         }
@@ -200,7 +170,6 @@
             letter-spacing: 0.7px;
             vertical-align: middle;
             font-weight: bold;
-            font-size: 14px;
 
         }
 
@@ -212,7 +181,7 @@
             position: absolute;
             bottom: 0;
             width: 100%;
-            padding: 60px 50px 136px;
+            padding: 60px 2cm 136px;
             background: #f9fafc;
             display: flex;
         }
@@ -264,7 +233,6 @@
 
         .contactEmail {
             margin-top: 10px;
-            word-wrap: break-word;
         }
 
         .noteText {
@@ -273,12 +241,12 @@
         }
 
 
-        @page {
+        @page  {
             min-height: 29.7cm;
             margin: 0;
         }
 
-        /*@media print {*/
+        @media  print {
             body {
                 margin: 0;
                 padding: 0;
@@ -294,11 +262,13 @@
                 -webkit-print-color-adjust: exact;
             }
             .item {
+                height: 80px;
                 page-break-after: auto;
                 page-break-inside: avoid;
+                font-size: 16pt;
             }
             .item:nth-child(7n + 7) {
-                /*page-break-after: always;*/
+                page-break-after: always;
             }
             .heading {
                 margin: 0;
@@ -307,18 +277,17 @@
                 page-break-after: avoid;
             }
             .footer {
-                position: absolute;
                 width: 100%;
                 padding-bottom: 90px;
             }
-            /*.footer::after {
+            .footer::after {
                 counter-increment: page;
                 content: counter(page);
-            }*/
+            }
             .payNowBtn {
                 display: none;
             }
-        /*}*/
+        }
     </style>
 </head>
 <body>
@@ -326,43 +295,38 @@
     <div class="page">
         <div class="heading">
             <div class="column column--left">
-                <h1>{{ $userCompanyName }}</h1>
+                <h1>Loneland Digital Ltd.</h1>
                 <span class="subTitle">Web design for Alphabet homepage</span>
             </div>
             <div class="column column--right">
                 <div class="invoiceMeta">
                     <h1>Invoice</h1>
                     <span class="invoiceNumber">
-                        {{ $invoiceNumber }}
+                        Invoice56456456
                     </span>
-                    @if ($poNumber)
-                    <span class="invoiceNumber">
-                        Order: <span class="highlight">{{ $poNumber }}</span>
+                                        <span class="invoiceNumber">
+                        Order: <span class="highlight">000016</span>
                     </span>
-                    @endif
-                    <span class="invoiceDate">
-                        {{ $date }}
+                                        <span class="invoiceDate">
+                        November 1, 2017
                     </span>
                 </div>
                 <div>
                     <span class="totalAmount">
-                        {{ $currencySymbol }} @money($grandTotal)
+                        € 0
                     </span>
                 </div>
             </div>
         </div>
         <div class="itemsList">
-        @foreach ($items as $item)
-            @include ('pdfs.invoice.default.item-row', ['item' => $item])
-        @endforeach
-        </div>
+                </div>
         <table class="summary">
             <tr class="summaryItem">
                 <td class="summaryItemName">
                     Sub total
                 </td>
                 <td class="summaryItemValue">
-                    {{ $currencySymbol }} @money($subTotal)
+                    € 0
                 </td>
             </tr>
             <tr class="summaryItem">
@@ -370,7 +334,7 @@
                     Discount
                 </td>
                 <td class="summaryItemValue">
-                    {{ $currencySymbol }} @money($discount)
+                    € 0
                 </td>
             </tr>
             <tr class="summaryItem">
@@ -378,7 +342,7 @@
                     Tax
                 </td>
                 <td class="summaryItemValue">
-                    {{ $currencySymbol }} @money($tax)
+                    € 0
                 </td>
             </tr>
             <tr class="summaryItem">
@@ -386,7 +350,7 @@
                     Partial / Deposit
                 </td>
                 <td class="summaryItemValue">
-                    {{ $currencySymbol }} @money($paidIn)
+                    € 68.3
                 </td>
             </tr>
         </table>
@@ -396,9 +360,9 @@
                 Total Due
             </div>
             <div class="totalValue">
-                {{ $currencySymbol }} @money($grandTotal)
+                € 0
                 <span class="currencyCode">
-                    {{ $currencyCode }}
+                    EUR
                 </span>
             </div>
         </div>
@@ -408,75 +372,39 @@
                     To
                 </div>
                 <div class="name">
-                    {{ $clientName }}
+                    O&#039;Keefe, Howell and Volkman
                 </div>
                 <div class="address">
-                    @if ($clientAddress1)
-                    <div class="addressLine">
-                        {{ $clientAddress1 }}
+                                        <div class="addressLine">
+                        328 Deshawn Valleys
                     </div>
-                    @endif
-                    @if ($clientAddress1)
-                    <div class="addressLine">
-                        {{ $clientAddress2 }}
+                                                            <div class="addressLine">
+                        Suite 914
                     </div>
-                    @endif
-                    @if ($clientCountry)
-                    <div class="addressLine">
-                        {{ $clientCountry }}
+                                                            <div class="addressLine">
+                        Denmark
                     </div>
-                    @endif
-                </div>
+                                    </div>
                 <div class="contact">
-                    @if ($clientEmail)
-                    <div class="contactEmail">
-                        {{ $clientEmail }}
-                    </div>
-                    @endif
-                </div>
+                                    </div>
             </div>
             <div class="column">
                 <div class="columnTitle">
                     From
                 </div>
                 <div class="name">
-                    {{ $userCompanyName }}
+                    Loneland Digital Ltd.
                 </div>
                 <div class="address">
-                    @if ($userAddress1)
-                    <div class="addressLine">
-                        {{ $userAddress1 }}
-                    </div>
-                    @endif
-                    @if ($userAddress1)
-                    <div class="addressLine">
-                        {{ $userAddress2 }}
-                    </div>
-                    @endif
-                    @if ($userCountry)
-                    <div class="addressLine">
-                        {{ $userCountry }}
-                    </div>
-                    @endif
-                </div>
+                                                                            </div>
                 <div class="contact">
-                    @if ($userCompanyEmail)
-                    <div class="contactEmail">
-                        {{ $userCompanyEmail }}
+                                        <div class="contactEmail">
+                        stanislovas.janonis@gmail.com
                     </div>
-                    @endif
-                </div>
+                                    </div>
             </div>
             <div class="column">
-                @if ($noteToClient)
-                <div class="columnTitle">
-                    Note
-                </div>
-                <div class="noteText">
-                    {{ $noteToClient }}
-                </div>
-                @endif
-            </div>
+                            </div>
             <a href="/" class="payNowBtn">
                 Pay Now
             </a>

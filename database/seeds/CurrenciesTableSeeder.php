@@ -4,6 +4,7 @@ use Illuminate\Database\Seeder;
 
 use App\Domain\Model\Documents\Passive\Country;
 use App\Domain\Model\Documents\Passive\Currency;
+use App\Domain\Service\Currency\CurrencyRateService;
 
 class CurrenciesTableSeeder extends Seeder
 {
@@ -12,7 +13,7 @@ class CurrenciesTableSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(CurrencyRateService $currencyRateService)
     {
         $currencies = [
             ['name' => 'US Dollar', 'code' => 'USD', 'symbol' => '$', 'precision' => '2'],
@@ -91,5 +92,7 @@ class CurrenciesTableSeeder extends Seeder
             }
             Currency::create($currency);
         }
+
+        $currencyRateService->updateRates();
     }
 }

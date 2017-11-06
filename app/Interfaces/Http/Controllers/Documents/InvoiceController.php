@@ -59,20 +59,21 @@ class InvoiceController extends DocumentController
                                     $currencyCode
                                 );
 
-                                $appliedCredit = $this->repository
-                                    ->findActive(
-                                        request()->route()->parameter('invoice')
-                                    )
-                                    ->bill
-                                    ->appliedCredits
-                                    ->where('credit_uuid', $credit->uuid)
-                                    ->first();
+                                $invoiceUuid = request()->route()->parameter('invoice');
+                                $invoice = $this->repository->findActive($invoiceUuid);
 
-                                if ($appliedCredit) {
-                                    $creditBalance += convert_currency($appliedCredit->amount, $appliedCredit->currency_code, $currencyCode);
+                                if ($invoice) {
+                                    $appliedCredit = $invoice->bill
+                                        ->appliedCredits
+                                        ->where('credit_uuid', $credit->uuid)
+                                        ->first();
+
+                                    if ($appliedCredit) {
+                                        $creditBalance = bcadd($creditBalance, convert_currency($appliedCredit->amount, $appliedCredit->currency_code, $currencyCode), 2);
+                                    }
                                 }
 
-                                if ($creditBalance < $creditToApply['amount']) {
+                                if (bccomp($creditBalance, $creditToApply['amount'], 2) === -1) {
                                     $fail("applied_credits.{$index}.amount is greater than available credit balance. $creditBalance < {$creditToApply['amount']}");
                                 }
                             } else {

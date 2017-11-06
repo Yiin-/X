@@ -3,6 +3,7 @@
 namespace App\Domain\Observers\Documents;
 
 use App\Application\Jobs\GenerateInvoicePdf;
+use App\Domain\Model\Documents\Pdf\Pdf;
 
 class PdfObserver
 {

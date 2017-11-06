@@ -8,7 +8,7 @@
         html, body {
           padding: 0;
           margin: 0;
-          background: #eee;
+          background: #fff;
           font-family: 'Open Sans', sans-serif;
         }
 
@@ -36,9 +36,10 @@
         }
 
         .heading {
+          width: 100%;
           margin-top: 50px;
           display: flex;
-          justify_content: space-between;
+          justify-content: space-between;
         }
 
         .heading__text, .heading__meta {

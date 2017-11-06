@@ -20,6 +20,7 @@ class InvoiceObserver
         if (!$invoice->isDirty()) {
             return;
         }
+        $invoice->loadRelationships();
 
         \Log::debug('Generating pdf for invoice #' . $invoice->bill->number);
         GenerateInvoicePdf::dispatch($invoice);

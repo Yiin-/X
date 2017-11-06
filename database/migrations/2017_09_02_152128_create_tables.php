@@ -275,7 +275,7 @@ class CreateTables extends Migration
             $table->string('product_uuid')->nullable();
             $table->foreign('product_uuid')
                 ->references('uuid')->on('products')
-                ->onDelete('cascade')->onUpdate('cascade');
+                ->onDelete('set null')->onUpdate('cascade');
 
             $table->decimal('cost', 13, 3);
             $table->decimal('qty', 13, 3);

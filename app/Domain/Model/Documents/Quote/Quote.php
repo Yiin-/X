@@ -24,6 +24,19 @@ class Quote extends BillableDocument
         'company_uuid'
     ];
 
+    /**
+     * Paid in amount
+     */
+    public function paidIn()
+    {
+        return round(
+            $this->bill->partial
+            + $this->bill->appliedCredits->reduce(function ($sum, $appliedCredit) {
+                return $sum + convert_currency($appliedCredit->amount, $appliedCredit->currency_code, $this->bill->currency_code);
+            }, 0)
+        , 2);
+    }
+
     public function transform()
     {
         return [

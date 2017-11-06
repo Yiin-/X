@@ -91,7 +91,7 @@ class RecurringInvoiceRepository extends AbstractDocumentRepository
         }
     }
 
-    public function savingNew(&$recurringInvoice, &$data, &$protectedData)
+    public function saving(&$recurringInvoice, &$data, &$protectedData)
     {
         $this->billableDocumentService->createBill($recurringInvoice, $data);
         $this->billableDocumentService->setBillItems($recurringInvoice, $data['items']);

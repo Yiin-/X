@@ -4,6 +4,7 @@ namespace App\Application\Providers;
 
 use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
 use Illuminate\Support\ServiceProvider;
+use Blade;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,7 +15,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Blade::directive('money', function ($expression) {
+            return "<?php echo number_format($expression, 2); ?>";
+        });
     }
 
     /**

@@ -29,7 +29,7 @@ class BillableDocument extends AbstractDocument
         $amount = 0;
 
         foreach ($this->bill->items as $item) {
-            $amount += $item->cost;
+            $amount = bcadd($amount, $item->initial_cost, 2);
         }
 
         return +$amount;
@@ -43,7 +43,7 @@ class BillableDocument extends AbstractDocument
         $amount = 0;
 
         foreach ($this->bill->items as $item) {
-            $amount += $item->discount;
+            $amount = bcadd($amount, $item->discount, 2);
         }
 
         return +$amount;
@@ -57,7 +57,7 @@ class BillableDocument extends AbstractDocument
         $amount = 0;
 
         foreach ($this->bill->items as $item) {
-            $amount += $item->tax;
+            $amount = bcadd($amount, $item->tax, 2);
         }
 
         return +$amount;
@@ -72,19 +72,21 @@ class BillableDocument extends AbstractDocument
         $amount = 0;
 
         foreach ($this->bill->items as $item) {
-            $amount += $item->final_price;
+            $amount = bcadd($amount, $item->final_price, 2);
         }
 
         switch ($this->bill->discount_type) {
             case DiscountTypes::FLAT:
-                $amount -= $this->bill->discount;
+                $amount = bcsub($amount, $this->bill->discount, 2);
                 break;
             case DiscountTypes::PERCENTAGE:
-                $amount -= $amount * ($this->bill->discount / 100);
+                $amount = bcsub($amount, bcmul($amount, bcdiv($this->bill->discount, 100, 2), 2), 2);
                 break;
         }
 
-        return round($amount, 2);
+        $amount = bcsub($amount, $this->bill->applied_credits_sum, 2);
+
+        return +$amount;
     }
 
     /**

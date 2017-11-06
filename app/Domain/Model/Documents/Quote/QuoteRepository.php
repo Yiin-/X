@@ -33,7 +33,7 @@ class QuoteRepository extends AbstractDocumentRepository
             ->get();
     }
 
-    public function savingNew($quote, &$data, &$protectedData)
+    public function saving($quote, &$data, &$protectedData)
     {
         $this->billableDocumentService->createBill($quote, $data);
         $this->billableDocumentService->setBillItems($quote, $data['items']);

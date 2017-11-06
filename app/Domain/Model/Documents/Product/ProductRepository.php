@@ -22,7 +22,7 @@ class ProductRepository extends AbstractDocumentRepository
 
     public function adjustData(&$data)
     {
-        if ($data['is_service']) {
+        if (isset($data['is_service']) && $data['is_service']) {
             $data['qty'] = null;
         } else {
             $data['qty'] = !$data['qty'] ? 0 : $data['qty'];

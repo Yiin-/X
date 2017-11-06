@@ -43,6 +43,11 @@ abstract class AbstractDocument extends Model
 
     abstract public function transform();
 
+    public function loadRelationships()
+    {
+        //
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

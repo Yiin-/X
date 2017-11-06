@@ -12,6 +12,7 @@ class BillItem extends AbstractDocument
         'bill_id',
         'product_uuid',
         'name',
+        'identification_number',
         'cost',
         'qty',
         'discount',
@@ -28,6 +29,7 @@ class BillItem extends AbstractDocument
         return [
             'product' => $this->product ? $this->product->transform() : null,
             'name' => $this->name,
+            'identification_number' => $this->identification_number,
             'cost' => +$this->cost,
             'discount' => +$this->discount,
             'qty' => +$this->qty,
@@ -38,24 +40,29 @@ class BillItem extends AbstractDocument
 
     protected $dispatchesEvents = [];
 
+    public function getInitialCostAttribute()
+    {
+        return bcmul($this->qty, $this->cost, 2);
+    }
+
     public function getCostBeforeTaxAttribute()
     {
-        $sum = $this->qty * $this->cost;
-        $discount = $sum * $this->discount / 100;
+        $sum = $this->initial_cost;
+        $discount = bcdiv(bcmul($sum, $this->discount, 2), 100, 2);
 
-        return $sum - $discount;
+        return bcsub($sum, $discount, 2);
     }
 
     public function getTaxAttribute()
     {
-        $tax = $this->taxRate ? ($this->taxRate->rate / 100) : 0;
+        $tax = $this->taxRate ? bcdiv($this->taxRate->rate, 100, 2) : 0;
 
-        return $tax * $this->cost_before_tax;
+        return bcmul($tax, $this->cost_before_tax, 2);
     }
 
     public function getFinalPriceAttribute()
     {
-        return $this->tax + $this->cost_before_tax;
+        return bcadd($this->tax, $this->cost_before_tax, 2);
     }
 
     public function bill()

@@ -49,21 +49,21 @@ class InvoiceRepository extends AbstractDocumentRepository
         }
     }
 
-    public function savingNew($invoice, &$data, &$protectedData)
+    public function saving($invoice, &$data, &$protectedData)
     {
-        $this->billableDocumentService->createBill($invoice, $data);
-        $this->billableDocumentService->setBillItems($invoice, $data['items']);
-        $this->billableDocumentService->applyCredits($invoice, $data['applied_credits']);
-    }
+        if ($invoice->exists) {
+            $this->billableDocumentService->updateBill($invoice, $data);
 
-    public function updated(&$invoice, &$data, &$protectedData)
-    {
-        $this->billableDocumentService->updateBill($invoice, $data);
-
-        if (isset($data['items'])) {
-            $this->billableDocumentService->setBillItems($invoice, $data['items']);
+            if (isset($data['items'])) {
+                $this->billableDocumentService->setBillItems($invoice, $data['items']);
+            }
+            if (isset($data['applied_credits'])) {
+                $this->billableDocumentService->applyCredits($invoice, $data['applied_credits']);
+            }
         }
-        if (isset($data['applied_credits'])) {
+        else {
+            $this->billableDocumentService->createBill($invoice, $data);
+            $this->billableDocumentService->setBillItems($invoice, $data['items']);
             $this->billableDocumentService->applyCredits($invoice, $data['applied_credits']);
         }
     }

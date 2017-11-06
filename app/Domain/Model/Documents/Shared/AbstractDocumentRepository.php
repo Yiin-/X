@@ -27,8 +27,8 @@ class AbstractDocumentRepository
 
         $document = $this->repository->create($data, $protectedData, false);
 
-        if (method_exists($this, 'savingNew')) {
-            $this->savingNew($document, $data, $protectedData);
+        if (method_exists($this, 'saving')) {
+            $this->saving($document, $data, $protectedData);
         }
 
         $document->save();
@@ -57,7 +57,13 @@ class AbstractDocumentRepository
             $this->updating($data, $protectedData);
         }
 
-        $document = $this->repository->update($data, $protectedData);
+        $document = $this->repository->update($data, $protectedData, false);
+
+        if (method_exists($this, 'saving')) {
+            $this->saving($document, $data, $protectedData);
+        }
+
+        $document->save();
 
         if (method_exists($this, 'saved')) {
             $this->saved($document, $data, $protectedData);

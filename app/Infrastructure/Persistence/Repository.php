@@ -81,7 +81,7 @@ class Repository
         return $document;
     }
 
-    public function update(array $data, $protectedData = [])
+    public function update(array $data, $protectedData = [], $save = true)
     {
         $document = $this->find($data['uuid']);
 
@@ -91,7 +91,9 @@ class Repository
             $document->{$attribute} = $value;
         }
 
-        $document->save();
+        if ($save) {
+            $document->save();
+        }
 
         return $document;
     }
@@ -101,7 +103,11 @@ class Repository
         $document = $this->find($uuid);
 
         if ($document) {
-            $document->delete();
+            if ($document->deleted_at) {
+                $document->forceDelete();
+            } else {
+                $document->delete();
+            }
         }
 
         return $document;
@@ -136,9 +142,22 @@ class Repository
         return $document;
     }
 
+    /**
+     * TODO: rewrite batch actions from the ground up.
+     */
     public function deleteBatch($uuids)
     {
         $this->newQuery()->whereIn('uuid', $uuids)->delete();
+
+        $documents = $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get();
+
+        foreach ($documents as $document) {
+            if ($document->deleted_at) {
+                $document->forceDelete();
+            } else {
+                $document->delete();
+            }
+        }
 
         $documents = $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get();
 

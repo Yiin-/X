@@ -24,17 +24,24 @@ class Invoice extends BillableDocument
         'company_uuid'
     ];
 
+    public function loadRelationships()
+    {
+        $this->bill->load(['items', 'appliedCredits']);
+    }
+
     /**
      * Paid in amount
      */
-    public function paidIn()
+    public function paidIn($options = [])
     {
         return round(
-            $this->payments()->sum('amount')
+            (
+                isset($options['exclude_payments']) && $options['exclude_payments']
+                ? 0
+                : $this->payments()->sum('amount')
+            )
             + $this->bill->partial
-            + $this->bill->appliedCredits->reduce(function ($sum, $appliedCredit) {
-                return $sum + convert_currency($appliedCredit->amount, $appliedCredit->currency_code, $this->bill->currency_code);
-            }, 0)
+            + $this->bill->applied_credits_sum
         , 2);
     }
 

@@ -38,30 +38,6 @@ class PaymentRepository extends AbstractDocumentRepository
         }
     }
 
-    public function creating(&$data)
-    {
-        // if ($totalAmount > $invoiceBalance) {
-            // $credit = $this->creditRepository->create([
-            //     'client_uuid' => $data['client_uuid'],
-            //     'amount' => $data['amount'] - $invoiceBalance,
-            //     'currency_code' => $data['currency_code'],
-            //     'credit_date' => \Carbon\Carbon::now()->toDateString(),
-            //     'credit_number' => 'Credit created by payment ' . ($data['payment_reference'] ?? '<payment has no reference>')
-            // ]);
-
-            /**
-             * Uncomment if we want to decrease payment ammount to match
-             * invoice balance. E.g. if invoice was missing payment
-             * for $10 and we created a payment for $50, payment amount
-             * would be changed to $10, and credit of $40 for client would be
-             * saved.
-             *
-             * Atm, both credit of $40 is saved, and payment amount is saved as $50
-             */
-            // $data['amount'] = $invoiceBalance;
-        // }
-    }
-
     public function adjustData(&$data)
     {
         if (isset($data['refunded'])) {
@@ -76,6 +52,39 @@ class PaymentRepository extends AbstractDocumentRepository
                     $data['refunded'] = $document->amount;
                 }
             }
+        }
+    }
+
+    public function creating(&$data)
+    {
+        $invoice = $this->invoiceRepository->findActive($data['invoice_uuid']);
+        $invoiceBalance = $invoice->balance();
+
+        $invoiceCurrencyCode = $invoice->bill->currency_code;
+        $amount = convert_currency($data['amount'], $data['currency_code'], $invoiceCurrencyCode);
+
+        $data['currency_code'] = $invoiceCurrencyCode;
+        $data['amount'] = $amount;
+
+        if ($amount > $invoiceBalance) {
+            $credit = $this->creditRepository->create([
+                'client_uuid' => $data['client_uuid'],
+                'balance' => $amount - $invoiceBalance,
+                'currency_code' => $invoiceCurrencyCode,
+                'credit_date' => \Carbon\Carbon::now()->toDateString(),
+                'credit_number' => 'Credit created by payment ' . ($data['payment_reference'] ?? '<payment has no reference>')
+            ]);
+
+            /**
+             * Uncomment if we want to decrease payment ammount to match
+             * invoice balance. E.g. if invoice was missing payment
+             * for $10 and we created a payment for $50, payment amount
+             * would be changed to $10, and credit of $40 for client would be
+             * saved.
+             *
+             * Atm, both credit of $40 is saved, and payment amount is saved as $50
+             */
+            // $data['amount'] = $invoiceBalance;
         }
     }
 }
