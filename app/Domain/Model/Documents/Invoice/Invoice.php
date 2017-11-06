@@ -48,9 +48,9 @@ class Invoice extends BillableDocument
     /**
      * Left to pay amount
      */
-    public function balance()
+    public function balance($options = [])
     {
-        return round($this->amount() - $this->paidIn());
+        return bcsub($this->amount(), $this->paidIn($options));
     }
 
     public function transform()

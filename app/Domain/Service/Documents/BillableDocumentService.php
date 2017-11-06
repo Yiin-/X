@@ -82,7 +82,7 @@ class BillableDocumentService
             'poNumber'      => $invoice->bill->po_number,
 
             // Summary
-            'paidIn'        => $invoice->paidIn(['exclude_payments' => true])
+            'paidIn'        => $invoice->paidIn()
         ]);
 
         return $fields;
@@ -114,7 +114,7 @@ class BillableDocumentService
 
             // Summary
             'subTotal'       => $document->subTotal(),
-            'grandTotal'     => $document->amount(),
+            'grandTotal'     => $document->amount(['exclude_payments' => true]),
             'discount'       => $document->discount(),
             'tax'            => $document->taxes(),
 

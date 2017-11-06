@@ -84,8 +84,6 @@ class BillableDocument extends AbstractDocument
                 break;
         }
 
-        $amount = bcsub($amount, $this->bill->applied_credits_sum, 2);
-
         return +$amount;
     }
 
