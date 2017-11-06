@@ -147,8 +147,6 @@ class Repository
      */
     public function deleteBatch($uuids)
     {
-        $this->newQuery()->whereIn('uuid', $uuids)->delete();
-
         $documents = $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get();
 
         foreach ($documents as $document) {
