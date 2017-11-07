@@ -33,6 +33,7 @@ class User extends AbstractDocument implements
     ];
 
     protected $hidden = [
+        'pin_code',
         'account_uuid',
         'password',
         'remember_token',
@@ -50,7 +51,8 @@ class User extends AbstractDocument implements
     {
         return [
             'uuid' => $this->uuid,
-            'full_name' => $this->full_name
+            'full_name' => $this->full_name,
+            'email' => $this->email
         ];
     }
 
