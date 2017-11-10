@@ -17,7 +17,8 @@ class CreateAppliedCreditsTable extends Migration
             $table->increments('id');
 
             $table->string('credit_uuid');
-            $table->integer('bill_id')->unsigned();
+            $table->string('billable_type');
+            $table->string('billable_id');
             $table->decimal('amount', 13, 2);
             $table->string('currency_code');
 

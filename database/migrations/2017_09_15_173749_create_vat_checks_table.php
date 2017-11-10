@@ -23,7 +23,7 @@ class CreateVatChecksTable extends Migration
 
             $table->string('name')->nullable();
             $table->string('address')->nullable();
-            $table->enum('status', \App\Domain\Constants\VatCheck\Statuses::LIST);
+            $table->enum('status', \App\Domain\Constants\VatInfo\Statuses::LIST);
 
             $table->string('country_code');
             $table->string('number');

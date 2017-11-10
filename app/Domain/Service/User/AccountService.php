@@ -115,6 +115,7 @@ class AccountService
          * @var \App\Domain\Model\Authentication\User\User
          */
         \Log::debug('Creating user account: ' . $userEmail);
+
         $user = $this->userRepository->create([
             'username' => $userEmail,
             'password' => $userPassword

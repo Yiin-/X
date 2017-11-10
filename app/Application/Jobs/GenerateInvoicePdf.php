@@ -10,7 +10,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use App\Domain\Mail\InvoiceForClient;
 use App\Domain\Model\Documents\Invoice\Invoice;
 use App\Domain\Service\Documents\BillableDocumentService;
-use App\Domain\Constants\Pdf\Statuses;
 use Illuminate\Support\Facades\Mail;
 use GuzzleHttp\Client;
 

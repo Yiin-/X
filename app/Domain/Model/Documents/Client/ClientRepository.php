@@ -23,7 +23,20 @@ class ClientRepository extends AbstractDocumentRepository
         $this->profileRepository = $profileRepository;
     }
 
-    public function saved(&$client, &$data, &$protectedData)
+    public function created(&$client, &$data, &$protectedData)
+    {
+        $this->updateContacts($client, $data);
+    }
+
+    public function saving(&$client, &$data)
+    {
+        if (!$client->exists) {
+            return;
+        }
+        $this->updateContacts($client, $data);
+    }
+
+    public function updateContacts(&$client, &$data)
     {
         $client->contacts()->delete();
 
@@ -39,6 +52,10 @@ class ClientRepository extends AbstractDocumentRepository
             ]);
         }
 
-        $client->load('contacts');
+        if (!$client->isDirty()) {
+            $client->touch();
+        }
+
+        $client->load(['contacts', 'contacts.profile']);
     }
 }

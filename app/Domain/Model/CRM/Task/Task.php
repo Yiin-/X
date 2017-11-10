@@ -24,9 +24,9 @@ class Task extends AbstractDocument
         return $this->belongsTo(User::class);
     }
 
-    public function transform()
+    public function getTransformer()
     {
-        return (new TaskTransformer)->transform($this);
+        return new TaskTransformer;
     }
 
     public function taskList()

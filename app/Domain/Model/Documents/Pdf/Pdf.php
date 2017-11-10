@@ -22,18 +22,9 @@ class Pdf extends AbstractDocument
         'created' => PdfWasCreated::class
     ];
 
-    public function transform()
+    public function getTransformer()
     {
-        return [
-            'id' => $this->id,
-
-            'filename' => $this->filename,
-            'status' => $this->status,
-            'pdfable_type' => class_basename($this->pdfable_type),
-            'pdfable_id' => $this->pdfable_id,
-
-            'created_at' => $this->created_at
-        ];
+        return new PdfTransformer;
     }
 
     public function pdfable()

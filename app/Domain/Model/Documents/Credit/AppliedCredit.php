@@ -3,20 +3,21 @@
 namespace App\Domain\Model\Documents\Credit;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Domain\Model\Documents\Bill\Bill;
 
 class AppliedCredit extends Model
 {
     protected $fillable = [
         'credit_uuid',
-        'bill_id',
+        'billable_type',
+        'billable_id',
         'amount',
         'currency_code'
     ];
 
     protected $hidden = [
         'id',
-        'bill_id'
+        'billable_type',
+        'billable_id'
     ];
 
     public function credit()
@@ -24,13 +25,13 @@ class AppliedCredit extends Model
         return $this->belongsTo(Credit::class);
     }
 
-    public function bill()
+    public function billable()
     {
-        return $this->belongsTo(Bill::class);
+        return $this->morphTo();
     }
 
     public function document()
     {
-        return $this->bill->billable;
+        return $this->billable;
     }
 }

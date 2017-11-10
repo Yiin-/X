@@ -63,8 +63,7 @@ class InvoiceController extends DocumentController
                                 $invoice = $this->repository->findActive($invoiceUuid);
 
                                 if ($invoice) {
-                                    $appliedCredit = $invoice->bill
-                                        ->appliedCredits
+                                    $appliedCredit = $invoice->appliedCredits()
                                         ->where('credit_uuid', $credit->uuid)
                                         ->first();
 
@@ -114,15 +113,15 @@ class InvoiceController extends DocumentController
         $invoice = \App\Domain\Model\Documents\Invoice\Invoice::first();
 
         return view('pdfs.invoice.default.invoice', [
-            'noteToClient' => $invoice->bill->notes,
-            'poNumber'     => $invoice->bill->po_number,
-            'date'         => $invoice->bill->date,
-            'items'        => $invoice->bill->items,
+            'noteToClient' => $invoice->notes,
+            'poNumber'     => $invoice->po_number,
+            'date'         => $invoice->date,
+            'items'        => $invoice->items,
             'subTotal'     => $invoice->subTotal(),
             'grandTotal'   => $invoice->amount(),
             'discount'     => $invoice->discount(),
             'tax'          => $invoice->taxes(),
-            'footerText'   => $invoice->bill->footer
+            'footerText'   => $invoice->footer
         ]);
     }
 }

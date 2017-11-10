@@ -2,7 +2,6 @@
 
 namespace App\Domain\Model\Documents\Invoice;
 
-use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Bill\BillItem;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Payment\Payment;
@@ -16,7 +15,18 @@ class Invoice extends BillableDocument
 
     protected $fillable = [
         'client_uuid',
-        'status'
+        'status',
+        'invoice_number',
+        'po_number',
+        'partial',
+        'discount_value',
+        'discount_type',
+        'date',
+        'due_date',
+        'currency_code',
+        'notes',
+        'terms',
+        'footer'
     ];
 
     protected $hidden = [
@@ -24,9 +34,15 @@ class Invoice extends BillableDocument
         'company_uuid'
     ];
 
+    protected $dates = [
+        'date',
+        'due_date',
+        'archived_at'
+    ];
+
     public function loadRelationships()
     {
-        $this->bill->load(['items', 'appliedCredits']);
+        $this->load(['items', 'appliedCredits']);
     }
 
     /**
@@ -35,14 +51,16 @@ class Invoice extends BillableDocument
     public function paidIn($options = [])
     {
         return round(
-            (
-                isset($options['exclude_payments']) && $options['exclude_payments']
-                ? 0
-                : $this->payments()->sum('amount')
-            )
-            + $this->bill->partial
-            + $this->bill->applied_credits_sum
-        , 2);
+            bcadd(
+                bcadd(
+                    (
+                        isset($options['exclude_payments']) && $options['exclude_payments']
+                        ? 0
+                        : $this->payments()->sum('amount')
+                    ), $this->partial, 2
+                ), $this->applied_credits_sum, 2
+            ), 2
+        );
     }
 
     /**
@@ -53,53 +71,9 @@ class Invoice extends BillableDocument
         return bcsub($this->amount(), $this->paidIn($options));
     }
 
-    public function transform()
+    public function getTransformer()
     {
-        $amount = $this->amount();
-        $paid_in = $this->paidIn();
-
-        return [
-            'uuid' => $this->uuid,
-
-            'client' => [ 'uuid' => $this->client_uuid ],
-            'payments' => $this->payments->map(function (Payment $payment) {
-                return [ 'uuid' => $payment->uuid ];
-            }),
-
-            'pdfs' => $this->pdfs->map(function (Pdf $pdf) {
-                return $pdf->transform();
-            }),
-
-            'applied_credits' => $this->bill->appliedCredits,
-
-            'amount' => +$amount,
-            'paid_in' => +$paid_in,
-            'balance' => +($amount - $paid_in),
-
-            'invoice_date' => $this->bill->date,
-            'due_date' => $this->bill->due_date,
-            'partial' => +$this->bill->partial,
-            'currency' => $this->bill->currency,
-            'invoice_number' => $this->bill->number,
-            'po_number' => $this->bill->po_number,
-            'discount_type' => $this->bill->discount_type,
-            'discount_value' => +$this->bill->discount,
-            'items' => $this->bill->items->map(function (BillItem $item) {
-                return $item->transform();
-            }),
-            'note_to_client' => $this->bill->notes,
-            'terms' => $this->bill->terms,
-            'footer' => $this->bill->footer,
-
-            'status' => $this->status,
-
-            'is_disabled' => $this->is_disabled,
-
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
-            'archived_at' => $this->archived_at
-        ];
+        return new InvoiceTransformer;
     }
 
     public function invoiceable()

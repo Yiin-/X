@@ -6,7 +6,7 @@ use App\Domain\Model\Documents\Shared\AbstractDocument;
 
 class ActivityRepository
 {
-    public function registerUserActivity($user, $action, AbstractDocument $document)
+    public function registerUserActivity($user, $action, AbstractDocument $document, $meta = [])
     {
         return Activity::create([
             'user_uuid' => $user ? $user->uuid : null,
@@ -16,8 +16,18 @@ class ActivityRepository
             'changes' => json_encode($document->getDirty()),
             'json_backup' => json_encode([
                 'user' => $user ? $user->toJson() : null,
-                'document' => $document->toJson()
+                'documentRaw' => $document->toJson(),
+                'documentTransformed' => $document->transform()->parseExcludes(['history'])->toJson(),
+                'meta' => json_encode($meta)
             ])
         ]);
+    }
+
+    public function getDocumentHistory(AbstractDocument $document)
+    {
+        return Activity::where([
+            'document_type' => get_class($document),
+            'document_uuid' => $document->getKey()
+        ])->orderBy('id', 'desc')->get();
     }
 }

@@ -22,7 +22,7 @@ class InvoiceObserver
         }
         $invoice->loadRelationships();
 
-        \Log::debug('Generating pdf for invoice #' . $invoice->bill->number);
+        \Log::debug('Generating pdf for invoice #' . $invoice->invoice_number);
         GenerateInvoicePdf::dispatch($invoice);
     }
 }

@@ -22,16 +22,8 @@ class TaxRate extends AbstractDocument
         'company_uuid'
     ];
 
-    public function transform()
+    public function getTransformer()
     {
-        return [
-            'uuid' => $this->uuid,
-
-            'name' => $this->name,
-            'rate' => +$this->rate,
-            'is_inclusive' => $this->is_inclusive,
-
-            'created_at' => $this->created_at->toDateString()
-        ];
+        return new TaxRateTransformer;
     }
 }

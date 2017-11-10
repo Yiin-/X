@@ -5,7 +5,6 @@ namespace App\Domain\Model\Documents\Quote;
 use App\Infrastructure\Persistence\Repository;
 use App\Domain\Service\Documents\BillableDocumentService;
 use App\Domain\Constants\Quote\Statuses;
-use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Shared\AbstractDocumentRepository;
 use App\Domain\Model\Documents\Shared\Traits\FillsUserData;
 
@@ -35,16 +34,17 @@ class QuoteRepository extends AbstractDocumentRepository
 
     public function saving($quote, &$data, &$protectedData)
     {
-        $this->billableDocumentService->createBill($quote, $data);
-        $this->billableDocumentService->setBillItems($quote, $data['items']);
-    }
-
-    public function updated(&$quote, &$data, &$protectedData)
-    {
-        $this->billableDocumentService->updateBill($quote, $data);
-
-        if (isset($data['items'])) {
+        if ($quote->exists) {
+            if (isset($data['items'])) {
+                $this->billableDocumentService->setBillItems($quote, $data['items']);
+            }
+            if (isset($data['applied_credits'])) {
+                // $this->billableDocumentService->applyCredits($quote, $data['applied_credits']);
+            }
+        }
+        else {
             $this->billableDocumentService->setBillItems($quote, $data['items']);
+            // $this->billableDocumentService->applyCredits($quote, $data['applied_credits']);
         }
     }
 

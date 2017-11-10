@@ -66,6 +66,9 @@ class AuthService
                 'password' => $password
             ]);
 
+            $user->login_attempts = 0;
+            $user->save();
+
             $data['user'] = $user;
             $data['user']['site_address'] = $user->account->site_address;
             $data['user']['company'] = $user->account->uuid;

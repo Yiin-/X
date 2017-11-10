@@ -36,7 +36,8 @@ class SendInvoice implements ShouldQueue
      */
     public function __construct(Invoice $invoice)
     {
-        $invoice->loadMissing(['client', 'bill', 'company']);
+        $invoice->loadMissing(['client', 'company']);
+        $invoice->loadRelationships();
         $this->invoice = $invoice;
     }
 

@@ -25,9 +25,9 @@ class Project extends AbstractDocument
         'user_uuid'
     ];
 
-    public function transform()
+    public function getTransformer()
     {
-        return (new ProjectTransformer)->transform($this);
+        return new ProjectTransformer;
     }
 
     public function taskLists()

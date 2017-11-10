@@ -34,26 +34,9 @@ class Expense extends AbstractDocument
         'deleted_at'
     ];
 
-    public function transform()
+    public function getTransformer()
     {
-        return [
-            'uuid' => $this->uuid,
-
-            'vendor' => [ 'uuid' => $this->vendor_uuid ],
-            'client' => [ 'uuid' => $this->client_uuid ],
-            'invoice' => [ 'uuid' => $this->invoice ? $this->invoice->uuid : null ],
-
-            'amount' => +$this->amount,
-            'currency' => $this->currency,
-            'date' => $this->date,
-
-            'is_disabled' => $this->is_disabled,
-
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'archived_at' => $this->archived_at,
-            'deleted_at' => $this->deleted_at
-        ];
+        return new ExpenseTransformer;
     }
 
     /**

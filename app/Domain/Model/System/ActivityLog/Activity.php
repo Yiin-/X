@@ -24,6 +24,13 @@ class Activity extends Model
         'created' => RegisteredNewActivity::class
     ];
 
+    public function transform()
+    {
+        return fractal()
+            ->item($this)
+            ->transformWith(new ActivityTransformer);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

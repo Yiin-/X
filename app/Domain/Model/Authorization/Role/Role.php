@@ -20,11 +20,9 @@ class Role extends AbstractDocument
 
     protected $dispatchesEvents = [];
 
-    public function transform()
+    public function getTransformer()
     {
-        return [
-            'name' => $this->name
-        ];
+        return new RoleTransformer;
     }
 
     public function users()

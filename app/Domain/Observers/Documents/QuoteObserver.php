@@ -21,7 +21,7 @@ class QuoteObserver
             return;
         }
 
-        \Log::debug('Generating pdf for quote #' . $quote->bill->number);
+        \Log::debug('Generating pdf for quote #' . $quote->quote_number);
         GenerateQuotePdf::dispatch($quote);
     }
 }

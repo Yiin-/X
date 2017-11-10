@@ -4,7 +4,6 @@ namespace App\Domain\Model\Documents\RecurringInvoice;
 
 use App\Infrastructure\Persistence\Repository;
 use App\Domain\Service\Documents\BillableDocumentService;
-use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Shared\AbstractDocumentRepository;
 use App\Domain\Model\Documents\Shared\Traits\FillsUserData;
 use App\Domain\Constants\RecurringInvoice\Statuses;

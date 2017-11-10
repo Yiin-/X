@@ -28,9 +28,9 @@ class Product extends AbstractDocument
         'company_uuid'
     ];
 
-    public function transform()
+    public function getTransformer()
     {
-        return (new Fractal\Manager)->createData(new Fractal\Resource\Item($this, new ProductTransformer))->toArray()['data'];
+        return new ProductTransformer;
     }
 
     public function currency()

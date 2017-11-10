@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Domain\Mail\QuoteForClient;
 use App\Domain\Model\Documents\Quote\Quote;
+use App\Domain\Service\Documents\BillableDocumentService;
 use Illuminate\Support\Facades\Mail;
 use GuzzleHttp\Client;
 
@@ -23,8 +24,8 @@ class GenerateQuotePdf implements ShouldQueue
         $this->quote = $quote;
     }
 
-    public function handle()
+    public function handle(BillableDocumentService $billableDocumentService)
     {
-        $this->billableDocumentService->genPdf($this->quote, true);
+        $billableDocumentService->genPdf($this->quote, true);
     }
 }

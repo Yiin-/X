@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Constants\VatCheck;
+namespace App\Domain\Constants\VatInfo;
 
 class Statuses
 {

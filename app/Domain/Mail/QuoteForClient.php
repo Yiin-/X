@@ -43,7 +43,7 @@ class QuoteForClient extends Mailable implements ShouldQueue
         }
         return $this->markdown('emails.quote.default')
             ->attach(storage_path($this->quote->pdfs()->latest()->path_to_pdf), [
-                'as' => $this->quote->bill->number . '.pdf',
+                'as' => $this->quote->quote_number . '.pdf',
                 'mime' => 'application/pdf'
             ]);
     }

@@ -17,7 +17,7 @@ use App\Domain\Model\Authorization\Role\Role;
 use App\Domain\Model\Authorization\Permission\Permission;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Profile\Profile;
-use App\Domain\Model\Features\VatChecker\VatCheck;
+use App\Domain\Model\Features\VatChecker\VatInfo;
 use App\Domain\Model\System\ActivityLog\Activity;
 
 class User extends AbstractDocument implements
@@ -47,13 +47,9 @@ class User extends AbstractDocument implements
 
     protected $dispatchesEvents = [];
 
-    public function transform()
+    public function getTransformer()
     {
-        return [
-            'uuid' => $this->uuid,
-            'full_name' => $this->full_name,
-            'email' => $this->email
-        ];
+        return new UserTransformer;
     }
 
     public function invoice_number_pattern()
@@ -103,7 +99,7 @@ class User extends AbstractDocument implements
 
     public function vatChecks()
     {
-        return $this->hasMany(VatCheck::class);
+        return $this->hasMany(VatInfo::class);
     }
 
     public function settings()
@@ -126,13 +122,12 @@ class User extends AbstractDocument implements
     public function activity()
     {
         return $this->hasMany(Activity::class)->whereNotIn('document_type', [
-            \App\Domain\Model\Documents\Bill\Bill::class,
             \App\Domain\Model\Documents\Bill\BillItem::class,
             \App\Domain\Model\Documents\Client\ClientContact::class,
             \App\Domain\Model\Documents\Vendor\VendorContact::class,
             \App\Domain\Model\Documents\Payment\Refund::class,
             \App\Domain\Model\Documents\Profile\Profile::class,
-            \App\Domain\Model\Features\VatChecker\VatCheck::class
+            \App\Domain\Model\Features\VatChecker\VatInfo::class
         ])->orderBy('id', 'desc');
     }
 

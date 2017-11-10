@@ -21,24 +21,22 @@ class AbstractDocumentRepository
     {
         $this->fillData($data, $protectedData, true);
 
-        if (method_exists($this, 'creating')) {
-            $this->creating($data, $protectedData);
-        }
+        $this->creating($data, $protectedData);
 
         $document = $this->repository->create($data, $protectedData, false);
 
-        if (method_exists($this, 'saving')) {
-            $this->saving($document, $data, $protectedData);
-        }
+        $this->saving($document, $data, $protectedData);
+
+        $this->dispatchEvent('creating', $document);
+        $this->dispatchEvent('saving', $document);
 
         $document->save();
 
-        if (method_exists($this, 'saved')) {
-            $this->saved($document, $data, $protectedData);
-        }
-        if (method_exists($this, 'created')) {
-            $this->created($document, $data, $protectedData);
-        }
+        $this->saved($document, $data, $protectedData);
+        $this->created($document, $data, $protectedData);
+
+        $this->dispatchEvent('saved', $document);
+        $this->dispatchEvent('created', $document);
 
         return $document;
     }
@@ -51,53 +49,109 @@ class AbstractDocumentRepository
      */
     public function update($data, $protectedData = [])
     {
-        $this->fillData($data, $protectedData);
+        $activity = $this->checkIfWeAreRestoringDocument($data, $protectedData);
 
-        if (method_exists($this, 'updating')) {
-            $this->updating($data, $protectedData);
-        }
+        $this->fillData($data, $protectedData);
+        $this->updating($data, $protectedData);
 
         $document = $this->repository->update($data, $protectedData, false);
 
-        if (method_exists($this, 'saving')) {
-            $this->saving($document, $data, $protectedData);
+        if (isset($activity)) {
+            $document->restoredFromActivity = $activity->id;
         }
+
+        $this->saving($document, $data, $protectedData);
+
+        $this->dispatchEvent('updating', $document);
+        $this->dispatchEvent('saving', $document);
 
         $document->save();
 
-        if (method_exists($this, 'saved')) {
-            $this->saved($document, $data, $protectedData);
-        }
-        if (method_exists($this, 'updated')) {
-            $this->updated($document, $data, $protectedData);
-        }
+        $this->saved($document, $data, $protectedData);
+        $this->updated($document, $data, $protectedData);
+
+        $this->dispatchEvent('saved', $document);
+        $this->dispatchEvent('updated', $document);
 
         return $document;
+    }
+
+    /**
+     * Dispatch custom model event
+     *
+     * We do that, so activity logger which saves document state
+     * can save document together with his relationships, e.g.
+     * when creating client, we need to dispatch `created` event
+     * after we create both client and his contacts. That allows
+     * us to restore client state w/ his contacts list from
+     * previous state, otherwise client state will be saved before
+     * his contacts are created, therefore after restoration his
+     * contacts information will be lost, because it wasn't
+     * available when client state was saved.
+     */
+    public function dispatchEvent($event, $document)
+    {
+        if ($eventClass = $document->getDocumentEvent($event)) {
+            event(new $eventClass($document));
+        }
+    }
+
+    /**
+     * Returns activity if we're restoring document to his previous state.
+     * FALSE otherwise.
+     */
+    public function checkIfWeAreRestoringDocument(&$data, &$protectedData)
+    {
+        if (isset($data['restoredFromActivity']) && $data['restoredFromActivity']) {
+            $activity = \App\Domain\Model\System\ActivityLog\Activity::find($data['restoredFromActivity']);
+            unset($data['restoredFromActivity']);
+
+            if (!$activity) {
+                return false;
+            }
+
+            // restore dates
+            $backupData = json_decode(json_decode($activity->json_backup)->documentTransformed, true);
+            $documentClass = $this->repository->getDocumentClass();
+            $dates = (new $documentClass)->getDates();
+
+            foreach (array_diff($dates, ['updated_at']) as $date) {
+                $protectedData[$date] = $backupData[$date]
+                    ? \Carbon\Carbon::parse($backupData[$date]['date'])->toDateTimeString()
+                    : null;
+            }
+            return $activity;
+        }
+        return false;
     }
 
     public function fillData(&$data, &$protectedData, $creating = false)
     {
         if ($creating) {
-            if (method_exists($this, 'fillDefaultData')) {
-                $this->fillDefaultData($data, $protectedData);
-            }
+            $this->fillDefaultData($data, $protectedData);
         }
 
-        if (method_exists($this, 'fillUserData')) {
-            $this->fillUserData($protectedData);
-        }
-
-        if (method_exists($this, 'fillMissingData')) {
-            $this->fillMissingData($data, $protectedData);
-        }
-
-        if (method_exists($this, 'adjustData')) {
-            $this->adjustData($data, $protectedData);
-        }
+        $this->fillUserData($protectedData);
+        $this->fillMissingData($data, $protectedData);
+        $this->adjustData($data, $protectedData);
     }
 
     public function __call($method, $parameters)
     {
+        if (in_array($method, [
+            'creating',
+            'created',
+            'updating',
+            'updated',
+            'saving',
+            'saved',
+            'fillDefaultData',
+            'fillUserData',
+            'fillMissingData',
+            'adjustData'
+        ])) {
+            return;
+        }
         try {
             return $this->repository->$method(...$parameters);
         } catch (BadMethodCallException $e) {

@@ -20,9 +20,9 @@ class TaskList extends AbstractDocument
         'user_uuid'
     ];
 
-    public function transform()
+    public function getTransformer()
     {
-        return (new TaskListTransformer)->transform($this);
+        return new TaskListTransformer;
     }
 
     public function project()

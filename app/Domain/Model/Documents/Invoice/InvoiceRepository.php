@@ -5,7 +5,6 @@ namespace App\Domain\Model\Documents\Invoice;
 use App\Infrastructure\Persistence\Repository;
 use App\Domain\Service\Documents\BillableDocumentService;
 use App\Domain\Constants\Invoice\Statuses;
-use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Quote\Quote;
 use App\Domain\Model\Documents\Shared\AbstractDocumentRepository;
 use App\Domain\Model\Documents\Shared\Traits\FillsUserData;
@@ -52,8 +51,6 @@ class InvoiceRepository extends AbstractDocumentRepository
     public function saving($invoice, &$data, &$protectedData)
     {
         if ($invoice->exists) {
-            $this->billableDocumentService->updateBill($invoice, $data);
-
             if (isset($data['items'])) {
                 $this->billableDocumentService->setBillItems($invoice, $data['items']);
             }
@@ -62,7 +59,6 @@ class InvoiceRepository extends AbstractDocumentRepository
             }
         }
         else {
-            $this->billableDocumentService->createBill($invoice, $data);
             $this->billableDocumentService->setBillItems($invoice, $data['items']);
             $this->billableDocumentService->applyCredits($invoice, $data['applied_credits']);
         }

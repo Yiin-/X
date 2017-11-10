@@ -2,19 +2,34 @@
 
 namespace App\Domain\Model\CRM\Task;
 
-use App\Domain\Model\Documents\Shared\DocumentTransformer;
+use League\Fractal;
+use App\Domain\Model\Authentication\User\UserTransformer;
+use App\Domain\Model\System\ActivityLog\ActivityTransformer;
 
-class TaskTransformer extends DocumentTransformer
+class TaskTransformer extends Fractal\TransformerAbstract
 {
-    public function map(Task $task)
+    protected $defaultIncludes = [
+        'user',
+        'history'
+    ];
+
+    public function transform(Task $task)
     {
         return [
             'name' => $task->name,
             'is_completed' => $task->is_completed,
 
-            'user' => $task->user->transform(),
-
             'is_disabled' => false
         ];
+    }
+
+    public function includeUser(Task $task)
+    {
+        return $this->item($task->user, new UserTransformer);
+    }
+
+    public function includeHistory(Task $task)
+    {
+        return $this->collection($task->getHistory(), new ActivityTransformer);
     }
 }

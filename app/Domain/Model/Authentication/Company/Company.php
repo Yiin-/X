@@ -22,14 +22,9 @@ class Company extends AbstractDocument
 
     protected $dispatchesEvents = [];
 
-    public function transform()
+    public function getTransformer()
     {
-        return [
-            'uuid' => $this->uuid,
-            'name' => $this->name,
-            'email' => $this->email,
-            'logo_url' => $this->logo_url
-        ];
+        return new CompanyTransformer;
     }
 
     public function account()

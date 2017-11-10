@@ -2,28 +2,33 @@
 
 namespace App\Domain\Model\System\ActivityLog;
 
-class ActivityTransformer
+use League\Fractal;
+use App\Domain\Model\System\ActivityLog\ActivityTransformer;
+
+class ActivityTransformer extends Fractal\TransformerAbstract
 {
     public function transform(Activity $activity)
     {
         if ($activity->user) {
-            $user = $activity->user->transform();
+            $user = $activity->user->transform()->parseExcludes(['history'])->toArray();
         } else {
             $user = null;
         }
 
         $documentBackup = [];
         if ($activity->json_backup) {
-            $documentBackup = (array) json_decode($activity->json_backup)->document ?? [];
+            $documentBackup = (array) json_decode($activity->json_backup)->documentTransformed ?? [];
         }
         $changes = json_decode($activity->changes, true) ?? [];
 
         $document = null;
+
         if ($activity->document_uuid) {
             $document = ($activity->document_type)::find($activity->document_uuid);
+
             if ($document) {
                 $document = [
-                    'data' => $document->transform(),
+                    'data' => $document->transform()->parseExcludes(['history'])->toArray(),
                     'type' => resource_name($document),
                     'from_backup' => false
                 ];

@@ -3,11 +3,14 @@
 namespace App\Domain\Model\Documents\Product;
 
 use League\Fractal;
-use Money\Currency;
-use Money\Money;
+use App\Domain\Model\System\ActivityLog\ActivityTransformer;
 
 class ProductTransformer extends Fractal\TransformerAbstract
 {
+    protected $defaultIncludes = [
+        'history'
+    ];
+
     public function transform(Product $product)
     {
         return [
@@ -30,5 +33,10 @@ class ProductTransformer extends Fractal\TransformerAbstract
             'deleted_at' => $product->deleted_at,
             'archived_at' => $product->archived_at
         ];
+    }
+
+    public function includeHistory(Product $product)
+    {
+        return $this->collection($product->getHistory(), new ActivityTransformer);
     }
 }

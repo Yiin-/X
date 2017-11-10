@@ -43,7 +43,7 @@ class InvoiceForClient extends Mailable implements ShouldQueue
         }
         return $this->markdown('emails.invoice.default')
             ->attach(storage_path($this->invoice->pdfs()->latest()->path_to_pdf), [
-                'as' => $this->invoice->bill->number . '.pdf',
+                'as' => $this->invoice->invoice_number . '.pdf',
                 'mime' => 'application/pdf'
             ]);
     }

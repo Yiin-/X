@@ -15,13 +15,9 @@ class Account extends AbstractDocument
 
     protected $dispatchesEvents = [];
 
-    public function transform()
+    public function getTransformer()
     {
-        return [
-            'uuid' => $this->uuid,
-            'name' => $this->name,
-            'site_address' => $this->site_address
-        ];
+        return new AccountTransformer;
     }
 
     public function companies()

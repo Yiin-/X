@@ -19,11 +19,9 @@ class Permission extends AbstractDocument
 
     protected $dispatchesEvents = [];
 
-    public function transform()
+    public function getTransformer()
     {
-        return [
-            'type' => $this->type
-        ];
+        return new PermissionTransformer;
     }
 
     public function roles()

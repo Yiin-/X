@@ -37,7 +37,10 @@ class Repository
             ->orderBy('id', 'desc')
             ->get()
             ->map(function (AbstractDocument $model) {
-                return $model->transform();
+                return $model
+                    ->transform()
+                    ->parseIncludes(['history'])
+                    ->toArray();
             });
     }
 
@@ -103,11 +106,7 @@ class Repository
         $document = $this->find($uuid);
 
         if ($document) {
-            if ($document->deleted_at) {
-                $document->forceDelete();
-            } else {
-                $document->delete();
-            }
+            $document->delete();
         }
 
         return $document;
@@ -150,11 +149,7 @@ class Repository
         $documents = $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get();
 
         foreach ($documents as $document) {
-            if ($document->deleted_at) {
-                $document->forceDelete();
-            } else {
-                $document->delete();
-            }
+            $document->delete();
         }
 
         $documents = $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get();
@@ -164,26 +159,34 @@ class Repository
 
     public function restoreBatch($uuids)
     {
-        $this->newQuery()->whereIn('uuid', $uuids)->restore();
+        $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get()->each(function ($document) {
+            $document->restore();
+        });
 
         return $this->newQuery()->withTrashed()->whereIn('uuid', $uuids)->get();
     }
 
     public function archiveBatch($uuids)
     {
-        $this->newQuery()->whereIn('uuid', $uuids)->update([
-            'archived_at' => (new $this->documentClass)->freshTimestamp()
-        ]);
+        $documents = $this->newQuery()->whereIn('uuid', $uuids)->get();
 
-        return $this->newQuery()->whereIn('uuid', $uuids)->get();
+        foreach ($documents as $document) {
+            $document->archived_at = (new $this->documentClass)->freshTimestamp();
+            $document->save();
+        }
+
+        return $documents;
     }
 
     public function unarchiveBatch($uuids)
     {
-        $this->newQuery()->whereIn('uuid', $uuids)->update([
-            'archived_at' => null
-        ]);
+        $documents = $this->newQuery()->whereIn('uuid', $uuids)->get();
 
-        return $this->newQuery()->whereIn('uuid', $uuids)->get();
+        foreach ($documents as $document) {
+            $document->archived_at = null;
+            $document->save();
+        }
+
+        return $documents;
     }
 }

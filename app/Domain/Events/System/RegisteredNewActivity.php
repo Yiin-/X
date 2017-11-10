@@ -23,11 +23,11 @@ class RegisteredNewActivity
      */
     public function __construct(Activity $activity)
     {
-        if (!auth()->check()) {
-            // TODO: Notify account owner about new account
+        if (!$activity->user) {
+            // new account created
             return;
         }
-        $this->user = auth()->user();
+        $this->user = $activity->user;
         $this->activity = $activity;
 
         if ($activity->document) {

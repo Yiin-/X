@@ -40,28 +40,9 @@ class Payment extends AbstractDocument
 
     protected $touches = ['invoice'];
 
-    public function transform($exclude = [])
+    public function getTransformer()
     {
-        return [
-            'uuid' => $this->uuid,
-
-            'client_uuid' => $this->client_uuid,
-            'invoice_uuid' => $this->invoice_uuid,
-
-            'amount' => +$this->amount,
-            'refunded' => +$this->refunded,
-            'currency' => $this->currency,
-            'payment_type' => $this->paymentType,
-            'payment_date' => $this->payment_date,
-            'payment_reference' => $this->payment_reference,
-
-            'is_disabled' => $this->is_disabled,
-
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
-            'archived_at' => $this->archived_at
-        ];
+        return new PaymentTransformer;
     }
 
     public function client()

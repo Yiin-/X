@@ -3,12 +3,43 @@
 namespace App\Domain\Model\Documents\Shared;
 
 use App\Domain\Constants\Bill\DiscountTypes;
-use App\Domain\Model\Documents\Bill\Bill;
+use App\Domain\Model\Documents\Bill\BillItem;
 use App\Domain\Model\Documents\Pdf\Pdf;
+use App\Domain\Model\Documents\Credit\AppliedCredit;
+use App\Domain\Model\Documents\Client\Client;
+use App\Domain\Model\Documents\Passive\Currency;
 
 class BillableDocument extends AbstractDocument
 {
-    public function transform()
+    protected $fillable = [
+        'date',
+        'due_date',
+        'archived_at'
+    ];
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class, 'currency_code', 'code');
+    }
+
+    public function items()
+    {
+        return $this->morphMany(BillItem::class, 'billable')->orderBy('index', 'asc');
+    }
+
+    public function appliedCredits()
+    {
+        return $this->morphMany(AppliedCredit::class, 'billable');
+    }
+
+    public function getAppliedCreditsSumAttribute()
+    {
+        return $this->appliedCredits->reduce(function ($sum, $appliedCredit) {
+            return bcadd($sum, convert_currency($appliedCredit->amount, $appliedCredit->currency_code, $this->currency_code), 2);
+        }, 0);
+    }
+
+    public function getTransformer()
     {
         //
     }
@@ -28,7 +59,7 @@ class BillableDocument extends AbstractDocument
     {
         $amount = 0;
 
-        foreach ($this->bill->items as $item) {
+        foreach ($this->items as $item) {
             $amount = bcadd($amount, $item->initial_cost, 2);
         }
 
@@ -42,7 +73,7 @@ class BillableDocument extends AbstractDocument
     {
         $amount = 0;
 
-        foreach ($this->bill->items as $item) {
+        foreach ($this->items as $item) {
             $amount = bcadd($amount, $item->discount, 2);
         }
 
@@ -56,7 +87,7 @@ class BillableDocument extends AbstractDocument
     {
         $amount = 0;
 
-        foreach ($this->bill->items as $item) {
+        foreach ($this->items as $item) {
             $amount = bcadd($amount, $item->tax, 2);
         }
 
@@ -71,27 +102,19 @@ class BillableDocument extends AbstractDocument
     {
         $amount = 0;
 
-        foreach ($this->bill->items as $item) {
+        foreach ($this->items as $item) {
             $amount = bcadd($amount, $item->final_price, 2);
         }
 
-        switch ($this->bill->discount_type) {
+        switch ($this->discount_type) {
             case DiscountTypes::FLAT:
-                $amount = bcsub($amount, $this->bill->discount, 2);
+                $amount = bcsub($amount, $this->discount_value, 2);
                 break;
             case DiscountTypes::PERCENTAGE:
-                $amount = bcsub($amount, bcmul($amount, bcdiv($this->bill->discount, 100, 2), 2), 2);
+                $amount = bcsub($amount, bcmul($amount, bcdiv($this->discount_value, 100, 2), 2), 2);
                 break;
         }
 
         return +$amount;
-    }
-
-    /**
-     * Every billable document should have reference to actual bill
-     */
-    public function bill()
-    {
-        return $this->morphOne(Bill::class, 'billable', null, 'billable_uuid');
     }
 }

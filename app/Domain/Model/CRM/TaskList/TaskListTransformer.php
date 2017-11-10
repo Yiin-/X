@@ -2,22 +2,40 @@
 
 namespace App\Domain\Model\CRM\TaskList;
 
-use App\Domain\Model\Documents\Shared\DocumentTransformer;
-use App\Domain\Model\CRM\Task\TaskTransformer;
+use League\Fractal;
+use App\Domain\Model\Authentication\User\UserTransformer;
+use App\Domain\Model\System\ActivityLog\ActivityTransformer;
 
-class TaskListTransformer extends DocumentTransformer
+class TaskListTransformer extends Fractal\TransformerAbstract
 {
-    public function map(TaskList $taskList)
+    protected $defaultIncludes = [
+        'user',
+        'tasks',
+        'history'
+    ];
+
+    public function transform(TaskList $taskList)
     {
         return [
             'name' => $taskList->name,
             'color' => $taskList->color,
 
-            'tasks' => $taskList->tasks->map(function ($task) {
-                return (new TaskTransformer)->transform($task);
-            }),
-
             'is_disabled' => false
         ];
+    }
+
+    public function includeUser(Task $task)
+    {
+        return $this->item($task->user, new UserTransformer);
+    }
+
+    public function includeTasks(TaskList $taskList)
+    {
+        return $this->collection($taskList->items, new TaskTransformer);
+    }
+
+    public function includeHistory(Task $task)
+    {
+        return $this->collection($task->getHistory(), new ActivityTransformer);
     }
 }

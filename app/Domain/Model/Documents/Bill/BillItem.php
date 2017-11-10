@@ -9,7 +9,8 @@ use App\Domain\Model\Documents\Shared\AbstractDocument;
 class BillItem extends AbstractDocument
 {
     protected $fillable = [
-        'bill_id',
+        'billable_type',
+        'billable_id',
         'product_uuid',
         'name',
         'identification_number',
@@ -20,22 +21,9 @@ class BillItem extends AbstractDocument
         'index'
     ];
 
-    protected $touches = [
-        'bill'
-    ];
-
-    public function transform()
+    public function getTransformer()
     {
-        return [
-            'product' => $this->product ? $this->product->transform() : null,
-            'name' => $this->name,
-            'identification_number' => $this->identification_number,
-            'cost' => +$this->cost,
-            'discount' => +$this->discount,
-            'qty' => +$this->qty,
-            'tax_rate' => $this->taxRate,
-            'index' => $this->index
-        ];
+        return new BillItemTransformer;
     }
 
     protected $dispatchesEvents = [];
@@ -65,9 +53,9 @@ class BillItem extends AbstractDocument
         return bcadd($this->tax, $this->cost_before_tax, 2);
     }
 
-    public function bill()
+    public function billable()
     {
-        return $this->belongsTo(Bill::class);
+        return $this->morphTo();
     }
 
     public function product()

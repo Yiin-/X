@@ -74,9 +74,45 @@ class AuthController extends AbstractController
         return response()->json($data);
     }
 
-    public function refresh(Request $request)
+    public function refresh()
     {
         return response()->json($this->authService->attemptRefresh());
+    }
+
+    public function unlock(Request $request)
+    {
+        $pin = $request->get('pin');;
+
+        if (
+            // auth()->user()->login_attempts < (int)config('auth.max_login_attempts') &&
+            password_verify($pin, auth()->user()->pin_code)
+        ) {
+            auth()->user()->login_attempts = 0;
+            auth()->user()->save();
+
+            return 'OK';
+        }
+        else {
+            auth()->user()->increment('login_attempts');
+
+            if (auth()->user()->login_attempts < config('auth.max_login_attempts')) {
+                return response()->json([
+                    'message' => 'invalid_pin',
+                    'attempts' => auth()->user()->login_attempts,
+                    'max_attempts' => config('auth.max_login_attempts')
+                ], 401);
+            }
+            else {
+                auth()->user()->login_attempts = 0;
+                auth()->user()->save();
+
+                $this->authService->logout();
+
+                return response([
+                    'message' => 'invalid_token'
+                ], 401);
+            }
+        }
     }
 
     public function heartbeat()
@@ -84,7 +120,9 @@ class AuthController extends AbstractController
         if (auth()->check()) {
             return 'OK';
         }
-        return response(null, 401);
+        return response([
+            'message' => 'invalid_token'
+        ], 401);
     }
 
     public function logout()

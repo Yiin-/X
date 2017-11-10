@@ -36,7 +36,8 @@ class SendQuote implements ShouldQueue
      */
     public function __construct(Quote $quote)
     {
-        $quote->loadMissing(['client', 'bill', 'company']);
+        $quote->loadMissing(['client', 'company'])
+        $quote->loadRelationships();
         $this->quote = $quote;
     }
 

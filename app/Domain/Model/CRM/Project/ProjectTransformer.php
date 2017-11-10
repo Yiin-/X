@@ -2,26 +2,41 @@
 
 namespace App\Domain\Model\CRM\Project;
 
-use App\Domain\Model\Documents\Shared\DocumentTransformer;
+use League\Fractal;
 use App\Domain\Model\CRM\TaskList\TaskListTransformer;
 use App\Domain\Model\CRM\Task\TaskTransformer;
+use App\Domain\Model\System\ActivityLog\ActivityTransformer;
 
-class ProjectTransformer extends DocumentTransformer
+class ProjectTransformer extends Fractal\TransformerAbstract
 {
-    public function map(Project $project)
+    protected $defaultIncludes = [
+        'task_lists',
+        'tasks',
+        'history'
+    ];
+
+    public function transform(Project $project)
     {
         return [
             'name' => $project->name,
             'description' => $project->description,
 
-            'client' => [ 'uuid' => $project->client_uuid ],
-
-            'taskLists' => $project->taskLists->map(function ($taskList) {
-                return (new TaskListTransformer)->transform($taskList);
-            }),
-            'tasks' => $project->tasks->map(function ($task) {
-                return (new TaskTransformer)->transform($task);
-            })
+            'client_uuid' => $project->client_uuid
         ];
+    }
+
+    public function includeTaskLists(Project $project)
+    {
+        return $this->collection($project->taskLists, new TaskListTransformer);
+    }
+
+    public function includeTasks(Project $project)
+    {
+        return $this->collection($project->tasks, new TaskTransformer);
+    }
+
+    public function includeHistory(Project $project)
+    {
+        return $this->collection($project->getHistory(), new ActivityTransformer);
     }
 }

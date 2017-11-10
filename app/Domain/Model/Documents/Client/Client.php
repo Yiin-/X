@@ -18,7 +18,7 @@ use App\Domain\Model\Documents\Credit\Credit;
 use App\Domain\Model\Documents\Quote\Quote;
 use App\Domain\Model\Documents\Expense\Expense;
 use App\Domain\Model\CRM\Project\Project;
-use App\Domain\Model\Features\VatChecker\VatCheck;
+use App\Domain\Model\Features\VatChecker\VatInfo;
 
 class Client extends AbstractDocument
 {
@@ -50,53 +50,13 @@ class Client extends AbstractDocument
         'company_uuid'
     ];
 
-    public function transform()
+    protected $with = [
+        'contacts'
+    ];
+
+    public function getTransformer()
     {
-        return [
-            // ID
-            'uuid' => $this->uuid,
-
-            // Organization
-            'name' => $this->name,
-            'registration_number' => $this->registration_number,
-            'vat_number' => $this->vat_number,
-            'vat_number_checks' => VatCheck::whereRaw('CONCAT(country_code, number) = ?', [$this->vat_number])
-                ->get()
-                ->map(function (VatCheck $vatCheck) {
-                    return $vatCheck->transform();
-                }),
-
-            'website' => $this->website,
-            'phone' => $this->phone,
-            'email' => $this->primary_email,
-
-            // Address
-            'address1' => $this->address1,
-            'address2' => $this->address2,
-            'city' => $this->city,
-            'postal_code' => $this->postal_code,
-            'state' => $this->state,
-
-            // Additional info
-            'payment_terms' => $this->payment_terms,
-            'notes' => $this->notes,
-
-            // Relationships
-            'country' => $this->country,
-            'contacts' => $this->exists ? $this->contacts->map(function ($contact) { return $contact->transform(); }) : $this->contacts,
-            'currency_code' => $this->currency_code,
-            'currency' => $this->currency,
-            'language' => $this->language,
-            'company_size' => $this->company_size,
-            'industry' => $this->industry,
-
-            'is_disabled' => $this->is_disabled,
-
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'archived_at' => $this->archived_at,
-            'deleted_at' => $this->deleted_at
-        ];
+        return new ClientTransformer;
     }
 
     public function country()

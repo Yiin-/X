@@ -5,7 +5,6 @@ namespace App\Domain\Service\Documents;
 use App\Domain\Model\Documents\Product\ProductRepository;
 use App\Domain\Model\Documents\Credit\CreditRepository;
 use App\Domain\Model\Documents\Shared\BillableDocument;
-use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Bill\BillItem;
 use App\Domain\Model\Documents\Quote\Quote;
 use App\Domain\Model\Documents\Invoice\Invoice;
@@ -78,8 +77,8 @@ class BillableDocumentService
     {
         $fields = array_merge($this->getCommonPdfFields($invoice), [
             // Invoice data
-            'invoiceNumber' => $invoice->bill->number,
-            'poNumber'      => $invoice->bill->po_number,
+            'invoiceNumber' => $invoice->invoice_number,
+            'poNumber'      => $invoice->po_number,
 
             // Summary
             'paidIn'        => $invoice->paidIn()
@@ -92,9 +91,9 @@ class BillableDocumentService
     {
         return array_merge($this->getCommonPdfFields($quote), [
             // Quote data
-            'quoteNumber' => $quote->bill->number,
-            'poNumber'    => $quote->bill->po_number,
-            'dueData'     => $quote->bill->due_date,
+            'quoteNumber' => $quote->quote_number,
+            'poNumber'    => $quote->po_number,
+            'dueData'     => $quote->due_date,
 
             // Summary
             'paidIn'      => $quote->paidIn()
@@ -109,8 +108,8 @@ class BillableDocumentService
             'userCompanyEmail' => $document->company->email,
 
             // Bill data
-            'items'          => $document->bill->items,
-            'date'           => \Carbon\Carbon::parse($document->bill->date)->format('F j, Y'),
+            'items'          => $document->items,
+            'date'           => \Carbon\Carbon::parse($document->date)->format('F j, Y'),
 
             // Summary
             'subTotal'       => $document->subTotal(),
@@ -119,12 +118,12 @@ class BillableDocumentService
             'tax'            => $document->taxes(),
 
             // Misc
-            'currencySymbol' => $document->bill->currency->symbol,
-            'currencyCode'   => $document->bill->currency->code,
+            'currencySymbol' => $document->currency->symbol,
+            'currencyCode'   => $document->currency->code,
 
             // Texts
-            'footerText'     => $document->bill->footer,
-            'noteToClient'   => $document->bill->notes,
+            'footerText'     => $document->footer,
+            'noteToClient'   => $document->notes,
 
 
             'clientName' => $document->client->name,
@@ -141,112 +140,6 @@ class BillableDocumentService
     }
 
     /**
-     * Create a bill for document with given data.
-     * @param  BillableDocument $document Document we're creating bill for.
-     * @param  array            $data     Data that we need to create the bill
-     * @return Bill                       Created Bill
-     */
-    public function createBill(BillableDocument $document, array $data)
-    {
-        $billData = $this->transformDataToBillData($document, $data);
-
-        return Bill::create(array_merge([
-            'billable_type' => get_class($document),
-            'billable_uuid' => $document->uuid
-        ], $billData));
-    }
-
-    public function updateBill(BillableDocument $document, array $data)
-    {
-        $billData = $this->transformDataToBillData($document, $data);
-
-        $document->bill->update($billData);
-    }
-
-    /**
-     * Transform data to bill data.
-     *
-     * Basically methods of this kind simply changes
-     * key name from 'x_date' to simply 'date'.
-     */
-    public function transformDataToBillData(BillableDocument $document, array $data)
-    {
-        $map = false;
-
-        if ($document instanceof Invoice) {
-            $map = $this->mapInvoice($data);
-        }
-        if ($document instanceof Quote) {
-            $map = $this->mapQuote($data);
-        }
-        if ($document instanceof RecurringInvoice) {
-            $map = $this->mapRecurringInvoice($data);
-        }
-
-        if (!$map) {
-            return $data;
-        }
-
-        $billData = [];
-
-        foreach ($map as $field => $billField) {
-            if (array_key_exists($field, $data)) {
-                $billData[$billField] = $data[$field];
-            } else if(array_key_exists($billField, $data)) {
-                $billData[$billField] = $data[$billField];
-            }
-        }
-        return $billData;
-    }
-
-    public function mapInvoice(array &$data)
-    {
-        return [
-            'invoice_number' => 'number',
-            'po_number' => 'po_number',
-            'partial' => 'partial',
-            'discount_value' => 'discount',
-            'discount_type' => 'discount_type',
-            'invoice_date' => 'date',
-            'due_date' => 'due_date',
-            'currency_code' => 'currency_code',
-            'note_to_client' => 'notes',
-            'terms' => 'terms',
-            'footer' => 'footer'
-        ];
-    }
-
-    public function mapQuote(array &$data)
-    {
-        return [
-            'quote_number' => 'number',
-            'po_number' => 'po_number',
-            'partial' => 'partial',
-            'discount' => 'discount',
-            'discount_type' => 'discount_type',
-            'currency_code' => 'currency_code',
-            'quote_date' => 'date',
-            'due_date' => 'due_date',
-            'notes' => 'notes',
-            'terms' => 'terms',
-            'footer' => 'footer'
-        ];
-    }
-
-    public function mapRecurringInvoice(array &$data)
-    {
-        return [
-            'po_number' => 'po_number',
-            'discount_value' => 'discount',
-            'discount_type' => 'discount_type',
-            'currency_code' => 'currency_code',
-            'note_to_client' => 'notes',
-            'terms' => 'terms',
-            'footer' => 'footer'
-        ];
-    }
-
-    /**
      * Apply credits for billable document EXCEPT if it's quote.
      * In case it's quote, we just create applied credit entries,
      * but do not actually modify the balance of the credits.
@@ -258,7 +151,7 @@ class BillableDocumentService
         /**
          * Go though each of the applied credit
          */
-        $document->bill->appliedCredits()->whereNotIn('credit_uuid', array_map(function ($appliedCredit) {
+        $document->appliedCredits()->whereNotIn('credit_uuid', array_map(function ($appliedCredit) {
             return $appliedCredit['credit_uuid'];
         }, $appliedCredits))->get()->each(function ($appliedCredit) {
             $appliedCredit->credit->balance += convert_currency($appliedCredit->amount, $appliedCredit->currency_code, $appliedCredit->credit->currency_code);
@@ -273,14 +166,14 @@ class BillableDocumentService
                 continue;
             }
 
-            $currencyCode = $document->bill->currency_code;
+            $currencyCode = $document->currency_code;
 
             $amountToApplyInBillCurrency = $creditToApply['amount'];
             $amountToApplyInCreditCurrency = convert_currency($amountToApplyInBillCurrency, $currencyCode, $credit->currency_code);
 
             if (
                 !$document->wasRecentlyCreated &&
-                $appliedCredit = $document->bill->appliedCredits()->where('credit_uuid', $credit->uuid)->first()
+                $appliedCredit = $document->appliedCredits()->where('credit_uuid', $credit->uuid)->first()
             ) {
                 /**
                  * Adjust credit
@@ -306,15 +199,14 @@ class BillableDocumentService
                     $credit->save();
                 }
 
-                $document->bill->appliedCredits()->create([
+                $document->appliedCredits()->create([
                     'credit_uuid' => $credit->uuid,
                     'amount' => $amountToApplyInBillCurrency,
                     'currency_code' => $currencyCode
                 ]);
             }
         }
-        $document->bill->load(['appliedCredits']);
-        $document->load(['bill']);
+        $document->load(['appliedCredits']);
     }
 
     /**
@@ -328,8 +220,8 @@ class BillableDocumentService
         $this->createMissingProducts($document, $items);
 
         // because we're assigning new items to the document, delete old items first
-        $document->bill->items()->delete();
-        $document->bill->items()->createMany(collect($items)->map([$this, 'transformToBillItemData'])->toArray());
+        $document->items()->delete();
+        $document->items()->createMany(collect($items)->map([$this, 'transformToBillItemData'])->toArray());
     }
 
     /**
@@ -358,7 +250,7 @@ class BillableDocumentService
                 'qty' => $item['qty'],
                 'discount' => $item['discount'],
                 'tax_rate_uuid' => $item['tax_rate_uuid'],
-                'currency_code' => $document->bill->currency_code
+                'currency_code' => $document->currency_code
             ])->uuid;
         }
     }

@@ -8,6 +8,8 @@ use App\Domain\Events\Document\DocumentWasUpdated;
 use App\Domain\Events\Document\DocumentWasSaved;
 use App\Domain\Events\Document\DocumentWasDeleted;
 use App\Domain\Events\Document\DocumentWasRestored;
+use App\Domain\Events\Document\DocumentWasArchived;
+use App\Domain\Events\Document\DocumentWasUnarchived;
 
 class ActivityListener
 {
@@ -25,12 +27,24 @@ class ActivityListener
 
     public function documentWasUpdated(DocumentWasUpdated $event)
     {
-        $this->activityRepository->registerUserActivity($event->user, 'updated', $event->document);
+       if ($event->document->restoredFromActivity) {
+            $this->activityRepository->registerUserActivity($event->user, 'restored', $event->document, [
+                'restoredFromActivity' => $event->document->restoredFromActivity
+            ]);
+        }
+        else {
+            $this->activityRepository->registerUserActivity($event->user, 'updated', $event->document);
+        }
     }
 
-    public function documentWasSaved(DocumentWasSaved $event)
+    public function documentWasArchived(DocumentWasArchived $event)
     {
-        // \Log::debug('documentWasSaved');
+        $this->activityRepository->registerUserActivity($event->user, 'archived', $event->document);
+    }
+
+    public function documentWasUnarchived(DocumentWasUnarchived $event)
+    {
+        $this->activityRepository->registerUserActivity($event->user, 'unarchived', $event->document);
     }
 
     public function documentWasDeleted(DocumentWasDeleted $event)
@@ -40,7 +54,7 @@ class ActivityListener
 
     public function documentWasRestored(DocumentWasRestored $event)
     {
-        $this->activityRepository->registerUserActivity($event->user, 'restored', $event->document);
+        $this->activityRepository->registerUserActivity($event->user, 'recovered', $event->document);
     }
 
     public function subscribe($events)
@@ -49,6 +63,7 @@ class ActivityListener
         $events->listen(DocumentWasUpdated::class, self::class . '@documentWasUpdated');
         $events->listen(DocumentWasDeleted::class, self::class . '@documentWasDeleted');
         $events->listen(DocumentWasRestored::class, self::class . '@documentWasRestored');
-        $events->listen(DocumentWasSaved::class, self::class . '@documentWasSaved');
+        $events->listen(DocumentWasArchived::class, self::class . '@documentWasArchived');
+        $events->listen(DocumentWasUnarchived::class, self::class . '@documentWasUnarchived');
     }
 }

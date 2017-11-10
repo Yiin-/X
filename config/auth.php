@@ -18,6 +18,8 @@ return [
         'passwords' => 'users',
     ],
 
+    'max_login_attempts' => env('AUTH_MAX_LOGIN_ATTEMPTS', 5),
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards

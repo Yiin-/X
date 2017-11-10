@@ -3,7 +3,6 @@
 namespace App\Domain\Model\Documents\RecurringInvoice;
 
 use App\Domain\Constants\Bill\DiscountTypes;
-use App\Domain\Model\Documents\Bill\Bill;
 use App\Domain\Model\Documents\Bill\BillItem;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Shared\BillableDocument;
@@ -57,7 +56,7 @@ class RecurringInvoice extends BillableDocument
 
             'po_number' => $this->bill->po_number,
             'discount_type' => $this->bill->discount_type,
-            'discount_value' => $this->bill->discount,
+            'discount_value' => $this->bill->discount_value,
             'items' => $this->bill->items->map(function (BillItem $item) {
                 return $item->transform();
             }),

@@ -44,7 +44,7 @@ class VatCheckController extends AbstractController
             ]);
         } catch (Exception $e) {
             $data = auth()->user()->vatChecks()->create([
-                'status' => \App\Domain\Constants\VatCheck\Statuses::INVALID,
+                'status' => \App\Domain\Constants\VatInfo\Statuses::INVALID,
                 'country_code' => $vat_CC,
                 'number' => $vat_VN,
                 'message' => $e->getMessage()
@@ -54,7 +54,7 @@ class VatCheckController extends AbstractController
         }
         if ($result->name !== '' && $result->name !== '---' && $result->address !== '') {
             $data = auth()->user()->vatChecks()->create([
-                'status' => \App\Domain\Constants\VatCheck\Statuses::VALID,
+                'status' => \App\Domain\Constants\VatInfo\Statuses::VALID,
                 'name' => $result->name,
                 'address' => trim(str_replace(' ,', ', ', str_replace(' .', '. ', $result->address))),
                 'country_code' => $vat_CC,
@@ -62,7 +62,7 @@ class VatCheckController extends AbstractController
             ]);
         } else {
             $data = auth()->user()->vatChecks()->create([
-                'status' => \App\Domain\Constants\VatCheck\Statuses::INVALID,
+                'status' => \App\Domain\Constants\VatInfo\Statuses::INVALID,
                 'country_code' => $vat_CC,
                 'number' => $vat_VN
             ]);

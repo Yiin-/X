@@ -3,11 +3,19 @@
 namespace App\Domain\Model\Documents\Invoice;
 
 use League\Fractal;
-use Money\Currency;
-use Money\Money;
+use App\Domain\Model\Documents\Payment\Payment;
+use App\Domain\Model\Documents\Pdf\PdfTransformer;
+use App\Domain\Model\Documents\Bill\BillItemTransformer;
+use App\Domain\Model\System\ActivityLog\ActivityTransformer;
 
 class InvoiceTransformer extends Fractal\TransformerAbstract
 {
+    protected $defaultIncludes = [
+        'pdfs',
+        'items',
+        'history'
+    ];
+
     public function transform(Invoice $invoice)
     {
         $amount = $invoice->amount();
@@ -16,48 +24,53 @@ class InvoiceTransformer extends Fractal\TransformerAbstract
         return [
             'uuid' => $invoice->uuid,
 
-            'relationships' => [
-                'client' => $invoice->client_uuid,
-                'payments' => $invoice->payments->map(function (Payment $payment) {
-                    return $payment->uuid;
-                }),
-            ],
+            'client_uuid' => $invoice->client_uuid,
+            'payments' => $invoice->payments->map(function (Payment $payment) {
+                return $payment->uuid;
+            }),
+
+            'applied_credits' => $invoice->appliedCredits,
 
             'amount' => +$amount,
             'paid_in' => +$paid_in,
-            'balance' => +$amount - +$paid_in,
+            'balance' => +($amount - $paid_in),
 
-            'invoice_date' => $invoice->bill->date,
-            'due_date' => $invoice->bill->due_date,
-            'partial' => $invoice->bill->partial,
-            'invoice_number' => $invoice->bill->number,
-            'po_number' => $invoice->bill->po_number,
-            'discount_type' => $invoice->bill->discount_type,
-            'discount_value' => $invoice->bill->discount,
-            'items' => $invoice->bill->items->map(function (BillItem $item) {
-                return $item->transform();
-            }),
-            'note_to_client' => $invoice->bill->notes,
-            'terms' => $invoice->bill->terms,
-            'footer' => $invoice->bill->footer,
+            'invoice_date' => $invoice->date,
+            'due_date' => $invoice->due_date,
+            'partial' => +$invoice->partial,
+            'currency' => $invoice->currency,
+            'invoice_number' => $invoice->invoice_number,
+            'po_number' => $invoice->po_number,
+            'discount_type' => $invoice->discount_type,
+            'discount_value' => +$invoice->discount_value,
+
+            'note_to_client' => $invoice->notes,
+            'terms' => $invoice->terms,
+            'footer' => $invoice->footer,
 
             'status' => $invoice->status,
+
+            'is_disabled' => $invoice->is_disabled,
 
             'created_at' => $invoice->created_at,
             'updated_at' => $invoice->updated_at,
             'deleted_at' => $invoice->deleted_at,
             'archived_at' => $invoice->archived_at
         ];
-        return [
-            'id'      => (int) $book->id,
-            'title'   => $book->title,
-            'year'    => (int) $book->yr,
-            'links'   => [
-                [
-                    'rel' => 'self',
-                    'uri' => '/books/'.$book->id,
-                ]
-            ],
-        ];
+    }
+
+    public function includePdfs(Invoice $invoice)
+    {
+        return $this->collection($invoice->pdfs, new PdfTransformer);
+    }
+
+    public function includeItems(Invoice $invoice)
+    {
+        return $this->collection($invoice->items, new BillItemTransformer);
+    }
+
+    public function includeHistory(Invoice $invoice)
+    {
+        return $this->collection($invoice->getHistory(), new ActivityTransformer);
     }
 }

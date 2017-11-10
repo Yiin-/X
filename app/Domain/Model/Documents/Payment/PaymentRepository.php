@@ -60,7 +60,7 @@ class PaymentRepository extends AbstractDocumentRepository
         $invoice = $this->invoiceRepository->findActive($data['invoice_uuid']);
         $invoiceBalance = $invoice->balance();
 
-        $invoiceCurrencyCode = $invoice->bill->currency_code;
+        $invoiceCurrencyCode = $invoice->currency_code;
         $amount = convert_currency($data['amount'], $data['currency_code'], $invoiceCurrencyCode);
 
         $data['currency_code'] = $invoiceCurrencyCode;

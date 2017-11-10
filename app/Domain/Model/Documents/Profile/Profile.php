@@ -16,17 +16,9 @@ class Profile extends AbstractDocument
         'job_position'
     ];
 
-    public function transform()
+    public function getTransformer()
     {
-        return [
-            'uuid' => $this->uuid,
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'email' => $this->email,
-            'website' => $this->website,
-            'phone' => $this->phone,
-            'job_position' => $this->job_position
-        ];
+        return new ProfileTransformer;
     }
 
     public function user()

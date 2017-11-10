@@ -20,7 +20,11 @@ class ChangeDecimalPrecision extends Migration
             $table->decimal('price', 13, 2)->change();
         });
 
-        Schema::table('bills', function (Blueprint $table) {
+        Schema::table('invoices', function (Blueprint $table) {
+            $table->decimal('partial', 13, 2)->change();
+        });
+
+        Schema::table('quotes', function (Blueprint $table) {
             $table->decimal('partial', 13, 2)->change();
         });
 

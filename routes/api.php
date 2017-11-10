@@ -13,6 +13,7 @@ Route::post('login', 'Auth\AuthController@login');
 // Refresh access token
 Route::post('login/refresh', 'Auth\AuthController@refresh');
 
+
 // Revoke access token
 Route::post('logout', 'Auth\AuthController@logout');
 
@@ -37,6 +38,11 @@ function genDocumentRoutes($name, $controller) {
  * Routes that requires for user to be authenticated
  */
 Route::middleware('auth:api')->group(function () {
+    /**
+     * Auth
+     */
+    Route::post('unlock', 'Auth\AuthController@unlock');
+
     /**
      * Documents
      */
