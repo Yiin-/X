@@ -56,7 +56,7 @@ class AbstractDocumentRepository
 
         $document = $this->repository->update($data, $protectedData, false);
 
-        if (isset($activity)) {
+        if (isset($activity) && $activity) {
             $document->restoredFromActivity = $activity->id;
         }
 
