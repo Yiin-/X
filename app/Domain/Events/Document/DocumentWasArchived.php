@@ -2,13 +2,10 @@
 
 namespace App\Domain\Events\Document;
 
-use App\Domain\Events\Traits\BroadcastsToUsers;
 use App\Domain\Model\Documents\Shared\AbstractDocument;
 
 class DocumentWasArchived
 {
-    use BroadcastsToUsers;
-
     public $user;
     public $document;
 
@@ -23,7 +20,5 @@ class DocumentWasArchived
 
         $this->user = auth()->user();
         $this->document = $document;
-
-        $this->broadcastToUsers($document);
     }
 }

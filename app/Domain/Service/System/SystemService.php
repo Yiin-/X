@@ -11,7 +11,7 @@ class SystemService
     {
         return [
             'activityLog' => ($user ?? auth()->user())->activity()
-                ->limit(15)
+                // ->limit(15)
                 ->get()
                 ->map(function (Activity $activity) {
                     return (new ActivityTransformer)->transform($activity);
