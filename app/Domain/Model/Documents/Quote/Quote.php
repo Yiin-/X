@@ -2,6 +2,7 @@
 
 namespace App\Domain\Model\Documents\Quote;
 
+use App\Domain\Model\Documents\Shared\Interfaces\BelongsToClient;
 use App\Domain\Constants\Bill\DiscountTypes;
 use App\Domain\Model\Documents\Bill\BillItem;
 use App\Domain\Model\Documents\Client\Client;
@@ -10,7 +11,7 @@ use App\Domain\Model\Documents\Shared\BillableDocument;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Domain\Model\Documents\Pdf\Pdf;
 
-class Quote extends BillableDocument
+class Quote extends BillableDocument implements BelongsToClient
 {
     use SoftDeletes;
 

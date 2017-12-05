@@ -5,20 +5,28 @@ namespace App\Domain\Model\Documents\Client;
 use League\Fractal;
 use App\Domain\Model\Features\VatChecker\VatInfo;
 use App\Domain\Model\Features\VatChecker\VatInfoTransformer;
+use App\Domain\Model\Documents\Contact\ContactTransformer;
 use App\Domain\Model\System\ActivityLog\ActivityTransformer;
+use App\Domain\Model\Authorization\Company\Company;
 
 class ClientTransformer extends Fractal\TransformerAbstract
 {
     protected $defaultIncludes = [
-        'contacts',
         'vat_number_checks',
-        'history'
+        'history',
+        'contacts'
     ];
+
+    public function excludeForBackup()
+    {
+        return ['vat_number_checks', 'history'];
+    }
 
     public function transform(Client $client)
     {
         return [
             'uuid' => $client->uuid,
+            'company_uuid' => $client->company_uuid,
 
             // Organization
             'name' => $client->name,
@@ -26,8 +34,8 @@ class ClientTransformer extends Fractal\TransformerAbstract
             'vat_number' => $client->vat_number,
 
             'website' => $client->website,
-            'phone' => $client->phone,
-            'email' => $client->primary_email,
+            'phone' => $client->primary_phone,
+            'email' => $client->email,
 
             // Address
             'address1' => $client->address1,
@@ -41,12 +49,11 @@ class ClientTransformer extends Fractal\TransformerAbstract
             'notes' => $client->notes,
 
             // Relationships
-            'country' => $client->country,
+            'country_id' => $client->country_id,
             'currency_code' => $client->currency_code,
-            'currency' => $client->currency,
-            'language' => $client->language,
-            'company_size' => $client->company_size,
-            'industry' => $client->industry,
+            'language_id' => $client->language_id,
+            'company_size_id' => $client->company_size_id,
+            'industry_id' => $client->industry_id,
 
             'is_disabled' => $client->is_disabled,
 
@@ -59,7 +66,7 @@ class ClientTransformer extends Fractal\TransformerAbstract
 
     public function includeContacts(Client $client)
     {
-        return $this->collection($client->contacts, new ClientContactTransformer);
+        return $this->collection($client->contacts, new ContactTransformer);
     }
 
     public function includeVatNumberChecks(Client $client)

@@ -39,12 +39,12 @@ class QuoteRepository extends AbstractDocumentRepository
                 $this->billableDocumentService->setBillItems($quote, $data['items']);
             }
             if (isset($data['applied_credits'])) {
-                // $this->billableDocumentService->applyCredits($quote, $data['applied_credits']);
+                $this->billableDocumentService->applyCredits($quote, $data['applied_credits']);
             }
         }
         else {
             $this->billableDocumentService->setBillItems($quote, $data['items']);
-            // $this->billableDocumentService->applyCredits($quote, $data['applied_credits']);
+            $this->billableDocumentService->applyCredits($quote, $data['applied_credits']);
         }
     }
 

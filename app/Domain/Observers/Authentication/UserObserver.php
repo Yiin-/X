@@ -15,8 +15,11 @@ class UserObserver
          */
         // Ignore demo accounts
         if (!$user->guest_key) {
-            Mail::to($user->email)
-                ->send(new WelcomeMessageForUser($user));
+            if ($user->email) {
+                \Log::debug('Sending welcome message to ' . $user->email);
+                Mail::to($user->email)
+                    ->send(new WelcomeMessageForUser($user));
+            }
         }
     }
 }

@@ -6,33 +6,42 @@ use League\Fractal;
 use App\Domain\Model\Features\VatChecker\VatInfo;
 use App\Domain\Model\Features\VatChecker\VatInfoTransformer;
 use App\Domain\Model\System\ActivityLog\ActivityTransformer;
+use App\Domain\Model\Documents\Contact\ContactTransformer;
 
 class VendorTransformer extends Fractal\TransformerAbstract
 {
     protected $defaultIncludes = [
-        'contacts',
         'vat_number_checks',
-        'history'
+        'history',
+        'contacts'
     ];
+
+    public function excludeForBackup()
+    {
+        return ['vat_number_checks', 'history'];
+    }
 
     public function transform(Vendor $vendor)
     {
         return [
             'uuid' => $vendor->uuid,
+            'company_uuid' => $vendor->company_uuid,
 
             'name' => $vendor->name,
             'registration_number' => $vendor->registration_number,
             'vat_number' => $vendor->vat_number,
             'website' => $vendor->website,
-            'phone' => $vendor->phone,
+            'phone' => $vendor->primary_phone,
+            'email' => $vendor->email,
+
             'logo' => $vendor->logo,
             'address1' => $vendor->address1,
             'address2' => $vendor->address2,
             'city' => $vendor->city,
             'postal_code' => $vendor->postal_code,
             'state' => $vendor->state,
-            'country' => $vendor->country,
-            'currency' => $vendor->currency,
+            'country_id' => $vendor->country_id,
+            'currency_code' => $vendor->currency_code,
             'notes' => $vendor->notes,
 
             'expenses' => $vendor->expenses()->sum('amount'),
@@ -48,7 +57,7 @@ class VendorTransformer extends Fractal\TransformerAbstract
 
     public function includeContacts(Vendor $vendor)
     {
-        return $this->collection($vendor->contacts, new VendorContactTransformer);
+        return $this->collection($vendor->contacts, new ContactTransformer);
     }
 
     public function includeVatNumberChecks(Vendor $vendor)

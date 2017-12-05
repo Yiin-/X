@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddWebsiteColumnToProfilesTable extends Migration
+class UpdatePasswordColumnInUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddWebsiteColumnToProfilesTable extends Migration
      */
     public function up()
     {
-        Schema::table('profiles', function(Blueprint $table) {
-            $table->string('website')->nullable();
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('password')->nullable()->change();
         });
     }
 
@@ -25,8 +25,6 @@ class AddWebsiteColumnToProfilesTable extends Migration
      */
     public function down()
     {
-        Schema::table('profiles', function (Blueprint $table) {
-            $table->dropColumn('website');
-        });
+        //
     }
 }

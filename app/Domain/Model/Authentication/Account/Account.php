@@ -5,6 +5,8 @@ namespace App\Domain\Model\Authentication\Account;
 use App\Domain\Model\Documents\Shared\AbstractDocument;
 use App\Domain\Model\Authentication\Company\Company;
 use App\Domain\Model\Authentication\User\User;
+use App\Domain\Events\Authentication\AccountWasCreated;
+use App\Domain\Events\Authentication\AccountWasUpdated;
 
 class Account extends AbstractDocument
 {
@@ -14,6 +16,11 @@ class Account extends AbstractDocument
     ];
 
     protected $dispatchesEvents = [];
+
+    protected $documentEvents = [
+        'created' => AccountWasCreated::class,
+        'updated' => AccountWasUpdated::class
+    ];
 
     public function getTransformer()
     {

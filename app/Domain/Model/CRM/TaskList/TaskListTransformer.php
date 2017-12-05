@@ -14,9 +14,17 @@ class TaskListTransformer extends Fractal\TransformerAbstract
         'history'
     ];
 
+    public function excludeForBackup()
+    {
+        return ['user', 'tasks', 'history'];
+    }
+
     public function transform(TaskList $taskList)
     {
         return [
+            'uuid' -> $taskList->uuid,
+            'company_uuid' -> $taskList->company_uuid,
+
             'name' => $taskList->name,
             'color' => $taskList->color,
 

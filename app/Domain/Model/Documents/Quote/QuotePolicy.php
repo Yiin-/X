@@ -74,6 +74,6 @@ class QuotePolicy
      */
     public function archive(User $user, Quote $quote)
     {
-        return $user->hasPermissionTo(Actions::ARCHIVE, $quote);
+        return $user->hasPermissionTo(Actions::EDIT, $quote);
     }
 }

@@ -20,23 +20,9 @@ class ExpenseCategory extends AbstractDocument
         'company_uuid'
     ];
 
-    public function transform()
+    public function getTransformer()
     {
-        return [
-            'uuid' => $this->uuid,
-            'relationships' => [
-                'expenses' => $this->expenses->map(function ($expense) {
-                    return $expense->uuid
-                }),
-            ],
-
-            'name' => $this->name,
-
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'archived_at' => $this->archived_at,
-            'deleted_at' => $this->deleted_at
-        ];
+        return new ExpenseCategoryTransformer;
     }
 
     public function expenses()

@@ -11,17 +11,23 @@ class ExpenseTransformer extends Fractal\TransformerAbstract
         'history'
     ];
 
+    public function excludeForBackup()
+    {
+        return ['history'];
+    }
+
     public function transform(Expense $expense)
     {
         return [
             'uuid' => $expense->uuid,
+            'company_uuid' => $expense->company_uuid,
 
             'vendor_uuid' => $expense->vendor_uuid,
             'client_uuid' => $expense->client_uuid,
             'invoice_uuid' => $expense->invoice ? $expense->invoice->uuid : null,
 
             'amount' => +$expense->amount,
-            'currency' => $expense->currency,
+            'currency_code' => $expense->currency_code,
             'date' => $expense->date,
 
             'is_disabled' => $expense->is_disabled,

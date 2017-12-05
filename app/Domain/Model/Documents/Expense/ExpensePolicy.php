@@ -74,6 +74,6 @@ class ExpensePolicy
      */
     public function archive(User $user, Expense $expense)
     {
-        return $user->hasPermissionTo(Actions::ARCHIVE, $expense);
+        return $user->hasPermissionTo(Actions::EDIT, $expense);
     }
 }

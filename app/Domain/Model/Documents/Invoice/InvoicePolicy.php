@@ -74,6 +74,6 @@ class InvoicePolicy
      */
     public function archive(User $user, Invoice $invoice)
     {
-        return $user->hasPermissionTo(Actions::ARCHIVE, $invoice);
+        return $user->hasPermissionTo(Actions::EDIT, $invoice);
     }
 }

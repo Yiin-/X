@@ -33,9 +33,9 @@ class CurrencyRateService
     public function fetchRates($base)
     {
         try {
-            $res = $this->httpClient->request('GET', 'http://api.fixer.io/latest?base=' . $base);
+            $output = exec('curl api.fixer.io/latest?base=' . $base);
 
-            return json_decode($res->getBody())->rates;
+            return json_decode($output)->rates;
         } catch (\Exception $e) {
             \Log::error('CurrencyRateService: ' . $base . ' rates update failed:');
             \Log::error($e->getMessage());

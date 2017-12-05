@@ -2,10 +2,10 @@
 
 namespace App\Domain\Model\Documents\Client;
 
-use App\Domain\Model\Documents\Profile\ProfileRepository;
 use App\Domain\Model\Documents\Shared\AbstractDocumentRepository;
 use App\Infrastructure\Persistence\Repository;
-use App\Domain\Model\Authentication\User\UserRepository;
+use App\Domain\Model\Documents\Contact\Contact;
+use App\Domain\Model\Documents\Contact\ContactRepository;
 use App\Domain\Model\Documents\Shared\Traits\FillsUserData;
 
 class ClientRepository extends AbstractDocumentRepository
@@ -13,49 +13,32 @@ class ClientRepository extends AbstractDocumentRepository
     use FillsUserData;
 
     protected $repository;
-    protected $userRepository;
-    protected $profileRepository;
+    protected $contactRepository;
 
-    public function __construct(UserRepository $userRepository, ProfileRepository $profileRepository)
+    public function __construct(ContactRepository $contactRepository)
     {
         $this->repository = new Repository(Client::class);
-        $this->userRepository = $userRepository;
-        $this->profileRepository = $profileRepository;
+        $this->contactRepository = $contactRepository;
     }
 
-    public function created(&$client, &$data, &$protectedData)
+    public function saved(&$client, &$data)
     {
-        $this->updateContacts($client, $data);
-    }
+        foreach ($data['contacts'] as $contact) {
+            if ($contact['uuid']) {
+                $client->contacts()->find($contact['uuid'])->update($contact);
+            } else {
+                $contactModel = new Contact;
+                $contactModel->uuid = $this->contactRepository->generateUuid();
+                $contactModel->fill($contact);
 
-    public function saving(&$client, &$data)
-    {
-        if (!$client->exists) {
-            return;
-        }
-        $this->updateContacts($client, $data);
-    }
-
-    public function updateContacts(&$client, &$data)
-    {
-        $client->contacts()->delete();
-
-        $profiles = array_map(function ($contact) {
-            return $this->profileRepository->create($contact);
-        }, $data['contacts']);
-
-        foreach ($profiles as $profile) {
-            $client->contacts()->forceCreate([
-                'uuid' => $this->repository->generateUuid(),
-                'client_uuid' => $client->uuid,
-                'profile_uuid' => $profile->uuid
-            ]);
+                $client->contacts()->save($contactModel);
+            }
         }
 
         if (!$client->isDirty()) {
             $client->touch();
         }
 
-        $client->load(['contacts', 'contacts.profile']);
+        $client->load('contacts');
     }
 }

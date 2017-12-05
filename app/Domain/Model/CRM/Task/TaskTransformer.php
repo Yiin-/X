@@ -13,9 +13,17 @@ class TaskTransformer extends Fractal\TransformerAbstract
         'history'
     ];
 
+    public function excludeForBackup()
+    {
+        return ['user', 'history'];
+    }
+
     public function transform(Task $task)
     {
         return [
+            'uuid' => $task->uuid,
+            'company_uuid' => $task->company_uuid,
+
             'name' => $task->name,
             'is_completed' => $task->is_completed,
 

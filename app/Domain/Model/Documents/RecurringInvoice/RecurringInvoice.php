@@ -2,13 +2,14 @@
 
 namespace App\Domain\Model\Documents\RecurringInvoice;
 
+use App\Domain\Model\Documents\Shared\Interfaces\BelongsToClient;
 use App\Domain\Constants\Bill\DiscountTypes;
 use App\Domain\Model\Documents\Bill\BillItem;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Shared\BillableDocument;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class RecurringInvoice extends BillableDocument
+class RecurringInvoice extends BillableDocument implements BelongsToClient
 {
     use SoftDeletes;
 
@@ -38,42 +39,9 @@ class RecurringInvoice extends BillableDocument
         'deleted_at'
     ];
 
-    public function transform()
+    public function getTransformer()
     {
-        return [
-            'uuid' => $this->uuid,
-
-            'client' => [ 'uuid' => $this->client_uuid ],
-
-            'amount' => +$this->amount(),
-
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
-            'due_date' => $this->due_date,
-            'frequency' => $this->frequency,
-            'frequency_type' => $this->frequency_type,
-            'frequency_value' => $this->frequency_value,
-
-            'po_number' => $this->bill->po_number,
-            'discount_type' => $this->bill->discount_type,
-            'discount_value' => $this->bill->discount_value,
-            'items' => $this->bill->items->map(function (BillItem $item) {
-                return $item->transform();
-            }),
-            'note_to_client' => $this->bill->notes,
-            'terms' => $this->bill->terms,
-            'footer' => $this->bill->footer,
-
-            'status' => $this->status,
-
-            'is_disabled' => $this->is_disabled,
-
-            'last_sent_at' => $this->created_at,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'archived_at' => $this->archived_at,
-            'deleted_at' => $this->deleted_at
-        ];
+        return new RecurringInvoiceTransformer;
     }
 
     public function getFrequencyAttribute()

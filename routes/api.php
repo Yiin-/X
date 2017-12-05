@@ -23,15 +23,20 @@ Route::post('heartbeat', 'Auth\AuthController@heartbeat');
 // Pdf generation
 Route::get('pdf-preview', 'Documents\InvoiceController@preview');
 
-function genDocumentRoutes($name, $controller) {
-    Route::post($name . '/{uuid}/archive', "{$controller}@archive");
-    Route::post($name . '/{uuid}/unarchive', "{$controller}@unarchive");
-    Route::post($name . '/{uuid}/restore', "{$controller}@restore");
-    Route::post($name . '-delete', "{$controller}@deleteBatch");
-    Route::post($name . '-restore', "{$controller}@restoreBatch");
-    Route::post($name . '-archive', "{$controller}@archiveBatch");
-    Route::post($name . '-unarchive', "{$controller}@unarchiveBatch");
-    Route::resource($name, $controller);
+if (!function_exists('genDocumentRoutes')) {
+    function genDocumentRoutes($name, $controller, Closure $additionalRoutes = null) {
+        Route::post($name . '/{uuid}/archive', "{$controller}@archive");
+        Route::post($name . '/{uuid}/unarchive', "{$controller}@unarchive");
+        Route::post($name . '/{uuid}/restore', "{$controller}@restore");
+        Route::post($name . '-delete', "{$controller}@deleteBatch");
+        Route::post($name . '-restore', "{$controller}@restoreBatch");
+        Route::post($name . '-archive', "{$controller}@archiveBatch");
+        Route::post($name . '-unarchive', "{$controller}@unarchiveBatch");
+        if (is_callable($additionalRoutes)) {
+            $additionalRoutes();
+        }
+        Route::resource($name, $controller);
+    }
 }
 
 /**
@@ -76,6 +81,11 @@ Route::middleware('auth:api')->group(function () {
     // Quotes
     genDocumentRoutes('quotes', 'Documents\QuoteController');
 
+    // Employees
+    genDocumentRoutes('employees', 'Documents\EmployeeController', function () {
+        Route::post('employees/{uuid}/profile-picture', 'Documents\EmployeeController@profilePicture');
+    });
+
     // Tax Rates
     Route::post('tax-rates/{uuid}/restore', 'Documents\TaxRateController@restore');
     Route::resource('tax-rates', 'Documents\TaxRateController');
@@ -101,11 +111,42 @@ Route::middleware('auth:api')->group(function () {
         Route::put('projects/{project}/task-lists/{taskList}/tasks', 'CRM\ProjectController@updateTask');
     });
 
+    Route::prefix('documents')->group(function () {
+        Route::post('accessible', 'Auth\AuthorizationController@accessibleDocuments');
+    });
+
+    /**
+     * Company
+     */
+    Route::prefix('companies')->group(function () {
+        Route::post('/', 'Auth\CompanyController@store');
+    });
+
     /**
      * User data
      */
     Route::prefix('user')->group(function () {
         Route::post('taskbar', 'Auth\UserController@saveTaskbarState');
+        Route::prefix('state')->group(function () {
+            Route::post('company/{uuid}', 'Auth\UserController@saveStateCompany');
+        });
+    });
+
+    /**
+     * Roles and permissions assignment to user
+     */
+    Route::prefix('authorization')->group(function () {
+        // Give/revoke role to/from user
+        Route::post('give-role/{user}/{role}', 'Auth\AuthorizationController@giveRole');
+        Route::post('revoke-role/{user}/{role}', 'Auth\AuthorizationController@revokeRole');
+
+        // Give/revoke permission to/from role
+        Route::post('give-role-permission/{role}', 'Auth\AuthorizationController@givePermissionToRole');
+        Route::post('revoke-role-permission/{role}', 'Auth\AuthorizationController@revokePermissionFromRole');
+
+        // Give/revoke permission to/from user
+        Route::post('give-user-permission/{user}', 'Auth\AuthorizationController@givePermissionToUser');
+        Route::post('revoke-user-permission/{user}', 'Auth\AuthorizationController@revokePermissionFromUser');
     });
 
     /**

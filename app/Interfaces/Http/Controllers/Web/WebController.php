@@ -37,37 +37,28 @@ class WebController extends AbstractController
 
     public function demo(Request $request)
     {
-        $data = [
-            'preloadedJson' => []
-        ];
-
         /**
          * Try to login to existing guest account
          */
         if ($request->guest_key) {
             try {
-                $authData = $this->authService->attemptLogin($request->guest_key, 'demo', 'demo');
-                $data['preloadedJson']['user'] = $authData['user'];
+                $data = $this->authService->attemptLogin($request->guest_key, 'demo', 'demo');
             } catch (\Exception $e) {}
-        } else if (auth()->check() && !auth()->user()->guest_key) {
+        }
+        /**
+         * If user is already authenticated and not a guest,
+         * serve application normally.
+         */
+        else if (auth()->check() && !auth()->user()->guest_key) {
             return $this->serveApplication();
         }
+
         /**
          * Or create a new one if login wasn't successful
          */
-        if (!array_key_exists('user', $data['preloadedJson'])) {
-            $authData = $this->authService->registerDemoAccount();
-            $user = $authData['user'];
-            $data['preloadedJson']['user'] = $user;
-            $data['preloadedJson']['user']['site_address'] = $user->account->site_address;
-            $data['preloadedJson']['user']['company'] = $user->account->uuid;
-            $data['preloadedJson']['user']['profile'] = $user->profile;
-            $data['preloadedJson']['user']['settings'] = $user->settings;
-            $data['preloadedJson']['user']['preferences'] = $user->preferences;
+        if (!isset($data)) {
+            $data = $this->authService->registerDemoAccount();
         }
-
-        $data['preloadedJson']['access_token'] = $authData['access_token'];
-        $data['preloadedJson']['data'] = $authData['preloadedData']['data'];
 
         return view('front-end.index', $data);
         // $client = $this->validateClient($request);
@@ -78,13 +69,13 @@ class WebController extends AbstractController
     public function serveApplication()
     {
         $data = [
-            'preloadedJson' => []
+            'preloadedData' => []
         ];
 
         // If user is authenticated
         if (auth()->check()) {
             $user = auth()->user();
-            // Logout it out, if that's a guest account
+            // Logout it out, if that's a guest account and trying to access login or register screen
             if ($user->guest_key && (request()->is('login') || request()->is('register') || request()->is('/'))) {
                 // Revoke issued access token
                 $this->authService->logout();
@@ -100,16 +91,14 @@ class WebController extends AbstractController
                 ) {
                     return $this->redirectToUserAccount($user);
                 }
-                $data['preloadedJson']['access_token'] = request()->cookie('_accessToken');
-                $data['preloadedJson']['user'] = $user;
-                $data['preloadedJson']['user']['site_address'] = $user->account->site_address;
-                $data['preloadedJson']['user']['company'] = $user->account->uuid;
-                $data['preloadedJson']['user']['profile'] = $user->profile;
-                $data['preloadedJson']['user']['settings'] = $user->settings;
-                $data['preloadedJson']['user']['preferences'] = $user->preferences;
+                $data['preloadedData']['auth'] = [
+                    'access_token' => request()->cookie('_accessToken')
+                ];
+                $data['preloadedData']['account'] = $user->account->transform()->toArray();
+                $data['preloadedData']['user'] = $user->transform()->toArray();
 
                 // User is authenticated, and is not a guest, we can safely pass preloaded data
-                $data['preloadedJson']['data'] = $this->accountService->fetchDataForUser();
+                $data['preloadedData']['data'] = $this->accountService->fetchDataForUser();
             }
         }
         return view('front-end.index', $data);

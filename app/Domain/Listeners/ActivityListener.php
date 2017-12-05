@@ -2,16 +2,17 @@
 
 namespace App\Domain\Listeners;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Domain\Model\System\ActivityLog\ActivityRepository;
-use App\Domain\Events\Document\DocumentWasCreated;
-use App\Domain\Events\Document\DocumentWasUpdated;
+use App\Domain\Events\Document\UserCreatedDocument;
+use App\Domain\Events\Document\UserUpdatedDocument;
 use App\Domain\Events\Document\DocumentWasSaved;
 use App\Domain\Events\Document\DocumentWasDeleted;
 use App\Domain\Events\Document\DocumentWasRestored;
 use App\Domain\Events\Document\DocumentWasArchived;
 use App\Domain\Events\Document\DocumentWasUnarchived;
 
-class ActivityListener
+class ActivityListener implements ShouldQueue
 {
     private $activityRepository;
 
@@ -20,12 +21,22 @@ class ActivityListener
         $this->activityRepository = $activityRepository;
     }
 
-    public function documentWasCreated(DocumentWasCreated $event)
+    public function accountWasCreated(AccountWasCreated $event)
+    {
+        $this->activityRepository->registerUserActivity(null, 'created', $event->account);
+    }
+
+    public function accountWasUpdated(AccountWasUpdated $event)
+    {
+        $this->activityRepository->registerUserActivity(null, 'updated', $event->account);
+    }
+
+    public function documentWasCreated(UserCreatedDocument $event)
     {
         $this->activityRepository->registerUserActivity($event->user, 'created', $event->document);
     }
 
-    public function documentWasUpdated(DocumentWasUpdated $event)
+    public function documentWasUpdated(UserUpdatedDocument $event)
     {
        if ($event->document->restoredFromActivity) {
             $this->activityRepository->registerUserActivity($event->user, 'restored', $event->document, [
@@ -59,8 +70,11 @@ class ActivityListener
 
     public function subscribe($events)
     {
-        $events->listen(DocumentWasCreated::class, self::class . '@documentWasCreated');
-        $events->listen(DocumentWasUpdated::class, self::class . '@documentWasUpdated');
+        $events->listen(AccountWasCreated::class, self::class . '@accountWasCreated');
+        $events->listen(AccountWasUpdated::class, self::class . '@accountWasUpdated');
+
+        $events->listen(UserCreatedDocument::class, self::class . '@documentWasCreated');
+        $events->listen(UserUpdatedDocument::class, self::class . '@documentWasUpdated');
         $events->listen(DocumentWasDeleted::class, self::class . '@documentWasDeleted');
         $events->listen(DocumentWasRestored::class, self::class . '@documentWasRestored');
         $events->listen(DocumentWasArchived::class, self::class . '@documentWasArchived');

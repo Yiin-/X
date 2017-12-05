@@ -55,7 +55,7 @@ abstract class DocumentController extends AbstractController
 
         $this->authorize('see', $document);
 
-        return response()->json($document->transform()->toArray());
+        return response()->json($document->transform(['include_all'])->toArray());
     }
 
     /**
@@ -74,7 +74,7 @@ abstract class DocumentController extends AbstractController
         $data = $request->get($this->getResourceName(), []);
 
         return response()->json(
-            $this->repository->create($data)->transform()->toArray(), 201
+            $this->repository->create($data)->transform(['include_all'])->toArray(), 201
         );
     }
 
@@ -100,7 +100,7 @@ abstract class DocumentController extends AbstractController
 
         $data['uuid'] = $uuid;
 
-        return $this->repository->update($data)->transform()->toArray();
+        return $this->repository->update($data)->transform(['include_all'])->toArray();
     }
 
     /**
@@ -112,7 +112,7 @@ abstract class DocumentController extends AbstractController
     {
         $this->authorize('delete', $this->repository->find($uuid));
 
-        return $this->repository->delete($uuid)->transform()->toArray();
+        return $this->repository->delete($uuid)->transform(['include_all'])->toArray();
     }
 
     /**
@@ -124,7 +124,7 @@ abstract class DocumentController extends AbstractController
     {
         $this->authorize('delete', $this->repository->find($uuid));
 
-        return response()->json($this->repository->restore($uuid)->transform()->toArray());
+        return response()->json($this->repository->restore($uuid)->transform(['include_all'])->toArray());
     }
 
     /**
@@ -136,7 +136,7 @@ abstract class DocumentController extends AbstractController
     {
         $this->authorize('archive', $this->repository->find($uuid));
 
-        return response()->json($this->repository->archive($uuid)->transform()->toArray());
+        return response()->json($this->repository->archive($uuid)->transform(['include_all'])->toArray());
     }
 
     /**
@@ -148,7 +148,7 @@ abstract class DocumentController extends AbstractController
     {
         $this->authorize('archive', $this->repository->find($uuid));
 
-        return response()->json($this->repository->unarchive($uuid)->transform()->toArray());
+        return response()->json($this->repository->unarchive($uuid)->transform(['include_all'])->toArray());
     }
 
     /**
@@ -156,36 +156,74 @@ abstract class DocumentController extends AbstractController
      */
     public function deleteBatch(Request $request)
     {
+        $documents = $this->repository->find($request->get('keys', []));
+        $keys = [];
+
+        foreach ($documents as $document) {
+            if (!auth()->user()->can('delete', $document)) {
+                continue;
+            }
+            $keys [] = $document->uuid;
+        }
+
         return response()->json(
-            $this->repository->deleteBatch($request->get('keys', []))->map(function ($document) {
-                return $document->transform()->toArray();
+            $this->repository->deleteBatch($keys)->map(function ($document) {
+                return $document->transform(['include_all'])->toArray();
             })
         );
     }
 
     public function restoreBatch(Request $request)
     {
+        $documents = $this->repository->find($request->get('keys', []));
+        $keys = [];
+
+        foreach ($documents as $document) {
+            if (!auth()->user()->can('delete', $document)) {
+                continue;
+            }
+            $keys [] = $document->uuid;
+        }
+
         return response()->json(
-            $this->repository->restoreBatch($request->get('keys', []))->map(function ($document) {
-                return $document->transform()->toArray();
+            $this->repository->restoreBatch($keys)->map(function ($document) {
+                return $document->transform(['include_all'])->toArray();
             })
         );
     }
 
     public function archiveBatch(Request $request)
     {
+        $documents = $this->repository->find($request->get('keys', []));
+        $keys = [];
+
+        foreach ($documents as $document) {
+            if (!auth()->user()->can('delete', $document)) {
+                continue;
+            }
+            $keys [] = $document->uuid;
+        }
         return response()->json(
-            $this->repository->archiveBatch($request->get('keys', []))->map(function ($document) {
-                return $document->transform()->toArray();
+            $this->repository->archiveBatch($keys)->map(function ($document) {
+                return $document->transform(['include_all'])->toArray();
             })
         );
     }
 
     public function unarchiveBatch(Request $request)
     {
+        $documents = $this->repository->find($request->get('keys', []));
+        $keys = [];
+
+        foreach ($documents as $document) {
+            if (!auth()->user()->can('delete', $document)) {
+                continue;
+            }
+            $keys [] = $document->uuid;
+        }
         return response()->json(
-            $this->repository->unarchiveBatch($request->get('keys', []))->map(function ($document) {
-                return $document->transform()->toArray();
+            $this->repository->unarchiveBatch($keys)->map(function ($document) {
+                return $document->transform(['include_all'])->toArray();
             })
         );
     }
@@ -242,7 +280,7 @@ abstract class DocumentController extends AbstractController
             ->orderBy($orderBy, $orderDirection)
             ->get()
             ->map(function ($model) {
-                return $model->transform()->toArray();
+                return $model->transform(['include_all'])->toArray();
             });
     }
 

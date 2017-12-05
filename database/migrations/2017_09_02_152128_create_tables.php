@@ -182,7 +182,7 @@ class CreateTables extends Migration
             $table->string('vat_number')->nullable();
 
             $table->string('website')->nullable();
-            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
             $table->text('description')->nullable();
 
             $table->string('address1')->nullable();
@@ -220,19 +220,19 @@ class CreateTables extends Migration
             $table->softDeletes();
         });
 
-        Schema::create('client_contacts', function (Blueprint $table) {
+        Schema::create('contacts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('uuid')->unique();
 
-            $table->string('client_uuid');
-            $table->foreign('client_uuid')
-                ->references('uuid')->on('clients')
-                ->onDelete('cascade')->onUpdate('cascade');
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
+            $table->string('job_title')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
+            $table->string('website')->nullable();
 
-            $table->string('profile_uuid');
-            $table->foreign('profile_uuid')
-                ->references('uuid')->on('profiles')
-                ->onDelete('cascade')->onUpdate('cascade');
+            $table->string('contactable_type');
+            $table->string('contactable_id');
 
             $table->timestamps();
         });
@@ -461,7 +461,7 @@ class CreateTables extends Migration
             $table->string('registration_number')->nullable();
             $table->string('vat_number')->nullable();
             $table->string('website')->nullable();
-            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
             $table->string('logo')->nullable();
 
             $table->string('address1')->nullable();

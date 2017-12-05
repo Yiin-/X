@@ -2,6 +2,7 @@
 
 namespace App\Domain\Model\Documents\Payment;
 
+use App\Domain\Model\Documents\Shared\Interfaces\BelongsToClient;
 use App\Domain\Model\Documents\Company\Company;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Invoice\Invoice;
@@ -10,7 +11,7 @@ use App\Domain\Model\Documents\Passive\Currency;
 use App\Domain\Model\Documents\Shared\AbstractDocument;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Payment extends AbstractDocument
+class Payment extends AbstractDocument implements BelongsToClient
 {
     use SoftDeletes;
 

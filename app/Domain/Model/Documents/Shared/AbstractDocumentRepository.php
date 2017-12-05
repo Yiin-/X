@@ -131,7 +131,7 @@ class AbstractDocumentRepository
             $this->fillDefaultData($data, $protectedData);
         }
 
-        $this->fillUserData($protectedData);
+        $this->fillUserData($data, $protectedData);
         $this->fillMissingData($data, $protectedData);
         $this->adjustData($data, $protectedData);
     }

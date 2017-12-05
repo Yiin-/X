@@ -2,12 +2,13 @@
 
 namespace App\Domain\Model\Documents\Credit;
 
+use App\Domain\Model\Documents\Shared\Interfaces\BelongsToClient;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Passive\Currency;
 use App\Domain\Model\Documents\Shared\AbstractDocument;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Credit extends AbstractDocument
+class Credit extends AbstractDocument implements BelongsToClient
 {
     use SoftDeletes;
 

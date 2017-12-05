@@ -12,6 +12,7 @@ use App\Domain\Model\Documents\Quote\QuoteRepository;
 use App\Domain\Model\Documents\RecurringInvoice\RecurringInvoiceRepository;
 use App\Domain\Model\Documents\Vendor\VendorRepository;
 use App\Domain\Model\Documents\TaxRate\TaxRateRepository;
+use App\Domain\Model\Documents\Employee\EmployeeRepository;
 
 class DocumentsService
 {
@@ -24,6 +25,7 @@ class DocumentsService
     protected $quoteRepository;
     protected $recurringInvoiceRepository;
     protected $vendorRepository;
+    protected $employeeRepository;
     protected $taxRateRepository;
 
     public function __construct(
@@ -36,6 +38,7 @@ class DocumentsService
         QuoteRepository $quoteRepository,
         RecurringInvoiceRepository $recurringInvoiceRepository,
         VendorRepository $vendorRepository,
+        EmployeeRepository $employeeRepository,
         TaxRateRepository $taxRateRepository
     ) {
         $this->clientRepository = $clientRepository;
@@ -47,26 +50,32 @@ class DocumentsService
         $this->quoteRepository = $quoteRepository;
         $this->recurringInvoiceRepository = $recurringInvoiceRepository;
         $this->vendorRepository = $vendorRepository;
+        $this->employeeRepository = $employeeRepository;
         $this->taxRateRepository = $taxRateRepository;
+    }
+
+    public function getRepositories()
+    {
+        return [
+            'clientRepository' => $this->clientRepository,
+            'creditRepository' => $this->creditRepository,
+            'expenseRepository' => $this->expenseRepository,
+            'invoiceRepository' => $this->invoiceRepository,
+            'paymentRepository' => $this->paymentRepository,
+            'productRepository' => $this->productRepository,
+            'quoteRepository' => $this->quoteRepository,
+            'recurringInvoiceRepository' => $this->recurringInvoiceRepository,
+            'vendorRepository' => $this->vendorRepository,
+            'taxRateRepository' => $this->taxRateRepository
+        ];
     }
 
     public function getAll($user = null)
     {
         $arr = [];
 
-        foreach ([
-            'clientRepository',
-            'creditRepository',
-            'expenseRepository',
-            'invoiceRepository',
-            'paymentRepository',
-            'productRepository',
-            'quoteRepository',
-            'recurringInvoiceRepository',
-            'vendorRepository',
-            'taxRateRepository'
-        ] as $repo) {
-            $arr [resource_name($this->{$repo}->getDocumentClass())] = $this->{$repo}->getVisible($user ? $user->uuid : auth()->id());
+        foreach ($this->getRepositories() as $repo) {
+            $arr [resource_name($repo->getDocumentClass())] = $repo->getVisible($user ? $user->uuid : auth()->id());
         }
         return $arr;
     }

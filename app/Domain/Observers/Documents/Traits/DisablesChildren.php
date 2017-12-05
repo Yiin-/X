@@ -24,7 +24,7 @@ trait DisablesChildren
         }
     }
 
-    public function restoring(AbstractDocument $document)
+    public function restored(AbstractDocument $document)
     {
         foreach ($this->children as $childrenRelationship) {
             foreach ($document->{$childrenRelationship} as $relatedDocument) {

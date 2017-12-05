@@ -12,9 +12,14 @@ class InvoiceTransformer extends Fractal\TransformerAbstract
 {
     protected $defaultIncludes = [
         'pdfs',
-        'items',
-        'history'
+        'history',
+        'items'
     ];
+
+    public function excludeForBackup()
+    {
+        return ['pdfs', 'history'];
+    }
 
     public function transform(Invoice $invoice)
     {
@@ -23,6 +28,7 @@ class InvoiceTransformer extends Fractal\TransformerAbstract
 
         return [
             'uuid' => $invoice->uuid,
+            'company_uuid' => $invoice->company_uuid,
 
             'client_uuid' => $invoice->client_uuid,
             'payments' => $invoice->payments->map(function (Payment $payment) {
@@ -35,10 +41,10 @@ class InvoiceTransformer extends Fractal\TransformerAbstract
             'paid_in' => +$paid_in,
             'balance' => +($amount - $paid_in),
 
-            'invoice_date' => $invoice->date,
+            'date' => $invoice->date,
             'due_date' => $invoice->due_date,
             'partial' => +$invoice->partial,
-            'currency' => $invoice->currency,
+            'currency_code' => $invoice->currency_code,
             'invoice_number' => $invoice->invoice_number,
             'po_number' => $invoice->po_number,
             'discount_type' => $invoice->discount_type,

@@ -54,6 +54,9 @@ class BillableDocumentService
 
     public function genHtml(BillableDocument $document)
     {
+        if ($document->is_disabled) {
+            return '';
+        }
         if ($document instanceof Invoice) {
             return $this->genInvoiceHtml($document);
         }
@@ -125,11 +128,10 @@ class BillableDocumentService
             'footerText'     => $document->footer,
             'noteToClient'   => $document->notes,
 
-
             'clientName' => $document->client->name,
             'clientAddress1' => $document->client->address1,
             'clientAddress2' => $document->client->address2,
-            'clientCountry' => $document->client->country->name,
+            'clientCountry' => $document->client->country ? $document->client->country->name : '',
             'clientEmail' => $document->client->email,
             'userCompanyName' => $document->company->name,
             'userAddress1' => '',
@@ -156,6 +158,8 @@ class BillableDocumentService
         }, $appliedCredits))->get()->each(function ($appliedCredit) {
             $appliedCredit->credit->balance += convert_currency($appliedCredit->amount, $appliedCredit->currency_code, $appliedCredit->credit->currency_code);
             $appliedCredit->credit->save();
+            $this->creditRepository->dispatchEvent('saved', $appliedCredit->credit);
+            $this->creditRepository->dispatchEvent('updated', $appliedCredit->credit);
             $appliedCredit->delete();
         });
 
@@ -184,6 +188,8 @@ class BillableDocumentService
                 if (!($document instanceof Quote)) {
                     $credit->balance -= $differenceInCreditCurency;
                     $credit->save();
+                    $this->creditRepository->dispatchEvent('saved', $credit);
+                    $this->creditRepository->dispatchEvent('updated', $credit);
                 }
 
                 $appliedCredit->amount = $creditToApply['amount'];
@@ -197,6 +203,8 @@ class BillableDocumentService
                 if (!($document instanceof Quote)) {
                     $credit->balance -= $amountToApplyInCreditCurrency;
                     $credit->save();
+                    $this->creditRepository->dispatchEvent('saved', $credit);
+                    $this->creditRepository->dispatchEvent('updated', $credit);
                 }
 
                 $document->appliedCredits()->create([
@@ -248,9 +256,11 @@ class BillableDocumentService
                 'identification_number' => $item['identification_number'],
                 'price' => $item['cost'],
                 'qty' => $item['qty'],
-                'discount' => $item['discount'],
-                'tax_rate_uuid' => $item['tax_rate_uuid'],
+                'discount' => $item['discount'] ?? 0,
+                'tax_rate_uuid' => $item['tax_rate_uuid'] ?? null,
                 'currency_code' => $document->currency_code
+            ], [
+                'company_uuid' => $document->company_uuid
             ])->uuid;
         }
     }

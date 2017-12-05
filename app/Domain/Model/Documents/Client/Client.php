@@ -17,6 +17,7 @@ use App\Domain\Model\Documents\Payment\Payment;
 use App\Domain\Model\Documents\Credit\Credit;
 use App\Domain\Model\Documents\Quote\Quote;
 use App\Domain\Model\Documents\Expense\Expense;
+use App\Domain\Model\Documents\Contact\Contact;
 use App\Domain\Model\CRM\Project\Project;
 use App\Domain\Model\Features\VatChecker\VatInfo;
 
@@ -29,7 +30,7 @@ class Client extends AbstractDocument
         'registration_number',
         'vat_number',
         'website',
-        'phone',
+        'email',
         'description',
         'address1',
         'address2',
@@ -66,7 +67,7 @@ class Client extends AbstractDocument
 
     public function contacts()
     {
-        return $this->hasMany(ClientContact::class);
+        return $this->morphMany(Contact::class, 'contactable');
     }
 
     public function currency()
@@ -119,16 +120,15 @@ class Client extends AbstractDocument
         return $this->hasMany(Project::class);
     }
 
-
-    public function hasPrimaryEmail()
+    public function hasPrimaryPhone()
     {
-        return filter_var($this->primary_email, FILTER_VALIDATE_EMAIL);
+        return $this->primary_phone;
     }
 
-    public function getPrimaryEmailAttribute()
+    public function getPrimaryPhoneAttribute()
     {
         $primaryContact = $this->contacts()->first();
 
-        return $primaryContact ? $primaryContact->profile->email : '';
+        return $primaryContact ? $primaryContact->phone : '';
     }
 }

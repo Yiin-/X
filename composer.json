@@ -33,6 +33,12 @@
         "phpunit/phpunit": "~6.0"
     },
     "autoload": {
+        "files": [
+            "app/Domain/Helpers/naming.php",
+            "app/Domain/Helpers/bills.php",
+            "app/Domain/Helpers/currency.php",
+            "app/Domain/Helpers/pdf.php"
+        ],
         "classmap": [
             "database/seeds",
             "database/factories"

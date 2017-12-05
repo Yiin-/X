@@ -74,6 +74,6 @@ class TaskPolicy
      */
     public function archive(User $user, Task $task)
     {
-        return $user->hasPermissionTo(Actions::ARCHIVE, $task);
+        return $user->hasPermissionTo(Actions::EDIT, $task);
     }
 }

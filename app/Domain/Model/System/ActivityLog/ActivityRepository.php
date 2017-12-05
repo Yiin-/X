@@ -15,9 +15,9 @@ class ActivityRepository
             'document_uuid' => $document->getKey(),
             'changes' => json_encode($document->getDirty()),
             'json_backup' => json_encode([
-                'user' => $user ? $user->toJson() : null,
+                'user' => $user ? $user->transform(['for_backup'])->toJson() : null,
                 'documentRaw' => $document->toJson(),
-                'documentTransformed' => $document->transform()->parseExcludes(['history'])->toJson(),
+                'documentTransformed' => $document->transform(['for_backup'])->toJson(),
                 'meta' => json_encode($meta)
             ])
         ]);

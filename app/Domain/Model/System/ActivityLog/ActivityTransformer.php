@@ -10,7 +10,7 @@ class ActivityTransformer extends Fractal\TransformerAbstract
     public function transform(Activity $activity)
     {
         if ($activity->user) {
-            $user = $activity->user->transform()->parseExcludes(['history'])->toArray();
+            $user = $activity->user->transform(['for_backup'])->toArray();
         } else {
             $user = null;
         }
@@ -28,7 +28,7 @@ class ActivityTransformer extends Fractal\TransformerAbstract
 
             if ($document) {
                 $document = [
-                    'data' => $document->transform()->parseExcludes(['history'])->toArray(),
+                    'data' => $document->transform(['for_backup'])->toArray(),
                     'type' => resource_name($document),
                     'from_backup' => false
                 ];

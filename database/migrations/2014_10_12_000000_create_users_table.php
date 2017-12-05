@@ -46,20 +46,6 @@ class CreateUsersTable extends Migration
             $table->softDeletes();
         });
 
-        Schema::create('profiles', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('uuid')->unique();
-
-            $table->string('first_name')->nullable();
-            $table->string('last_name')->nullable();
-            $table->string('email')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('job_position')->nullable();
-
-            $table->timestamps();
-            $table->softDeletes();
-        });
-
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('uuid')->unique();
@@ -70,11 +56,6 @@ class CreateUsersTable extends Migration
             $table->string('account_uuid');
             $table->foreign('account_uuid')
                 ->references('uuid')->on('accounts')
-                ->onUpdate('cascade')->onDelete('cascade');
-
-            $table->string('profile_uuid');
-            $table->foreign('profile_uuid')
-                ->references('uuid')->on('profiles')
                 ->onUpdate('cascade')->onDelete('cascade');
 
             $table->unique(['account_uuid', 'username']);
@@ -109,7 +90,6 @@ class CreateUsersTable extends Migration
     public function down()
     {
         Schema::dropIfExists('user_company');
-        Schema::dropIfExists('profiles');
         Schema::dropIfExists('users');
         Schema::dropIfExists('companies');
         Schema::dropIfExists('accounts');

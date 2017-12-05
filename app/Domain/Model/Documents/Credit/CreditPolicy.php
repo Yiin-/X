@@ -74,6 +74,6 @@ class CreditPolicy
      */
     public function archive(User $user, Credit $credit)
     {
-        return $user->hasPermissionTo(Actions::ARCHIVE, $credit);
+        return $user->hasPermissionTo(Actions::EDIT, $credit);
     }
 }

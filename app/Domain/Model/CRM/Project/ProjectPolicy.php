@@ -74,6 +74,6 @@ class ProjectPolicy
      */
     public function archive(User $user, Project $project)
     {
-        return $user->hasPermissionTo(Actions::ARCHIVE, $project);
+        return $user->hasPermissionTo(Actions::EDIT, $project);
     }
 }

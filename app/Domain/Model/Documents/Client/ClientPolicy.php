@@ -74,6 +74,6 @@ class ClientPolicy
      */
     public function archive(User $user, Client $client)
     {
-        return $user->hasPermissionTo(Actions::ARCHIVE, $client);
+        return $user->hasPermissionTo(Actions::EDIT, $client);
     }
 }

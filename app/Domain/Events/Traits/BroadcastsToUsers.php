@@ -22,7 +22,7 @@ trait BroadcastsToUsers
 
         /**
          * ... and broadcast event to all of them.
-         * Realistically, there shouldn't be more than 30 users per company,
+         * Realistically, there shouldn't be more than 100 users per company,
          * but if there are any performance issues, we should think of better
          * implementation.
          */

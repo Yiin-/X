@@ -69,19 +69,18 @@ class AuthService
             $user->login_attempts = 0;
             $user->save();
 
-            $data['user'] = $user;
-            $data['user']['site_address'] = $user->account->site_address;
-            $data['user']['company'] = $user->account->uuid;
-            $data['user']['profile'] = $user->profile;
-            $data['user']['settings'] = $user->settings;
-            $data['user']['preferences'] = $user->preferences;
-
-            if ($isGuest) {
-                $data['user']['guest_key'] = $siteAddress;
-            }
             $data['preloadedData'] = [
+                'auth' => [
+                    'access_token' => $data['access_token']
+                ],
+                'account' => $user->account->transform(['include_all'])->toArray(),
+                'user' => $user->transform(['include_all'])->toArray(),
                 'data' => $this->accountService->fetchDataForUser($user)
             ];
+
+            if ($isGuest) {
+                $data['preloadedData']['user']['guest_key'] = $siteAddress;
+            }
 
             return $data;
         }
@@ -112,8 +111,8 @@ class AuthService
     public function proxy($grantType, array $data = [], $domain = null)
     {
         $data = array_merge($data, [
-            'client_id'     => env('PASSWORD_CLIENT_ID'),
-            'client_secret' => env('PASSWORD_CLIENT_SECRET'),
+            'client_id'     => config('auth.clients.password.id'),
+            'client_secret' => config('auth.clients.password.secret'),
             'grant_type'    => $grantType
         ]);
 

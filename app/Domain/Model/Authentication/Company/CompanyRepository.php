@@ -10,18 +10,23 @@ class CompanyRepository extends AbstractDocumentRepository
 {
     protected $repository;
 
-    protected $auth;
-
-    public function __construct(Auth $auth)
+    public function __construct()
     {
         $this->repository = new Repository(Company::class);
-        $this->auth = $auth;
     }
 
     public function creating(&$data, &$protectedData)
     {
-        if (!isset($protectedData['account_uuid'])) {
-            $protectedData['account_uuid'] = $this->auth->user()->account_uuid;
+        if (!isset($protectedData['account_uuid']) && auth()->check()) {
+            $protectedData['account_uuid'] = auth()->user()->account_uuid;
+        }
+    }
+
+    public function created($company)
+    {
+        if (auth()->check()) {
+            auth()->user()->companies()->attach($company->uuid);
+            auth()->user()->touch();
         }
     }
 }

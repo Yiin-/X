@@ -4,6 +4,7 @@ namespace App\Application\Providers;
 
 use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Blade;
 
 class AppServiceProvider extends ServiceProvider

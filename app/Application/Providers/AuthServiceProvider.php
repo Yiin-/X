@@ -22,6 +22,8 @@ use App\Domain\Model\Documents\TaxRate\TaxRate;
 use App\Domain\Model\Documents\TaxRate\TaxRatePolicy;
 use App\Domain\Model\Documents\Vendor\Vendor;
 use App\Domain\Model\Documents\Vendor\VendorPolicy;
+use App\Domain\Model\Documents\Employee\Employee;
+use App\Domain\Model\Documents\Employee\EmployeePolicy;
 use App\Domain\Model\CRM\Project\Project;
 use App\Domain\Model\CRM\Project\ProjectPolicy;
 use App\Domain\Model\CRM\TaskList\TaskList;
@@ -50,6 +52,7 @@ class AuthServiceProvider extends ServiceProvider
         Quote::class => QuotePolicy::class,
         TexRate::class => TexRatePolicy::class,
         Vendor::class => VendorPolicy::class,
+        Employee::class => EmployeePolicy::class,
         Project::class => ProjectPolicy::class,
         TaskList::class => TaskListPolicy::class,
         Task::class => TaskPolicy::class,

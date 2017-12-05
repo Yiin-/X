@@ -20,6 +20,17 @@ return [
 
     'max_login_attempts' => env('AUTH_MAX_LOGIN_ATTEMPTS', 5),
 
+    'clients' => [
+        'personal' => [
+            'id' => env('PERSONAL_CLIENT_ID'),
+            'secret' => env('PERSONAL_CLIENT_SECRET')
+        ],
+        'password' => [
+            'id' => env('PASSWORD_CLIENT_ID'),
+            'secret' => env('PASSWORD_CLIENT_SECRET')
+        ]
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards

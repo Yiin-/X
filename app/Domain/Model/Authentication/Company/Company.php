@@ -34,12 +34,12 @@ class Company extends AbstractDocument
 
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class, 'user_company');
     }
 
     public function roles()
     {
-        return $this->hasMany(Role::class);
+        return $this->morphMany(Role::class, 'roleable');
     }
 
     public function clients()

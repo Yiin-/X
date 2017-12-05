@@ -11,10 +11,16 @@ class TaxRateTransformer extends Fractal\TransformerAbstract
         'history'
     ];
 
+    public function excludeForBackup()
+    {
+        return ['history'];
+    }
+
     public function transform(TaxRate $taxRate)
     {
         return [
             'uuid' => $taxRate->uuid,
+            'company_uuid' => $taxRate->company_uuid,
 
             'name' => $taxRate->name,
             'rate' => +$taxRate->rate,

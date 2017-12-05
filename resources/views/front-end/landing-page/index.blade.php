@@ -93,13 +93,15 @@
 <script>
 var typed = new Typed('.typedElement', {
     strings: [
-        "Accountants",
-        "Shopkeepers",
         "Freelancers",
+        "Small Business",
+        "Corporations",
         "Entrepreneurs",
-        "Office Administrators",
-        "Project Managers",
-        "Business",
+        "Shopkeepers",
+        "Accountants",
+        "Administrators",
+        "Managers",
+        "Leaders",
         "You."
    ],
     typeSpeed: 50,

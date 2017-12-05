@@ -74,6 +74,6 @@ class PaymentPolicy
      */
     public function archive(User $user, Payment $payment)
     {
-        return $user->hasPermissionTo(Actions::ARCHIVE, $payment);
+        return $user->hasPermissionTo(Actions::EDIT, $payment);
     }
 }

@@ -74,6 +74,6 @@ class TaxRatePolicy
      */
     public function archive(User $user, TaxRate $taxRate)
     {
-        return $user->hasPermissionTo(Actions::ARCHIVE, $taxRate);
+        return $user->hasPermissionTo(Actions::EDIT, $taxRate);
     }
 }

@@ -58,15 +58,15 @@ class SendInvoice implements ShouldQueue
             return;
         }
 
-        if (!$client->hasPrimaryEmail()) {
+        if (!$client->email) {
             // TODO: Log an error and notify an user,
             // that invoice could not be sent
-            // because assigned client has no primary email set
+            // because assigned client has no email set
             return;
         }
 
         // Send an invoice
-        Mail::to($client->primary_email)
+        Mail::to($client->email)
             ->send(new InvoiceForClient($this->invoice));
     }
 

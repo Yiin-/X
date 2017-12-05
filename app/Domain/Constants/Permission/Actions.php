@@ -4,30 +4,43 @@ namespace App\Domain\Constants\Permission;
 
 class Actions
 {
-    const VIEW = 'view';
-    const CREATE = 'create';
-    const EDIT = 'edit';
-    const ARCHIVE = 'archive';
-    const DELETE = 'delete';
-    const EXPORT = 'export';
-    const IMPORT = 'import';
+    const VIEW = 1;
+    const CREATE = 2;
+    const EDIT = 3;
+    const DELETE = 4;
+    const MANAGE = 5;
 
-    const LIST = [
-        self::VIEW,
-        self::CREATE,
-        self::EDIT,
-        self::ARCHIVE,
-        self::DELETE,
-        self::EXPORT,
-        self::IMPORT
-    ];
+    public static function getAll()
+    {
+        return [
+            self::VIEW,
+            self::CREATE,
+            self::EDIT,
+            self::DELETE,
+            self::MANAGE
+        ];
+    }
 
-    const LIST_DOCUMENT_ACTIONS = [
-        self::VIEW,
-        self::EDIT,
-        self::ARCHIVE,
-        self::DELETE,
-        self::EXPORT,
-        self::IMPORT
-    ];
+    public static function getById($id)
+    {
+        return [
+            '' => '*',
+            self::VIEW => 'view',
+            self::CREATE => 'create',
+            self::EDIT => 'edit',
+            self::DELETE => 'delete',
+            self::MANAGE => 'manage'
+        ][$id];
+    }
+
+    public static function getByName($name)
+    {
+        return [
+            'view' => self::VIEW,
+            'create' => self::CREATE,
+            'edit' => self::EDIT,
+            'delete' => self::DELETE,
+            'manage' => self::MANAGE
+        ][strtolower($name)];
+    }
 }

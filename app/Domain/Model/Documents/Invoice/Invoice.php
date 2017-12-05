@@ -2,6 +2,7 @@
 
 namespace App\Domain\Model\Documents\Invoice;
 
+use App\Domain\Model\Documents\Shared\Interfaces\BelongsToClient;
 use App\Domain\Model\Documents\Bill\BillItem;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Payment\Payment;
@@ -9,7 +10,7 @@ use App\Domain\Model\Documents\Pdf\Pdf;
 use App\Domain\Model\Documents\Shared\BillableDocument;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Invoice extends BillableDocument
+class Invoice extends BillableDocument implements BelongsToClient
 {
     use SoftDeletes;
 
@@ -83,7 +84,7 @@ class Invoice extends BillableDocument
 
     public function client()
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(Client::class)->withTrashed();
     }
 
     public function payments()

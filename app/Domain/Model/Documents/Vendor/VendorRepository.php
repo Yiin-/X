@@ -2,10 +2,10 @@
 
 namespace App\Domain\Model\Documents\Vendor;
 
-use App\Domain\Model\Documents\Profile\ProfileRepository;
 use App\Domain\Model\Documents\Shared\AbstractDocumentRepository;
 use App\Infrastructure\Persistence\Repository;
-use App\Domain\Model\Authentication\User\UserRepository;
+use App\Domain\Model\Documents\Contact\Contact;
+use App\Domain\Model\Documents\Contact\ContactRepository;
 use App\Domain\Model\Documents\Shared\Traits\FillsUserData;
 
 class VendorRepository extends AbstractDocumentRepository
@@ -13,30 +13,30 @@ class VendorRepository extends AbstractDocumentRepository
     use FillsUserData;
 
     protected $repository;
-    protected $userRepository;
-    protected $profileRepository;
+    protected $contactRepository;
 
-    public function __construct(UserRepository $userRepository, ProfileRepository $profileRepository)
+    public function __construct(ContactRepository $contactRepository)
     {
         $this->repository = new Repository(Vendor::class);
-        $this->userRepository = $userRepository;
-        $this->profileRepository = $profileRepository;
+        $this->contactRepository = $contactRepository;
     }
 
     public function saved(&$vendor, &$data)
     {
-        $vendor->contacts()->delete();
+        foreach ($data['contacts'] as $contact) {
+            if ($contact['uuid']) {
+                $vendor->contacts()->find($contact['uuid'])->update($contact);
+            } else {
+                $contactModel = new Contact;
+                $contactModel->uuid = $this->contactRepository->generateUuid();
+                $contactModel->fill($contact);
 
-        $profiles = array_map(function ($contact) {
-            return $this->profileRepository->create($contact);
-        }, $data['contacts']);
+                $vendor->contacts()->save($contactModel);
+            }
+        }
 
-        foreach ($profiles as $profile) {
-            $vendor->contacts()->forceCreate([
-                'uuid' => $this->repository->generateUuid(),
-                'vendor_uuid' => $vendor->uuid,
-                'profile_uuid' => $profile->uuid
-            ]);
+        if (!$vendor->isDirty()) {
+            $vendor->touch();
         }
 
         $vendor->load('contacts');

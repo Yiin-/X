@@ -15,13 +15,26 @@ class ProjectTransformer extends Fractal\TransformerAbstract
         'history'
     ];
 
+    public function excludeForBackup()
+    {
+        return ['task_lists', 'tasks', 'history'];
+    }
+
     public function transform(Project $project)
     {
         return [
+            'uuid' => $project->uuid,
+            'company_uuid' => $project->company_uuid,
+
             'name' => $project->name,
             'description' => $project->description,
 
-            'client_uuid' => $project->client_uuid
+            'client_uuid' => $project->client_uuid,
+
+            'created_at' => $client->created_at,
+            'updated_at' => $client->updated_at,
+            'archived_at' => $client->archived_at,
+            'deleted_at' => $client->deleted_at
         ];
     }
 

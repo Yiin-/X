@@ -74,6 +74,6 @@ class ProductPolicy
      */
     public function archive(User $user, Product $product)
     {
-        return $user->hasPermissionTo(Actions::ARCHIVE, $product);
+        return $user->hasPermissionTo(Actions::EDIT, $product);
     }
 }

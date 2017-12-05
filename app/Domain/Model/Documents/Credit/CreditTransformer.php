@@ -11,14 +11,20 @@ class CreditTransformer extends Fractal\TransformerAbstract
         'history'
     ];
 
+    public function excludeForBackup()
+    {
+        return ['history'];
+    }
+
     public function transform(Credit $credit)
     {
         return [
             'uuid' => $credit->uuid,
+            'company_uuid' => $credit->company_uuid,
 
             'client_uuid' => $credit->client_uuid,
             'amount' => +$credit->amount,
-            'currency' => $credit->currency,
+            'currency_code' => $credit->currency_code,
             'balance' => +$credit->balance,
             'credit_date' => $credit->credit_date,
             'credit_number' => $credit->credit_number,

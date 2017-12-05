@@ -5,6 +5,8 @@ namespace App\Domain\Listeners;
 use App\Domain\Constants\Permission\Actions as PermissionActions;
 use App\Domain\Events\Shared\BroadcastableEvent;
 use App\Domain\Model\Authentication\User\User;
+use App\Domain\Events\Document\UserCreatedDocument;
+use App\Domain\Events\Document\UserUpdatedDocument;
 use App\Domain\Events\Document\DocumentWasCreated;
 use App\Domain\Events\Document\DocumentWasUpdated;
 use App\Domain\Events\Document\DocumentWasSaved;
@@ -18,7 +20,9 @@ class DocumentChangesListener
     public function subscribe($events)
     {
         $events->listen(DocumentWasCreated::class, self::class . '@broadcastToUsers');
+        $events->listen(UserCreatedDocument::class, self::class . '@broadcastToUsers');
         $events->listen(DocumentWasUpdated::class, self::class . '@broadcastToUsers');
+        $events->listen(UserUpdatedDocument::class, self::class . '@broadcastToUsers');
         $events->listen(DocumentWasDeleted::class, self::class . '@broadcastToOtherUsers');
         $events->listen(DocumentWasRestored::class, self::class . '@broadcastToOtherUsers');
         $events->listen(DocumentWasArchived::class, self::class . '@broadcastToOtherUsers');

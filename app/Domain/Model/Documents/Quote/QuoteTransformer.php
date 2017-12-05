@@ -15,10 +15,16 @@ class QuoteTransformer extends Fractal\TransformerAbstract
         'history'
     ];
 
+    public function excludeForBackup()
+    {
+        return ['pdfs', 'history'];
+    }
+
     public function transform(Quote $quote)
     {
         return [
             'uuid' => $quote->uuid,
+            'company_uuid' => $quote->company_uuid,
 
             'client_uuid' => $quote->client_uuid,
             'invoice_uuid' => $quote->invoice ? $quote->invoice->uuid : null,
@@ -27,10 +33,10 @@ class QuoteTransformer extends Fractal\TransformerAbstract
 
             'amount' => +$quote->amount(),
 
-            'quote_date' => $quote->date,
+            'date' => $quote->date,
             'due_date' => $quote->due_date,
             'partial' => +$quote->partial,
-            'currency' => $quote->currency,
+            'currency_code' => $quote->currency_code,
             'quote_number' => $quote->quote_number,
             'po_number' => $quote->po_number,
             'discount_type' => $quote->discount_type,

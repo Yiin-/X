@@ -74,6 +74,6 @@ class ExpenseCategoryPolicy
      */
     public function archive(User $user, ExpenseCategory $expenseCategory)
     {
-        return $user->hasPermissionTo(Actions::ARCHIVE, $expenseCategory);
+        return $user->hasPermissionTo(Actions::EDIT, $expenseCategory);
     }
 }

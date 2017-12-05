@@ -26,7 +26,7 @@ class Repository
 
     public function generateUuid()
     {
-        return (string)Uuid::uuid5(Uuid::uuid4(), config('app.url'));
+        return (string)Uuid::uuid5(Uuid::uuid4(), $this->getDocumentClass() . '@'. config('app.url'));
     }
 
     public function getVisible($userUuid = null)
@@ -38,8 +38,22 @@ class Repository
             ->get()
             ->map(function (AbstractDocument $model) {
                 return $model
-                    ->transform()
-                    ->parseIncludes(['history'])
+                    ->transform(['include_all'])
+                    ->toArray();
+            });
+    }
+
+    public function getUsingPermissions($permissions)
+    {
+        return $this->newQuery()
+            ->withTrashed()
+            ->where(function ($query) use ($permissions) {
+                return $query->fitsPermissions($permissions);
+            })
+            ->get()
+            ->map(function (AbstractDocument $model) {
+                return $model
+                    ->transform(['include_all'])
                     ->toArray();
             });
     }
@@ -50,10 +64,22 @@ class Repository
      */
     public function find($uuid)
     {
-        if (in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($this->getDocumentClass()))) {
-            $document = $this->newQuery()->withTrashed()->find($uuid);
-        } else {
-            $document = $this->newQuery()->find($uuid);
+        if (is_array($uuid)) {
+            $uuids = $uuid;
+            $ret = [];
+
+            foreach($uuids as $uuid) {
+                $ret[$uuid] = $this->find($uuid);
+            }
+
+            return $ret;
+        }
+        else {
+            if (in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($this->getDocumentClass()))) {
+                $document = $this->newQuery()->withTrashed()->find($uuid);
+            } else {
+                $document = $this->newQuery()->find($uuid);
+            }
         }
 
         return $document;

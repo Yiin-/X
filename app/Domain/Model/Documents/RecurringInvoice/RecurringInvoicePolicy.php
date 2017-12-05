@@ -74,6 +74,6 @@ class RecurringInvoicePolicy
      */
     public function archive(User $user, RecurringInvoice $recurringInvoice)
     {
-        return $user->hasPermissionTo(Actions::ARCHIVE, $recurringInvoice);
+        return $user->hasPermissionTo(Actions::EDIT, $recurringInvoice);
     }
 }

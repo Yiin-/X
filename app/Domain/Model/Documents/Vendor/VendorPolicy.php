@@ -74,6 +74,6 @@ class VendorPolicy
      */
     public function archive(User $user, Vendor $vendor)
     {
-        return $user->hasPermissionTo(Actions::ARCHIVE, $vendor);
+        return $user->hasPermissionTo(Actions::EDIT, $vendor);
     }
 }

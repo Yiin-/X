@@ -11,18 +11,24 @@ class PaymentTransformer extends Fractal\TransformerAbstract
         'history'
     ];
 
+    public function excludeForBackup()
+    {
+        return ['history'];
+    }
+
     public function transform(Payment $payment)
     {
         return [
             'uuid' => $payment->uuid,
+            'company_uuid' => $payment->company_uuid,
 
             'client_uuid' => $payment->client_uuid,
             'invoice_uuid' => $payment->invoice_uuid,
 
             'amount' => +$payment->amount,
             'refunded' => +$payment->refunded,
-            'currency' => $payment->currency,
-            'payment_type' => $payment->paymentType,
+            'currency_code' => $payment->currency_code,
+            'payment_type_id' => $payment->payment_type_id,
             'payment_date' => $payment->payment_date,
             'payment_reference' => $payment->payment_reference,
 

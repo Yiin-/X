@@ -11,10 +11,16 @@ class ProductTransformer extends Fractal\TransformerAbstract
         'history'
     ];
 
+    public function excludeForBackup()
+    {
+        return ['history'];
+    }
+
     public function transform(Product $product)
     {
         return [
             'uuid' => $product->uuid,
+            'company_uuid' => $product->company_uuid,
 
             'name' => $product->name,
             'qty' => +$product->qty,
@@ -22,7 +28,7 @@ class ProductTransformer extends Fractal\TransformerAbstract
             'description' => $product->description,
 
             'price' => +$product->price,
-            'currency' => $product->currency,
+            'currency_code' => $product->currency_code,
             'tax_rate' => $product->taxRate,
 
             'is_service' => $product->qty === null,

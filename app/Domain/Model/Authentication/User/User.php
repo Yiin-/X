@@ -10,13 +10,14 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Laravel\Passport\HasApiTokens;
 
+use App\Domain\Constants\Permission\Scopes as PermissionScope;
 use App\Domain\Model\Documents\Shared\AbstractDocument;
 use App\Domain\Model\Authentication\Account\Account;
 use App\Domain\Model\Authentication\Company\Company;
 use App\Domain\Model\Authorization\Role\Role;
 use App\Domain\Model\Authorization\Permission\Permission;
 use App\Domain\Model\Documents\Client\Client;
-use App\Domain\Model\Documents\Profile\Profile;
+use App\Domain\Model\Documents\Employee\Employee;
 use App\Domain\Model\Features\VatChecker\VatInfo;
 use App\Domain\Model\System\ActivityLog\Activity;
 
@@ -46,25 +47,26 @@ class User extends AbstractDocument implements
     ];
 
     protected $dispatchesEvents = [];
+    protected $documentEvents = [];
 
     public function getTransformer()
     {
         return new UserTransformer;
     }
 
-    public function invoice_number_pattern()
+    public function authenticable()
     {
-        return $this->preferences()->where('key', 'invoice_number_pattern')->first()->value;
+        return $this->morphTo()->withTrashed();
     }
 
-    public function recurring_invoice_number_pattern()
+    public function vatChecks()
     {
-        return $this->preferences()->where('key', 'recurring_invoice_number_pattern')->first()->value;
+        return $this->hasMany(VatInfo::class);
     }
 
-    public function quote_number_pattern()
+    public function role()
     {
-        return $this->preferences()->where('key', 'quote_number_pattern')->first()->value;
+        return $this->morphOne(Role::class, 'roleable');
     }
 
     public function roles()
@@ -80,26 +82,6 @@ class User extends AbstractDocument implements
     public function companies()
     {
         return $this->belongsToMany(Company::class, 'user_company');
-    }
-
-    public function clients()
-    {
-        return $this->hasMany(Client::class);
-    }
-
-    public function profile()
-    {
-        return $this->belongsTo(Profile::class);
-    }
-
-    public function permissions()
-    {
-        return $this->belongsToMany(Permission::class, 'user_permission');
-    }
-
-    public function vatChecks()
-    {
-        return $this->hasMany(VatInfo::class);
     }
 
     public function settings()
@@ -123,44 +105,95 @@ class User extends AbstractDocument implements
     {
         return $this->hasMany(Activity::class)->whereNotIn('document_type', [
             \App\Domain\Model\Documents\Bill\BillItem::class,
-            \App\Domain\Model\Documents\Client\ClientContact::class,
-            \App\Domain\Model\Documents\Vendor\VendorContact::class,
+            \App\Domain\Model\Documents\Contact\Contact::class,
             \App\Domain\Model\Documents\Payment\Refund::class,
-            \App\Domain\Model\Documents\Profile\Profile::class,
             \App\Domain\Model\Features\VatChecker\VatInfo::class
         ])->orderBy('id', 'desc');
     }
 
     public function getEmailAttribute()
     {
-        return $this->profile->email;
+        if ($this->employee) {
+            return $this->employee->email;
+        }
+        return '';
     }
 
     public function getFullNameAttribute()
     {
-        return $this->profile->first_name . ' ' . $this->profile->last_name;
+        if ($this->employee) {
+            return $this->employee->first_name . ' ' . $this->employee->last_name;
+        }
+        return '';
     }
 
-    public function hasPermissionTo($action, $document)
+    public function hasSameOrBetterRole(Role $role)
     {
-        if ($document instanceof AbstractDocument) {
-            return $this->companies()->where('uuid', $document->company_uuid)->exists();
+        $list = [];
+
+        do {
+            $list[] = $role->uuid;
+            $role = $role->parent;
         }
-        return true;
+        while($role);
+
+        return $this->roles()->whereIn('uuid', $list)->exists();
     }
 
-    public function scopeWithPermissionTo($query, $action, $document)
+    /**
+     * Check if user instance has permission to do something
+     * with given document or it's type
+     *
+     * @param  integer                  $action    Action id from \App\Domain\Constants\Permission\Actions
+     * @param  AbstractDocument|string  $document  Document instance or it's class
+     * @return boolean
+     */
+    public function hasPermissionTo($action, $document, $scope = null)
     {
-        if ($document instanceof AbstractDocument) {
-            return $query->whereHas('companies', function ($query) use ($document) {
-                return $query->where('uuid', $document->company_uuid);
-            });
+        if (is_string($document) && $scope === null) {
+            $scope = auth()->user()->companies()->first();
         }
-        return $query;
+        return $this->roles()->whereHas('permissions', function ($query) use ($action, $document, $scope) {
+            return $query->can($action, $document, $scope);
+        })->exists();
+    }
+
+    /**
+     * Filter out users without permission to do something
+     * with given document or it's type
+     *
+     * @param  mixed                    $query     QueryBuilder object
+     * @param  integer                  $action    Action id from \App\Domain\Constants\Permission\Actions
+     * @param  AbstractDocument|string  $document  Document instance or it's class
+     * @return boolean
+     */
+    public function scopeWithPermissionTo($query, $action, $document, $scope = null)
+    {
+        return $query->whereHas('roles', function ($query) use ($action, $document, $scope) {
+            return $query->withPermissionTo($action, $document, $scope);
+        });
     }
 
     public function findForPassport($uuid)
     {
        return $this->find($uuid);
+    }
+
+    /**
+     * Not used atm
+     */
+    public function invoice_number_pattern()
+    {
+        return $this->preferences()->where('key', 'invoice_number_pattern')->first()->value;
+    }
+
+    public function recurring_invoice_number_pattern()
+    {
+        return $this->preferences()->where('key', 'recurring_invoice_number_pattern')->first()->value;
+    }
+
+    public function quote_number_pattern()
+    {
+        return $this->preferences()->where('key', 'quote_number_pattern')->first()->value;
     }
 }

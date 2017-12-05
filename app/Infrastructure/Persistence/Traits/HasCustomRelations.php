@@ -6,36 +6,53 @@ use App\Infrastructure\Persistence\Relations\BelongsToManyLeftJoin;
 
 trait HasCustomRelations
 {
-    public function belongsToManyLeftJoin($related, $table = null, $foreignPivotKey = null, $relatedPivotKey = null,
-                                  $parentKey = null, $relatedKey = null, $relation = null)
-    {
-        // If no relationship name was passed, we will pull backtraces to get the
-        // name of the calling function. We will use that function name as the
-        // title of this relation since that is a great convention to apply.
-        if (is_null($relation)) {
-            $relation = $this->guessBelongsToManyRelation();
-        }
+    public function scopeBelongsToManyThrough($query, Model $parentInstance, $related, $parentRelatedTable = null, $relatedSelfTable = null) {
+        $relatedInstance = $this->newRelatedInstance($related);
 
-        // First, we'll need to determine the foreign key and "other key" for the
-        // relationship. Once we have determined the keys we'll make the query
-        // instances as well as the relationship instances we need for this.
-        $instance = $this->newRelatedInstance($related);
+        $selfQualifiedKeyName = $this->getQualifiedKeyName();
 
-        $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
+        $parentTablePart = Str::snake(class_basename($parentInstance));
+        $relatedTablePart = Str::snake(class_basename($relatedInstance));
+        $selfTablePart = Str::snake(class_basename($this));
 
-        $relatedPivotKey = $relatedPivotKey ?: $instance->getForeignKey();
+        $parentRelatedTable = $parentRelatedTable ?? implode('_', [$relatedTablePart, $parentTablePart]);
+        $relatedSelfTable = $relatedSelfTable ?? implode('_', [$relatedTablePart, $selfTablePart]);
 
-        // If no table name was provided, we can guess it by concatenating the two
-        // models using underscores in alphabetical order. The two model names
-        // are transformed to snake case from their default CamelCase also.
-        if (is_null($table)) {
-            $table = $this->joiningTable($related);
-        }
+        $selfForeignKey = $this->getForeignKey();
+        $parentForeignKey = $parentInstance->getForeignKey();
+        $relatedForeignKey = $relatedInstance->getForeignKey();
 
-        return new BelongsToManyLeftJoin(
-            $instance->newQuery(), $this, $table, $foreignPivotKey,
-            $relatedPivotKey, $parentKey ?: $this->getKeyName(),
-            $relatedKey ?: $instance->getKeyName(), $relation
-        );
+        return $query->orWhereExists(
+            function ($query) use (
+                $parentInstance,
+                $selfQualifiedKeyName,
+                $parentRelatedTable,
+                $relatedSelfTable,
+                $selfForeignKey,
+                $parentForeignKey,
+                $relatedForeignKey
+            ) {
+            $query
+                ->select("{$relatedSelfTable}.{$selfForeignKey}")
+                ->from("{$relatedSelfTable}")
+                ->whereRaw("{$selfQualifiedKeyName} = `{$relatedSelfTable}`.`{$selfForeignKey}`")
+                ->whereIn("{$relatedSelfTable}.{$relatedForeignKey}",
+                    function ($query) use (
+                        $parentRelatedTable,
+                        $relatedForeignKey,
+                        $parentForeignKey,
+                        $parentInstance
+                    ) {
+                        $query->select("{$parentRelatedTable}.{$relatedForeignKey}")
+                              ->from("{$parentRelatedTable}");
+
+                        if ($parentInstance->getKey()) {
+                            $query->where("{$parentRelatedTable}.{$parentForeignKey}", $parentInstance->getKey());
+                        }
+                        else {
+                            $query->whereRaw("`{$parentRelatedTable}`.`{$parentForeignKey}` = {$parentInstance->getQualifiedKeyName()}");
+                        }
+                    });
+        });
     }
 }
