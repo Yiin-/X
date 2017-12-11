@@ -43,6 +43,7 @@ class ProductTransformer extends Fractal\TransformerAbstract
 
     public function includeHistory(Product $product)
     {
+        // dd($product->getHistory());
         return $this->collection($product->getHistory(), new ActivityTransformer);
     }
 }

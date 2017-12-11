@@ -1,15 +1,12 @@
 {
-	"authHost": "http://api.overseer.dev",
+	"authHost": "172.20.0.4",
 	"authEndpoint": "/broadcasting/auth",
 	"clients": [],
 	"database": "redis",
 	"databaseConfig": {
 		"redis": {
-            "password": "secret"
-        },
-		"sqlite": {
-			"databasePath": "/database/laravel-echo-server.sqlite"
-		}
+            "host": "redis"
+        }
 	},
 	"devMode": true,
 	"host": null,

@@ -65,13 +65,15 @@ class AuthorizationService
         //     return false;
         // }
 
-        // create a new permission for role
-        return $role->permissions()->create([
+        // Use existing or create new permission
+        $permission = Permission::firstOrCreate([
             'scope' => $scope,
             'scope_id' => $scopeId,
             'permissible_type' => $permissibleType ? resource_name($permissibleType) : null,
             'permission_type_id' => $action
         ]);
+
+        return $role->permissions()->attach($permission->id);
     }
 
     public function revokePermissionFromRole(Role $role, $action, $permissibleType, $scope, $scopeId)
@@ -311,13 +313,13 @@ class AuthorizationService
          * to be able delete any client on the company? Big no no.
          */
         if ($scope === PermissionScope::COMPANY) {
-            $companyId = $user->companies()->first()->uuid;
+            $companyUuids = $user->companies->pluck('uuid');
 
             /**
              * User is trying to give permission to manage documents of company
              * he's not part of.
              */
-            if ($scopeId !== $companyId) {
+            if (!in_array($scopeId, $companyUuids)) {
                 return false;
             }
 

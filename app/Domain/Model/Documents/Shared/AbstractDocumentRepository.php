@@ -6,9 +6,32 @@ use BadMethodCallException;
 
 class AbstractDocumentRepository
 {
+    protected $repository;
+    protected $validator;
+
+    public function setRepository($repository)
+    {
+        $this->repository = $repository;
+    }
+
+    public function getRepository()
+    {
+        return $this->repository;
+    }
+
+    public function setValidator($validator)
+    {
+        $this->validator = $validator;
+    }
+
+    public function getValidator()
+    {
+        return $this->validator;
+    }
+
     public function createRaw($data, $protectedData = [])
     {
-        return $this->repository->create($data, $protectedData);
+        return $this->getRepository()->create($data, $protectedData);
     }
 
     /**
@@ -19,11 +42,16 @@ class AbstractDocumentRepository
      */
     public function create($data, $protectedData = [])
     {
+        \Log::debug(get_class($this) . ': create');
+        if ($this->getValidator()) {
+            $this->getValidator()->create();
+        }
+
         $this->fillData($data, $protectedData, true);
 
         $this->creating($data, $protectedData);
 
-        $document = $this->repository->create($data, $protectedData, false);
+        $document = $this->getRepository()->create($data, $protectedData, false);
 
         $this->saving($document, $data, $protectedData);
 
@@ -49,12 +77,18 @@ class AbstractDocumentRepository
      */
     public function update($data, $protectedData = [])
     {
+        \Log::debug(get_class($this) . ': update ' . $data['uuid']);
+
+        if ($this->getValidator()) {
+            $this->getValidator()->update();
+        }
+
         $activity = $this->checkIfWeAreRestoringDocument($data, $protectedData);
 
         $this->fillData($data, $protectedData);
         $this->updating($data, $protectedData);
 
-        $document = $this->repository->update($data, $protectedData, false);
+        $document = $this->getRepository()->update($data, $protectedData, false);
 
         if (isset($activity) && $activity) {
             $document->restoredFromActivity = $activity->id;
@@ -112,7 +146,7 @@ class AbstractDocumentRepository
 
             // restore dates
             $backupData = json_decode(json_decode($activity->json_backup)->documentTransformed, true);
-            $documentClass = $this->repository->getDocumentClass();
+            $documentClass = $this->getRepository()->getDocumentClass();
             $dates = (new $documentClass)->getDates();
 
             foreach (array_diff($dates, ['updated_at']) as $date) {
@@ -153,7 +187,7 @@ class AbstractDocumentRepository
             return;
         }
         try {
-            return $this->repository->$method(...$parameters);
+            return $this->getRepository()->$method(...$parameters);
         } catch (BadMethodCallException $e) {
             throw new BadMethodCallException(
                 sprintf('Call to undefined method %s::%s()', get_class($this), $method)

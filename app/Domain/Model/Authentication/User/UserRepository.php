@@ -67,7 +67,7 @@ class UserRepository extends AbstractDocumentRepository
 
         $user->authenticable()->associate($employee)->save();
 
-        $user->load(['employee']);
+        $user->load(['authenticable']);
     }
 
     public function findByUsername($siteAddress, $username)
@@ -80,5 +80,19 @@ class UserRepository extends AbstractDocumentRepository
                     })
                     ->where('username', $username)
                     ->first();
+    }
+
+    public function findByConfirmationToken($token)
+    {
+        return $this->repository->newQuery()
+            ->whereConfirmationToken($token)
+            ->first();
+    }
+
+    public function findByInvitationToken($token)
+    {
+        return $this->repository->newQuery()
+            ->whereInvitationToken($token)
+            ->first();
     }
 }

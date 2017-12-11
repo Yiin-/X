@@ -25,7 +25,7 @@ class ClientController extends DocumentController
             static::VALIDATION_RULES_CREATE => [
                 $this->getResourceName() => 'required|array',
                 "{$this->getResourceName()}.name" => 'required',
-                "{$this->getResourceName()}.country_id" => 'nullable|exists:countries,id',
+                "{$this->getResourceName()}.country_id" => 'required|exists:countries,id',
                 "{$this->getResourceName()}.currency_code" => 'nullable|exists:currencies,code',
                 "{$this->getResourceName()}.language_id" => 'nullable|exists:languages,id',
                 "{$this->getResourceName()}.company_size_id" => 'nullable|exists:company_sizes,id',

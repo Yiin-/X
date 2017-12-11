@@ -26,8 +26,8 @@ class UserController extends AbstractController
      *
      * Note:
      * It sort of sucks not to have any idea what exactly is stored
-     * in the state though, so better implementation would
-     * be quite helpful.
+     * in the state though, so better implementation is somethong
+     * to consider.
      */
     public function saveState()
     {

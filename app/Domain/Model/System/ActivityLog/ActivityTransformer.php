@@ -10,7 +10,11 @@ class ActivityTransformer extends Fractal\TransformerAbstract
     public function transform(Activity $activity)
     {
         if ($activity->user) {
-            $user = $activity->user->transform(['for_backup'])->toArray();
+            $user = [
+                'uuid' => $activity->user->uuid,
+                'authenticable_type' => resource_name($activity->user->authenticable_type),
+                'authenticable_id' => $activity->user->authenticable_id
+            ];
         } else {
             $user = null;
         }

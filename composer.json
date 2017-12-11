@@ -20,6 +20,7 @@
         "mikehaertl/phpwkhtmltopdf": "^2.2",
         "moneyphp/money": "^3.0",
         "optimus/api-consumer": "^0.2.3",
+        "pda/pheanstalk": "^3.1",
         "php-http/guzzle6-adapter": "^1.1",
         "php-http/message": "^1.6",
         "predis/predis": "^1.1",
@@ -37,7 +38,8 @@
             "app/Domain/Helpers/naming.php",
             "app/Domain/Helpers/bills.php",
             "app/Domain/Helpers/currency.php",
-            "app/Domain/Helpers/pdf.php"
+            "app/Domain/Helpers/pdf.php",
+            "app/Domain/Helpers/request.php"
         ],
         "classmap": [
             "database/seeds",

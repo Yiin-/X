@@ -47,8 +47,11 @@ class Repository
     {
         return $this->newQuery()
             ->withTrashed()
-            ->where(function ($query) use ($permissions) {
-                return $query->fitsPermissions($permissions);
+            ->visible()
+            ->when(count($permissions), function ($query) use ($permissions) {
+                return $query->where(function ($query) use ($permissions) {
+                    return $query->fitsPermissions($permissions);
+                });
             })
             ->get()
             ->map(function (AbstractDocument $model) {

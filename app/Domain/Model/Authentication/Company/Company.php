@@ -20,11 +20,14 @@ class Company extends AbstractDocument
         'account_uuid'
     ];
 
-    protected $dispatchesEvents = [];
-
     public function getTransformer()
     {
         return new CompanyTransformer;
+    }
+
+    public function loadRelationships()
+    {
+        $this->load(['roles', 'roles.permissions']);
     }
 
     public function account()

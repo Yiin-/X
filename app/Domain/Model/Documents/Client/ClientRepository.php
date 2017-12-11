@@ -13,12 +13,26 @@ class ClientRepository extends AbstractDocumentRepository
     use FillsUserData;
 
     protected $repository;
+    protected $validator;
     protected $contactRepository;
 
-    public function __construct(ContactRepository $contactRepository)
+    public function __construct(ClientValidator $clientValidator, ContactRepository $contactRepository)
     {
-        $this->repository = new Repository(Client::class);
+        $this->setRepository(new Repository(Client::class));
+        $this->setValidator($clientValidator);
+
         $this->contactRepository = $contactRepository;
+    }
+
+    public function created(&$client)
+    {
+        /**
+         * Assign created client to the user
+         */
+        if (!$client->user->assignAllClients) {
+            $client->user->clients()->attach($client->uuid);
+            $client->user->authenticable->touch();
+        }
     }
 
     public function saved(&$client, &$data)

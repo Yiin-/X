@@ -26,15 +26,59 @@ class WebController extends AbstractController
         $this->authService = $authService;
     }
 
-    public function confirmUser(UserRepository $userRepository, $token)
+    public function acceptInvitation(UserRepository $userRepository, $token)
     {
-        // Confirm user
-        if ($user = $userRepository->newQuery()->where('confirmation_token', $token)->first()) {
-            $user->update([ 'confirmation_token' => null ]);
+        /**
+         * User is already logged in, log him out
+         */
+        if (auth()->check()) {
+            // Revoke issued access token
+            $this->authService->logout();
+        }
+
+        /**
+         * Find user that invitation was delivered to.
+         */
+        $user = $userRepository->findByInvitationToken($token);
+
+        if (/**
+             * Redirect to company page
+             */
+            $this->getSubdomain() !== $user->account->site_address
+        ) {
+            return $this->redirectToUserAccount($user);
+        }
+
+        if ($user) {
+            return $this->serveApplication([
+                'user' => [
+                    'username' => $user->username,
+                    'is_password_set' => $user->password !== null,
+                    'personal_information' => $user->authenticable->transform()->toArray()
+                ]
+            ]);
         }
         return $this->serveApplication();
     }
 
+    /**
+     * Confirm user by using token he got from email.
+     *
+     * At the moment there is no difference between confirmed
+     * user and not.
+     */
+    public function confirmUser(UserRepository $userRepository, $token)
+    {
+        // Confirm user
+        if ($user = $userRepository->findByConfirmationToken($token)) {
+            $user->confirm();
+        }
+        return $this->serveApplication();
+    }
+
+    /**
+     * Create new or login to existing demo account.
+     */
     public function demo(Request $request)
     {
         /**
@@ -61,43 +105,73 @@ class WebController extends AbstractController
         }
 
         return view('front-end.index', $data);
-        // $client = $this->validateClient($request);
-        // $scopes = $this->validateScopes($this->getRequestParameter('scope', $request));
-        // $user = $this->validateUser($request, $client);
     }
 
-    public function serveApplication()
+    /**
+     * Used for routing.
+     *
+     * We're not referencing serveApplication method directly
+     * in web routes file because first parameter is always
+     * url path, e.g. /products or /logout, where in serveApplication
+     * method we're expecting array.
+     */
+    public function application()
+    {
+        return $this->serveApplication();
+    }
+
+    /**
+     * Pass preloaded data to front-end application
+     * view, so there is no loading time for data.
+     */
+    private function serveApplication(array $customData = [])
     {
         $data = [
-            'preloadedData' => []
+            'preloadedData' => $customData
         ];
 
-        // If user is authenticated
+        // Preload data only if user is authenticated
         if (auth()->check()) {
             $user = auth()->user();
-            // Logout it out, if that's a guest account and trying to access login or register screen
-            if ($user->guest_key && (request()->is('login') || request()->is('register') || request()->is('/'))) {
+            // Logout if that's a guest account and we're trying to access login or register page
+            if ($user->guest_key && (request()->is('login') || request()->is('register'))) {
                 // Revoke issued access token
                 $this->authService->logout();
                 // Also delete guest account, because there is no way for
-                // user to signin back to this account, even if he wanted.
+                // user to login back to this demo account.
                 $user->account->delete();
             }
             else {
-                if (// if it's demo account, subdomain should be "demo"
+                if (/**
+                     * If it is demo account, subdomain should be "demo"
+                     */
                     // ($user->guest_key && $this->getSubdomain() !== 'demo') ||
-                    // else it should be user account site_address
+                    /**
+                     * Else it should be site_address of user account
+                     */
                     (!$user->guest_key && $this->getSubdomain() !== $user->account->site_address)
                 ) {
                     return $this->redirectToUserAccount($user);
                 }
+
+                /**
+                 * Preload data
+                 *
+                 * API Access information
+                 */
                 $data['preloadedData']['auth'] = [
                     'access_token' => request()->cookie('_accessToken')
                 ];
+
+                /**
+                 * User and his account data
+                 */
                 $data['preloadedData']['account'] = $user->account->transform()->toArray();
                 $data['preloadedData']['user'] = $user->transform()->toArray();
 
-                // User is authenticated, and is not a guest, we can safely pass preloaded data
+                /**
+                 * The rest of the data
+                 */
                 $data['preloadedData']['data'] = $this->accountService->fetchDataForUser();
             }
         }

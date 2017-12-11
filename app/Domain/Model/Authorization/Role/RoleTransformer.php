@@ -20,6 +20,8 @@ class RoleTransformer extends Fractal\TransformerAbstract
     {
         return [
             'uuid' => $role->uuid,
+            'roleable_type' => resource_name($role->roleable_type),
+            'roleable_id' => $role->roleable_id,
 
             'name' => $role->name,
 
@@ -30,6 +32,7 @@ class RoleTransformer extends Fractal\TransformerAbstract
 
     public function includePermissions(Role $role)
     {
+        $role->load(['permissions']);
         return $this->collection($role->permissions, new PermissionTransformer);
     }
 }

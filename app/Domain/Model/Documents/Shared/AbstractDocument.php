@@ -10,6 +10,7 @@ use App\Infrastructure\Persistence\Traits\HasCustomRelations;
 use App\Domain\Model\Documents\Shared\Traits\HasHistory;
 use App\Domain\Model\Documents\Shared\Interfaces\BelongsToClient;
 use App\Domain\Model\Documents\Client\Client;
+use App\Domain\Model\Documents\Credit\Credit;
 use App\Domain\Model\Authentication\User\User;
 use App\Domain\Model\Authentication\Company\Company;
 use App\Domain\Model\Authorization\Permission\Permission;
@@ -155,6 +156,52 @@ abstract class AbstractDocument extends Model
     }
 
     /**
+     * Only query documents that user has access to.
+     *
+     * E.g. if user is assigned to X country, that has 10 clients,
+     * and user is assigned to 3 of them, we should ignore other clients
+     * and countries that we have no access to, even if our permission
+     * scope covers them. <is accessable> has priority over <permission scope>
+     */
+    public function scopeAccessable($query, $user)
+    {
+        if (!($this instanceof Client || $this instanceof BelongsToClient)) {
+            return $query;
+        }
+
+        /**
+         * Filter by country
+         */
+        if (!$user->assign_all_countries) {
+            $countries = $user->countries->pluck('id');
+
+            if ($this instanceof Client) {
+                $query->whereIn('country_id', $countries);
+            }
+            else {
+                $query->whereHas('client', function ($query) use ($user, $countries) {
+                    return $query->whereIn('country_id', $countries);
+                });
+            }
+        }
+
+        /**
+         * Filter by client
+         */
+        if (!$user->assign_all_clients) {
+            $clients = $user->clients->pluck('uuid');
+
+            if ($this instanceof Client) {
+                $query->whereIn('uuid', $clients);
+            } else {
+                $query->whereIn('client_uuid', $clients);
+            }
+        }
+
+        return $query;
+    }
+
+    /**
      * Find only documents that user has permission to.
      */
     public function checkForPermission($query, $userUuid, $permissionType)
@@ -168,32 +215,40 @@ abstract class AbstractDocument extends Model
         /**
          * Find only documents that fits following queries
          */
-        $query->whereRaw('0');
+        return $query->accessable($user)->where(function ($query) use ($user, $permissionType) {
 
-        /**
-         * Go through every role user has
-         */
-        foreach ($user->roles as $role) {
-            $permissions = $role->permissions()
-                ->where(function ($query) use ($permissionType) {
-                    return $query->where('permission_type_id', $permissionType)
-                        ->orWhereNull('permission_type_id');
-                })
-                ->where(function ($query) {
-                    return $query->where('permissible_type', resource_name($this))
-                        ->orWhereNull('permissible_type');
-                })
-                ->get();
+            $query->whereRaw('0');
 
-            $query->fitsPermissions($permissions);
-        }
+            /**
+             * Go through every role user has
+             */
+            foreach ($user->roles as $role) {
+                $permissions = $role->permissions()
+                    ->where(function ($query) use ($permissionType) {
+                        return $query->where('permission_type_id', $permissionType)
+                            ->orWhereNull('permission_type_id');
+                    })
+                    ->where(function ($query) {
+                        return $query->where('permissible_type', resource_name($this))
+                            ->orWhereNull('permissible_type');
+                    })
+                    ->get();
 
-        return $query;
+                $query->fitsPermissions($permissions);
+            }
+        });
     }
 
+    /**
+     * Used to filter out documents that we have no access to.
+     */
     public function scopeFitsPermissions($query, $permissions)
     {
         foreach ($permissions as $permission) {
+
+            /**
+             * Ignore permissions that are neither
+             */
             if ($permission->permission_type_id !== null &&
                 (int)$permission->permission_type_id !== PermissionActions::VIEW
             ) {
@@ -226,32 +281,11 @@ abstract class AbstractDocument extends Model
                 break;
 
             /**
-             * Or client
-             *
-             * Note: Will fail on some documents like products or vendors,
-             * because they doesn't belong to any client. Should not happen
-             * if we're setting permissions properly.
-             */
-            case PermissionScopes::CLIENT:
-                $query->when($this instanceof BelongsToClient || $this instanceof Client, function ($query) use ($permission) {
-                    return $query->orWhere(function ($query) use ($permission) {
-
-                        /**
-                         * Check for clients directly
-                         */
-                        if ($this instanceof Client) {
-                            return $query->where('uuid', $permission->scope_id);
-                        }
-                        return $query->where('client_uuid', $permission->scope_id);
-                    });
-                });
-                break;
-
-            /**
              * Or just query for specific document
              */
             case PermissionScopes::DOCUMENT:
                 $query->orWhere('uuid', $permission->scope_id);
+                break;
             }
         }
 

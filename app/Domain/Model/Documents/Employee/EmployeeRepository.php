@@ -72,21 +72,73 @@ class EmployeeRepository extends AbstractDocumentRepository
             }
 
             if ($employeeUser) {
-                if (isset($data['assignedClients']) && is_array($data['assignedClients'])) {
-                    Permission::ofUser($employeeUser)
-                        ->where('scope', PermissionScope::CLIENT)
-                        ->whereNotIn('scope_id', $data['assignedClients'])
-                        ->where('permissible_type', null)
-                        ->delete();
+                $assignedCountries = $data['assigned_countries'] ?? false;
 
-                    foreach ($data['assignedClients'] as $clientUuid) {
-                        $ret = app(\App\Domain\Service\Auth\AuthorizationService::class)->givePermissionToUser($employeeUser, [
-                            PermissionAction::VIEW,
-                            PermissionAction::CREATE,
-                            PermissionAction::EDIT,
-                            PermissionAction::DELETE
-                        ], null, PermissionScope::CLIENT, $clientUuid);
+                /**
+                 * If assigned countries array is presented
+                 */
+                if (is_array($assignedCountries)) {
+                    /**
+                     * If we have no assigned countries, clean up
+                     * user countries.
+                     */
+                    if (empty($assignedCountries)) {
+                        $employeeUser->countries()->sync([]);
+
+                        /**
+                         * If assign_all_countries flag is enabled,
+                         * save it.
+                         */
+                        $employeeUser->assign_all_countries = !!($data['assign_all_countries'] ?? false);
                     }
+                    /**
+                     * Else, if we have some countries to assign, sync them
+                     * up and disable assign_all_countries flag.
+                     */
+                    else {
+                        $employeeUser->countries()->sync($assignedCountries);
+
+                        $employeeUser->assign_all_countries = false;
+                    }
+                }
+
+                /**
+                 * Do the same for assigned clients
+                 */
+                $assignedClients = $data['assigned_clients'] ?? false;
+
+                if (is_array($assignedClients)) {
+                    if (empty($assignedClients)) {
+                        $employeeUser->clients()->sync([]);
+
+                        $employeeUser->assign_all_clients = !!($data['assign_all_clients'] ?? false);
+                    }
+                    else {
+                        $employeeUser->clients()->sync($assignedClients);
+
+                        $employeeUser->assign_all_clients = false;
+                    }
+                }
+
+                /**
+                 * Sync assigned roles
+                 */
+                $assignedRoles = $data['assigned_roles'] ?? false;
+
+                if (is_array($assignedRoles)) {
+                    $employeeUser->roles()->sync(
+                        array_merge($assignedRoles, [
+                            // include users private role,
+                            // because it's not present in assigned
+                            // roles array (cuz it's private i.e. not visible, duh).
+                            $employeeUser->role->uuid
+                        ])
+                    );
+                }
+
+                if ($employeeUser->isDirty()) {
+                    $employeeUser->save();
+                    $employee->touch();
                 }
             }
         } else {

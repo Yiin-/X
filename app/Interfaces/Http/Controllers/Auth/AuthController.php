@@ -9,6 +9,8 @@ use App\Domain\Service\Auth\AuthService;
 use App\Interfaces\Http\Requests\Auth\RegisterRequest;
 use App\Interfaces\Http\Requests\Auth\LoginRequest;
 use App\Interfaces\Http\Requests\Auth\DemoRequest;
+use App\Interfaces\Http\Requests\Auth\AcceptInvitationRequest;
+use App\Domain\Model\Authentication\User\UserRepository;
 
 class AuthController extends AbstractController
 {
@@ -72,6 +74,52 @@ class AuthController extends AbstractController
         $data = $this->authService->attemptLogin($siteAddress, $username, $password);
 
         return response()->json($data);
+    }
+
+    public function acceptInvitation(AcceptInvitationRequest $request, UserRepository $userRepository)
+    {
+        $data = $request->get('data');
+
+        $user = $userRepository->findByInvitationToken($data['invitation_token']);
+
+        /**
+         * Set new password for user
+         */
+        $password = $data['password'];
+
+        if ($user->password === null) {
+            $user->password = bcrypt($password);
+            $user->save();
+        }
+
+        $this->authService->checkCredentials($user->account->site_address, $user->username, $password);
+
+        /**
+         * Employee details
+         */
+        $firstName = $data['first_name'];
+        $lastName = $data['last_name'];
+        $phone = $data['phone'];
+        $jobTitle = $data['job_title'];
+        $password = $data['password'];
+
+        /**
+         * Update employee
+         */
+        $user->authenticable->update([
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'phone' => $phone,
+            'job_title' => $jobTitle
+        ]);
+
+        /**
+         * Mark that user accepted invitation
+         * and unlock his account.
+         */
+        $user->acceptInvitation();
+
+        return $this->authService->attemptLogin($user->account->site_address, $user->username, $password);
     }
 
     public function refresh()

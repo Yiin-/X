@@ -12,28 +12,13 @@ use App\Domain\Service\System\SystemService;
 use App\Domain\Service\Features\FeaturesService;
 use App\Domain\Model\Authentication\Account\AccountRepository;
 use App\Domain\Model\Authentication\User\User;
-use App\Domain\Model\Documents\Passive\Currency;
-use App\Domain\Model\Documents\Client\Client;
-use App\Domain\Model\Documents\Credit\Credit;
-use App\Domain\Model\Documents\Expense\Expense;
-use App\Domain\Model\Documents\Expense\ExpenseCategory;
-use App\Domain\Model\Documents\Product\Product;
-use App\Domain\Model\Documents\Payment\Payment;
-use App\Domain\Model\Documents\Vendor\Vendor;
-use App\Domain\Model\Documents\Invoice\Invoice;
-use App\Domain\Model\Documents\RecurringInvoice\RecurringInvoice;
-use App\Domain\Model\Documents\Quote\Quote;
-use App\Domain\Model\Documents\TaxRate\TaxRate;
 use App\Domain\Model\Documents\Employee\Employee;
-use App\Domain\Model\CRM\Project\Project;
-use App\Domain\Model\CRM\TaskList\TaskList;
-use App\Domain\Model\CRM\Task\Task;
 use App\Domain\Model\Authentication\User\UserRepository;
-use App\Domain\Model\Authentication\Company\Company;
 use App\Domain\Model\Authentication\Company\CompanyRepository;
-use App\Domain\Model\Authorization\Role\Role;
 use App\Domain\Model\Authorization\Role\RoleRepository;
+use App\Domain\Events\Authentication\EmployeeUserWasCreated;
 use Ramsey\Uuid\Uuid;
+use DB;
 
 class AccountService
 {
@@ -94,42 +79,70 @@ class AccountService
         $userPassword,
         $guestKey = null
     ) {
-        /**
-         * Create a new account for the user.
-         * @var \App\Domain\Model\Authentication\Account\Account
-         */
-        $account = $this->accountRepository->create([
-            'name' => $companyName,
-            'site_address' => $siteAddress
-        ]);
+        DB::transaction(function () {
+            /**
+             * Create a new account for the user.
+             * @var \App\Domain\Model\Authentication\Account\Account
+             */
+            $account = $this->accountRepository->create([
+                'name' => $companyName,
+                'site_address' => $siteAddress
+            ]);
 
-        /**
-         * Create a new company for the account
-         * @var \App\Domain\Model\Authentication\Company\Company
-         */
-        $company = $this->companyRepository->create([
-            'name' => $companyName,
-            'email' => $companyEmail
-        ], [
-            'account_uuid' => $account->uuid
-        ]);
+            /**
+             * Create a new company for the account
+             * @var \App\Domain\Model\Authentication\Company\Company
+             */
+            $company = $this->companyRepository->create([
+                'name' => $companyName,
+                'email' => $companyEmail
+            ], [
+                'account_uuid' => $account->uuid
+            ]);
 
-        /**
-         * Create a new user to manage created account
-         * @var \App\Domain\Model\Authentication\User\User
-         */
-        \Log::debug('Creating user account: ' . $userEmail);
+            /**
+             * Create a new user to manage created account
+             * @var \App\Domain\Model\Authentication\User\User
+             */
+            \Log::debug('Creating user account: ' . $userEmail);
 
-        $user = $this->createNewUser($company, $userEmail, $userPassword, $firstName, $lastName, $guestKey);
+            $user = $this->createNewUser($company, $userEmail, $userPassword, $firstName, $lastName, $guestKey);
 
-        /**
-         * Create permission to manage account
-         */
-        $this->authorizationService->givePermissionToUser($user, null, null, PermissionScope::ACCOUNT, $account->uuid);
+            /**
+             * Create permission to manage account
+             */
+            $this->authorizationService->givePermissionToUser($user, null, null, PermissionScope::ACCOUNT, $account->uuid);
+        });
 
         /**
          * Return created user
          */
+        return $user;
+    }
+
+    public function createNewUser($company, $email, $password, $firstName, $lastName, $guestKey = null)
+    {
+        $user = $this->userRepository->create([
+            'username' => $email,
+            'password' => $password,
+
+            // employee info
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $email,
+
+            // company info
+            'company_uuid' => $company->uuid
+        ], [
+            'account_uuid' => $company->account_uuid,
+            'guest_key' => $guestKey,
+            'confirmation_token' => str_random(32),
+            'assign_all_countries' => true,
+            'assign_all_clients' => true
+        ]);
+
+        $this->setupUser($user);
+
         return $user;
     }
 
@@ -152,29 +165,7 @@ class AccountService
         $this->setupUser($user);
         $this->authorizationService->givePermissionToUser($user, PermissionAction::VIEW, Employee::class, PermissionScope::COMPANY, $employee->company_uuid);
 
-        return $user;
-    }
-
-    public function createNewUser($company, $email, $password, $firstName, $lastName, $guestKey = null)
-    {
-        $user = $this->userRepository->create([
-            'username' => $email,
-            'password' => $password,
-
-            // employee info
-            'first_name' => $firstName,
-            'last_name' => $lastName,
-            'email' => $email,
-
-            // company info
-            'company_uuid' => $company->uuid
-        ], [
-            'account_uuid' => $company->account_uuid,
-            'guest_key' => $guestKey,
-            'confirmation_token' => str_random(32)
-        ]);
-
-        $this->setupUser($user);
+        event(new EmployeeUserWasCreated($user));
 
         return $user;
     }

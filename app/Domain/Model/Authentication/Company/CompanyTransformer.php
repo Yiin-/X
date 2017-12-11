@@ -31,6 +31,7 @@ class CompanyTransformer extends Fractal\TransformerAbstract
 
     public function includeRoles(Company $company)
     {
+        $company->load(['roles']);
         return $this->collection($company->roles, new RoleTransformer);
     }
 

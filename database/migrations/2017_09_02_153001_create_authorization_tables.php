@@ -69,8 +69,6 @@ class CreateAuthorizationTables extends Migration
          * account scope, but in this implementation we're not going to do that.
          */
         Schema::create('role_permission', function (Blueprint $table) {
-            $table->increments('id');
-
             $table->string('role_uuid');
             $table->foreign('role_uuid')
                 ->references('uuid')->on('roles')
@@ -87,8 +85,6 @@ class CreateAuthorizationTables extends Migration
          * of these roles.
          */
         Schema::create('user_role', function (Blueprint $table) {
-            $table->increments('id');
-
             $table->string('user_uuid');
             $table->foreign('user_uuid')
                 ->references('uuid')->on('users')

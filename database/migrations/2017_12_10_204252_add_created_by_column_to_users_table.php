@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddCounterColumnsToTables extends Migration
+class AddCreatedByColumnToUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,9 @@ class AddCounterColumnsToTables extends Migration
      */
     public function up()
     {
-        //
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('created_by')->nullable();
+        });
     }
 
     /**
@@ -23,6 +25,8 @@ class AddCounterColumnsToTables extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('created_by');
+        });
     }
 }

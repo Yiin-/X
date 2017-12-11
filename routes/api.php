@@ -13,6 +13,9 @@ Route::post('login', 'Auth\AuthController@login');
 // Refresh access token
 Route::post('login/refresh', 'Auth\AuthController@refresh');
 
+// Accept invitation
+Route::post('accept-invitation', 'Auth\AuthController@acceptInvitation');
+
 
 // Revoke access token
 Route::post('logout', 'Auth\AuthController@logout');
@@ -136,6 +139,8 @@ Route::middleware('auth:api')->group(function () {
      * Roles and permissions assignment to user
      */
     Route::prefix('authorization')->group(function () {
+        Route::resource('roles', 'Auth\RoleController');
+
         // Give/revoke role to/from user
         Route::post('give-role/{user}/{role}', 'Auth\AuthorizationController@giveRole');
         Route::post('revoke-role/{user}/{role}', 'Auth\AuthorizationController@revokeRole');

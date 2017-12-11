@@ -48,6 +48,21 @@ class AuthService
         return $this->attemptLogin($siteAddress, $userEmail, $userPassword);
     }
 
+    public function checkCredentials($siteAddress, $username, $password)
+    {
+        $user = $this->userRepository->findByUsername($siteAddress, $username);
+
+        if (!is_null($user)) {
+            $this->proxy('password', [
+                'username' => $user->uuid,
+                'password' => $password
+            ]);
+            // All good
+            return;
+        }
+        throw new InvalidCredentialsException('invalid_credentials');
+    }
+
     /**
      * Attempt to create an access token using user credentials
      *
@@ -60,7 +75,7 @@ class AuthService
     {
         $user = $this->userRepository->findByUsername($siteAddress, $username);
 
-        if (!is_null($user)) {
+        if ($user && !$user->is_disabled) {
             $data = $this->proxy('password', [
                 'username' => $user->uuid,
                 'password' => $password

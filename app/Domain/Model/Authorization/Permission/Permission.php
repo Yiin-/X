@@ -20,8 +20,7 @@ class Permission extends AbstractDocument
         'scope',
         'scope_id',
         'permissible_type',
-        'permission_type_id',
-        'country_id'
+        'permission_type_id'
     ];
 
     protected $hidden = [
@@ -39,23 +38,6 @@ class Permission extends AbstractDocument
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'role_permission');
-    }
-
-    private function belongsToCountry(AbstractDocument $document)
-    {
-        switch (get_class($document)) {
-        case \App\Domain\Model\Documents\Client\Client::class:
-            return $document->country_id;
-        case \App\Domain\Model\Documents\Invoice\Invoice::class:
-        case \App\Domain\Model\Documents\Quote\Quote::class:
-        case \App\Domain\Model\Documents\Payment\Payment::class:
-        case \App\Domain\Model\Documents\Expense\Expense::class:
-        case \App\Domain\Model\Documents\Credit\Credit::class:
-            if ($document->client) {
-                return $document->client->country_id;
-            }
-        }
-        return null;
     }
 
     private function belongsToClient(AbstractDocument $document)
@@ -77,14 +59,71 @@ class Permission extends AbstractDocument
         });
     }
 
+    /**
+     * Only select permisisons that can do specified action
+     * in specified scope.
+     */
     public function scopeCan($query, $action, $document, $scope = null)
     {
         if ($document instanceof AbstractDocument) {
-            return $query->when($document->company, function ($query) use ($action, $document) {
-                return $query->where(function ($query) use ($action, $document) {
+            $company = false;
+
+            if ($document->company) {
+                $company = $document->company;
+            }
+
+            if ($document instanceof Role) {
+                if ($document->roleable_type === Company::class) {
+                    $company = $document->roleable;
+                }
+            }
+
+            return $query->where(function ($query) use ($action, $document, $company) {
+                return $query->when($company, function ($query) use ($action, $document, $company) {
+                    /**
+                     * First check if user has account level permission
+                     */
+                    return $query->where(function ($query) use ($action, $document, $company) {
+                        return $query
+                            ->where('scope', PermissionScope::ACCOUNT)
+                            ->where('scope_id', $company->account_uuid)
+                            ->where(function ($query) use ($document) {
+                                return $query
+                                    ->where('permissible_type', resource_name($document))
+                                    ->orWhereNull('permissible_type');
+                            })
+                            ->where(function ($query) use ($action) {
+                                return $query
+                                    ->where('permission_type_id', $action)
+                                    ->orWhereNull('permission_type_id');
+                            });
+                    });
+                })
+                /**
+                 * Or maybe company level permission?
+                 */
+                ->orWhere(function ($query) use ($action, $document) {
                     return $query
-                        ->where('scope', PermissionScope::ACCOUNT)
-                        ->where('scope_id', $document->company->account_uuid)
+                        ->where('scope', PermissionScope::COMPANY)
+                        ->where('scope_id', $document->company_uuid)
+                        ->where(function ($query) use ($document) {
+                            return $query
+                                ->where('permissible_type', resource_name($document))
+                                ->orWhereNull('permissible_type');
+                        })
+                        ->where(function ($query) use ($action) {
+                            return $query
+                                ->where('permission_type_id', $action)
+                                ->orWhereNull('permission_type_id');
+                        });
+                })
+                /**
+                 * Document?..
+                 */
+                ->orWhere(function ($query) use ($action, $document) {
+                    return $query
+                        ->where('scope', PermissionScope::DOCUMENT)
+                        ->where('scope_id', $document->uuid)
                         ->where(function ($query) use ($document) {
                             return $query
                                 ->where('permissible_type', resource_name($document))
@@ -96,53 +135,6 @@ class Permission extends AbstractDocument
                                 ->orWhereNull('permission_type_id');
                         });
                 });
-            })
-            ->orWhere(function ($query) use ($action, $document) {
-                return $query
-                    ->where('scope', PermissionScope::COMPANY)
-                    ->where('scope_id', $document->company_uuid)
-                    ->where(function ($query) use ($document) {
-                        return $query
-                            ->where('permissible_type', resource_name($document))
-                            ->orWhereNull('permissible_type');
-                    })
-                    ->where(function ($query) use ($action) {
-                        return $query
-                            ->where('permission_type_id', $action)
-                            ->orWhereNull('permission_type_id');
-                    });
-            })
-            ->when($this->belongsToClient($document), function ($query) use ($action, $document) {
-                return $query->orWhere(function ($query) use ($action, $document) {
-                    return $query
-                        ->where('scope', PermissionScope::CLIENT)
-                        ->where('scope_id', $this->belongsToClient($document))
-                        ->where(function ($query) use ($document) {
-                            return $query
-                                ->where('permissible_type', resource_name($document))
-                                ->orWhereNull('permissible_type');
-                        })
-                        ->where(function ($query) use ($action) {
-                            return $query
-                                ->where('permission_type_id', $action)
-                                ->orWhereNull('permission_type_id');
-                        });
-                });
-            })
-            ->orWhere(function ($query) use ($action, $document) {
-                return $query
-                    ->where('scope', PermissionScope::DOCUMENT)
-                    ->where('scope_id', $document->uuid)
-                    ->where(function ($query) use ($document) {
-                        return $query
-                            ->where('permissible_type', resource_name($document))
-                            ->orWhereNull('permissible_type');
-                    })
-                    ->where(function ($query) use ($action) {
-                        return $query
-                            ->where('permission_type_id', $action)
-                            ->orWhereNull('permission_type_id');
-                    });
             });
         }
         else if ($scope instanceof Company || $scope instanceof Account || $scope instanceof Client) {
@@ -174,39 +166,13 @@ class Permission extends AbstractDocument
             ->when($scope instanceof Company, function ($query) use ($action, $document, $scope) {
                 return $query->orWhere(function ($query) use ($action, $document, $scope) {
                     return $query
-                        ->where('scope', PermissionScope::COMPANY)
-                        ->where('scope_id', $scope->uuid) // id of the Company
-                        ->where(function ($query) use ($document) {
-                            return $query
-                                ->where('permissible_type', resource_name($document))
-                                ->orWhereNull('permissible_type');
+                        ->where(function ($query) use ($scope) {
+                            return $query->where(function ($query) use ($scope) {
+                                return $query
+                                    ->where('scope', PermissionScope::COMPANY)
+                                    ->where('scope_id', $scope->uuid); // id of the Company
+                            });
                         })
-                        ->where(function ($query) use ($action) {
-                            return $query
-                                ->where('permission_type_id', $action)
-                                ->orWhereNull('permission_type_id');
-                        });
-                });
-            })
-            /**
-             * Finally if our scope is a client, check if this permission gives access to client stuff.
-             *
-             * Also it should check only resources whom can belong to client.
-             */
-            ->when($scope instanceof Client && in_array(resource_name($document), [
-                'invoice',
-                'payment',
-                'credit',
-                'quote',
-                'expense',
-                'project',
-                'task-list',
-                'task'
-            ]), function ($query) use ($action, $document, $scope) {
-                return $query->orWhere(function ($query) use ($action, $document, $scope) {
-                    return $query
-                        ->where('scope', PermissionScope::CLIENT)
-                        ->where('scope_id', $scope->uuid) // id of the Client
                         ->where(function ($query) use ($document) {
                             return $query
                                 ->where('permissible_type', resource_name($document))

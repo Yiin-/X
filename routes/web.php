@@ -23,6 +23,7 @@ Route::middleware('web-auth')->group(function () {
      * Application
      */
     Route::name('user.confirmation')->get('email-confirmation/{token}', 'Web\WebController@confirmUser');
+    Route::name('user.accept-invitation')->get('accept-invitation/{token}', 'Web\WebController@acceptInvitation');
     Route::name('demo')->get('demo', 'Web\WebController@demo');
-    Route::name('frontend-application')->get('{any?}', 'Web\WebController@serveApplication')->where('any', '.*');;
+    Route::name('frontend-application')->get('{any?}', 'Web\WebController@application')->where('any', '.*');
 });

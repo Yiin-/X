@@ -2,6 +2,8 @@
 
 namespace App\Application\Providers;
 
+use App\Domain\Model\Authorization\Role\Role;
+use App\Domain\Model\Authorization\Role\RolePolicy;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Client\ClientPolicy;
 use App\Domain\Model\Documents\Credit\Credit;
@@ -56,6 +58,7 @@ class AuthServiceProvider extends ServiceProvider
         Project::class => ProjectPolicy::class,
         TaskList::class => TaskListPolicy::class,
         Task::class => TaskPolicy::class,
+        Role::class => RolePolicy::class
     ];
 
     /**

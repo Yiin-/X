@@ -18,6 +18,7 @@ use App\Domain\Model\Authorization\Role\Role;
 use App\Domain\Model\Authorization\Permission\Permission;
 use App\Domain\Model\Documents\Client\Client;
 use App\Domain\Model\Documents\Employee\Employee;
+use App\Domain\Model\Documents\Passive\Country;
 use App\Domain\Model\Features\VatChecker\VatInfo;
 use App\Domain\Model\System\ActivityLog\Activity;
 
@@ -54,46 +55,97 @@ class User extends AbstractDocument implements
         return new UserTransformer;
     }
 
+    /**
+     * Public profile (i.e. Employee or Client),
+     * that this user account is assigned to.
+     */
     public function authenticable()
     {
         return $this->morphTo()->withTrashed();
     }
 
+    /**
+     * VAT checks this user has performed.
+     */
     public function vatChecks()
     {
         return $this->hasMany(VatInfo::class);
     }
 
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'uuid');
+    }
+
+    /**
+     * Private role that's used for setting permissions
+     * directly for this user only.
+     */
     public function role()
     {
         return $this->morphOne(Role::class, 'roleable');
     }
 
+    /**
+     * All roles that are assigned to user.
+     */
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'user_role');
     }
 
+    /**
+     * Account under which this user is created.
+     */
     public function account()
     {
         return $this->belongsTo(Account::class);
     }
 
+    /**
+     * Assigned companies
+     */
     public function companies()
     {
         return $this->belongsToMany(Company::class, 'user_company');
     }
 
+    /**
+     * Assigned countries
+     */
+    public function countries()
+    {
+        return $this->belongsToMany(Country::class, 'user_country');
+    }
+
+    /**
+     * Assigned clients
+     */
+    public function clients()
+    {
+        return $this->belongsToMany(Client::class, 'user_client');
+    }
+
+    /**
+     * List of user settings
+     */
     public function settings()
     {
         return $this->hasOne(UserSettings::class);
     }
 
+    /**
+     * List of saved user preferences
+     */
     public function preferences()
     {
         return $this->hasMany(UserPreference::class);
     }
 
+    /**
+     * Convert [[key, value], ...] array of preferences to
+     * [key => value, ...] mapped array.
+     */
     public function getPreferencesAttribute()
     {
         return $this->preferences()->get()->mapWithKeys(function (UserPreference $preference) {
@@ -101,6 +153,11 @@ class User extends AbstractDocument implements
         });
     }
 
+    /**
+     * Activity of the user.
+     *
+     * Gets list of things he did.
+     */
     public function activity()
     {
         return $this->hasMany(Activity::class)->whereNotIn('document_type', [
@@ -111,20 +168,58 @@ class User extends AbstractDocument implements
         ])->orderBy('id', 'desc');
     }
 
+    /**
+     * Ease the access to email address of the user.
+     */
     public function getEmailAttribute()
     {
-        if ($this->employee) {
-            return $this->employee->email;
+        if ($this->authenticable) {
+            return $this->authenticable->email;
+        }
+        return $this->username;
+    }
+
+    /**
+     * Format full name of the user.
+     */
+    public function getFullNameAttribute()
+    {
+        if ($this->authenticable) {
+            if ($this->authenticable instanceof Employee) {
+                return $this->authenticable->full_name;
+            }
+            if ($this->authenticable instanceof Client) {
+                return $this->authenticable->name;
+            }
         }
         return '';
     }
 
-    public function getFullNameAttribute()
+    /**
+     * Generate token that is used to identify
+     * user that is accepting the invitation.
+     */
+    public function genInvitationToken()
     {
-        if ($this->employee) {
-            return $this->employee->first_name . ' ' . $this->employee->last_name;
-        }
-        return '';
+        $invitationToken = str_random();
+
+        $this->invitation_token = $invitationToken;
+        $this->save();
+
+        return $invitationToken;
+    }
+
+    public function acceptInvitation()
+    {
+        $this->invitation_token = null;
+        $this->is_disabled = false;
+        $this->save();
+    }
+
+    public function confirm()
+    {
+        $this->confirmation_token = null;
+        $this->save();
     }
 
     public function hasSameOrBetterRole(Role $role)
@@ -151,7 +246,7 @@ class User extends AbstractDocument implements
     public function hasPermissionTo($action, $document, $scope = null)
     {
         if (is_string($document) && $scope === null) {
-            $scope = auth()->user()->companies()->first();
+            $scope = current_company();
         }
         return $this->roles()->whereHas('permissions', function ($query) use ($action, $document, $scope) {
             return $query->can($action, $document, $scope);
@@ -174,9 +269,15 @@ class User extends AbstractDocument implements
         });
     }
 
+    /**
+     * Because we pass uuid of the user instead of email address to
+     * Passport, we have to describe in the method below how to find
+     * user by using our passed value.
+     */
     public function findForPassport($uuid)
     {
-       return $this->find($uuid);
+        // and because uuid is users priamry key, it's quite easy to do :)
+        return $this->find($uuid);
     }
 
     /**

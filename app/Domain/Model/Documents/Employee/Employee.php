@@ -37,4 +37,9 @@ class Employee extends AbstractDocument
     {
         return $this->morphOne(User::class, 'authenticable');
     }
+
+    public function getFullNameAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
 }

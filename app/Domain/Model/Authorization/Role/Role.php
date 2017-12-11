@@ -20,7 +20,6 @@ class Role extends AbstractDocument
     ];
 
     protected $dispatchesEvents = [];
-    protected $documentEvents = [];
 
     public function getTransformer()
     {
@@ -59,7 +58,7 @@ class Role extends AbstractDocument
     public function hasPermissionTo($action, $document, $scope = null)
     {
         if (is_string($document) && $scope === null) {
-            $scope = auth()->user()->companies()->first();
+            $scope = current_company();
         }
         return $this->permissions()->can($action, $document, $scope)->exists();
     }
