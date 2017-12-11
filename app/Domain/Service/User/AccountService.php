@@ -79,49 +79,38 @@ class AccountService
         $userPassword,
         $guestKey = null
     ) {
-        DB::transaction(function () use (
-            $companyName,
-            $companyEmail,
-            $siteAddress,
-            $firstName,
-            $lastName,
-            $userEmail,
-            $userPassword,
-            $guestKey
-        ) {
-            /**
-             * Create a new account for the user.
-             * @var \App\Domain\Model\Authentication\Account\Account
-             */
-            $account = $this->accountRepository->create([
-                'name' => $companyName,
-                'site_address' => $siteAddress
-            ]);
+        /**
+         * Create a new account for the user.
+         * @var \App\Domain\Model\Authentication\Account\Account
+         */
+        $account = $this->accountRepository->create([
+            'name' => $companyName,
+            'site_address' => $siteAddress
+        ]);
 
-            /**
-             * Create a new company for the account
-             * @var \App\Domain\Model\Authentication\Company\Company
-             */
-            $company = $this->companyRepository->create([
-                'name' => $companyName,
-                'email' => $companyEmail
-            ], [
-                'account_uuid' => $account->uuid
-            ]);
+        /**
+         * Create a new company for the account
+         * @var \App\Domain\Model\Authentication\Company\Company
+         */
+        $company = $this->companyRepository->create([
+            'name' => $companyName,
+            'email' => $companyEmail
+        ], [
+            'account_uuid' => $account->uuid
+        ]);
 
-            /**
-             * Create a new user to manage created account
-             * @var \App\Domain\Model\Authentication\User\User
-             */
-            \Log::debug('Creating user account: ' . $userEmail);
+        /**
+         * Create a new user to manage created account
+         * @var \App\Domain\Model\Authentication\User\User
+         */
+        \Log::debug('Creating user account: ' . $userEmail);
 
-            $user = $this->createNewUser($company, $userEmail, $userPassword, $firstName, $lastName, $guestKey);
+        $user = $this->createNewUser($company, $userEmail, $userPassword, $firstName, $lastName, $guestKey);
 
-            /**
-             * Create permission to manage account
-             */
-            $this->authorizationService->givePermissionToUser($user, null, null, PermissionScope::ACCOUNT, $account->uuid);
-        });
+        /**
+         * Create permission to manage account
+         */
+        $this->authorizationService->givePermissionToUser($user, null, null, PermissionScope::ACCOUNT, $account->uuid);
 
         /**
          * Return created user
