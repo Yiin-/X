@@ -79,7 +79,16 @@ class AccountService
         $userPassword,
         $guestKey = null
     ) {
-        DB::transaction(function () {
+        DB::transaction(function () use (
+            $companyName,
+            $companyEmail,
+            $siteAddress,
+            $firstName,
+            $lastName,
+            $userEmail,
+            $userPassword,
+            $guestKey
+        ) {
             /**
              * Create a new account for the user.
              * @var \App\Domain\Model\Authentication\Account\Account
