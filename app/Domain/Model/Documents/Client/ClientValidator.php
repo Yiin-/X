@@ -51,7 +51,7 @@ class ClientValidator extends DocumentValidator
             'client.country_id' => 'country'
         ]);
 
-        if (!$this->user->assignAllCountries) {
+        if (!$this->user->assign_all_countries) {
             $hasCountryAssigned = $this->user->countries()->where('countries.id', $this->request->get('client')['country_id'])->exists();
 
             if (!$hasCountryAssigned) {
