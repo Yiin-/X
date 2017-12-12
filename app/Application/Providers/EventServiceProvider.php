@@ -4,7 +4,6 @@ namespace App\Application\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
-use App\Domain\Listeners\DocumentPermissionsListener;
 use App\Domain\Listeners\ActivityListener;
 use App\Domain\Listeners\DocumentChangesListener;
 use App\Domain\Listeners\MailingListener;

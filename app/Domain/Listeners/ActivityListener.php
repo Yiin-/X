@@ -2,7 +2,6 @@
 
 namespace App\Domain\Listeners;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Domain\Model\System\ActivityLog\ActivityRepository;
 use App\Domain\Events\Document\UserCreatedDocument;
 use App\Domain\Events\Document\UserUpdatedDocument;
@@ -12,7 +11,7 @@ use App\Domain\Events\Document\DocumentWasRestored;
 use App\Domain\Events\Document\DocumentWasArchived;
 use App\Domain\Events\Document\DocumentWasUnarchived;
 
-class ActivityListener implements ShouldQueue
+class ActivityListener
 {
     private $activityRepository;
 
