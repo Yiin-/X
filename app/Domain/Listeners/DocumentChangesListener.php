@@ -2,6 +2,7 @@
 
 namespace App\Domain\Listeners;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Domain\Constants\Permission\Actions as PermissionActions;
 use App\Domain\Events\Shared\BroadcastableEvent;
 use App\Domain\Model\Authentication\User\User;
@@ -18,7 +19,7 @@ use App\Domain\Events\Document\DocumentWasArchived;
 use App\Domain\Events\Document\DocumentWasUnarchived;
 use App\Domain\Events\Authorization\RoleWasSaved;
 
-class DocumentChangesListener
+class DocumentChangesListener implements ShouldQueue
 {
     public function subscribe($events)
     {
