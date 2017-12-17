@@ -31,7 +31,8 @@ class User extends AbstractDocument implements
 
     protected $fillable = [
         'username',
-        'taskbar'
+        'taskbar',
+        'state'
     ];
 
     protected $hidden = [

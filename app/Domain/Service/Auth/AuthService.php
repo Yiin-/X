@@ -88,8 +88,8 @@ class AuthService
                 'auth' => [
                     'access_token' => $data['access_token']
                 ],
-                'account' => $user->account->transform(['include_all'])->toArray(),
-                'user' => $user->transform(['include_all'])->toArray(),
+                'account' => $user->account->transform()->toArray(),
+                'user' => $user->transform()->parseIncludes(['settings', 'preferences', 'state'])->toArray(),
                 'data' => $this->accountService->fetchDataForUser($user)
             ];
 

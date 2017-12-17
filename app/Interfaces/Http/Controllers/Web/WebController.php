@@ -41,6 +41,13 @@ class WebController extends AbstractController
          */
         $user = $userRepository->findByInvitationToken($token);
 
+        /**
+         * Invalid invitation token
+         */
+        if (!$user) {
+            return $this->serveApplication();
+        }
+
         if (/**
              * Redirect to company page
              */
@@ -49,16 +56,13 @@ class WebController extends AbstractController
             return $this->redirectToUserAccount($user);
         }
 
-        if ($user) {
-            return $this->serveApplication([
-                'user' => [
-                    'username' => $user->username,
-                    'is_password_set' => $user->password !== null,
-                    'personal_information' => $user->authenticable->transform()->toArray()
-                ]
-            ]);
-        }
-        return $this->serveApplication();
+        return $this->serveApplication([
+            'user' => [
+                'username' => $user->username,
+                'is_password_set' => $user->password !== null,
+                'personal_information' => $user->authenticable->transform()->toArray()
+            ]
+        ]);
     }
 
     /**
@@ -167,7 +171,7 @@ class WebController extends AbstractController
                  * User and his account data
                  */
                 $data['preloadedData']['account'] = $user->account->transform()->toArray();
-                $data['preloadedData']['user'] = $user->transform()->toArray();
+                $data['preloadedData']['user'] = $user->transform()->parseIncludes(['settings', 'preferences', 'state'])->toArray();
 
                 /**
                  * The rest of the data

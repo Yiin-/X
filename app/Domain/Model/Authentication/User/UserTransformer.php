@@ -13,16 +13,17 @@ class UserTransformer extends Fractal\TransformerAbstract
         'roles'
     ];
 
+    protected $availableIncludes = [
+        'settings',
+        'preferences',
+        'state'
+    ];
+
     public function transform(User $user)
     {
-        return [
+        $data = [
             'uuid' => $user->uuid,
             'companies' => $user->companies->pluck('uuid'),
-
-            // User private data
-            'settings' => $user->settings,
-            'preferences' => $user->preferences,
-            'state' => json_decode($user->state),
 
             // Whos user is this
             'authenticable_type' => resource_name($user->authenticable_type),
@@ -37,6 +38,8 @@ class UserTransformer extends Fractal\TransformerAbstract
 
             'is_disabled' => $user->is_disabled
         ];
+
+        return $data;
     }
 
     public function includeRoles(User $user)
@@ -44,5 +47,17 @@ class UserTransformer extends Fractal\TransformerAbstract
         $roles = $user->roles;
 
         return $this->collection($roles, new RoleTransformer);
+    }
+
+    public function includeSettings(User $user) {
+        return $this->primitive($user->settings);
+    }
+
+    public function includePreferences(User $user) {
+        return $this->primitive($user->preferences);
+    }
+
+    public function includeState(User $user) {
+        return $this->primitive(json_decode($user->state));
     }
 }

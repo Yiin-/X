@@ -25,7 +25,6 @@ class RegisteredNewActivity
     {
         if (!$activity->user) {
             // new account created
-            return;
         }
         $this->user = $activity->user;
         $this->activity = $activity;
@@ -38,7 +37,9 @@ class RegisteredNewActivity
             }
         }
         else {
-            broadcast(new BroadcastActivity(static::class, $this->user, $activity));
+            if ($this->user) {
+                broadcast(new BroadcastActivity(static::class, $this->user, $activity));
+            }
         }
     }
 }

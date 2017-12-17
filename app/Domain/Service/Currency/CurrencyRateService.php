@@ -4,7 +4,7 @@ namespace App\Domain\Service\Currency;
 
 use GuzzleHttp\Client;
 use App\Domain\Model\Documents\Passive\Currency;
-use Redis;
+use Illuminate\Support\Facades\Redis;
 
 class CurrencyRateService
 {

@@ -123,7 +123,7 @@ class CreateTables extends Migration
 
             $table->string('name');
 
-            $table->decimal('rate', 13, 3);
+            $table->decimal('rate', 13, 2);
             $table->boolean('is_inclusive')->default(false);
 
             $table->timestamps();
@@ -145,11 +145,11 @@ class CreateTables extends Migration
                 ->onDelete('cascade')->onUpdate('cascade');
 
             $table->string('name');
-            $table->decimal('price', 13, 3);
+            $table->decimal('price', 13, 2);
 
             $table->string('currency_code');
 
-            $table->decimal('qty', 13, 3)->nullable();
+            $table->decimal('qty', 13, 2)->nullable();
             $table->text('description')->nullable();
 
             $table->string('tax_rate_uuid')->nullable();
@@ -248,9 +248,10 @@ class CreateTables extends Migration
                 ->references('uuid')->on('products')
                 ->onDelete('set null')->onUpdate('cascade');
 
-            $table->decimal('cost', 13, 3);
-            $table->decimal('qty', 13, 3);
-            $table->decimal('discount', 10, 3)->nullable();
+            $table->decimal('cost', 13, 2);
+            $table->decimal('qty', 13, 2);
+            $table->decimal('discount_value', 13, 2)->default(0);
+            $table->enum('discount_type', \App\Domain\Constants\Bill\DiscountTypes::LIST);
 
             $table->string('tax_rate_uuid')->nullable();
             $table->foreign('tax_rate_uuid')
@@ -326,8 +327,8 @@ class CreateTables extends Migration
             $table->string('invoice_number')->nullable();
             $table->string('po_number')->nullable();
 
-            $table->decimal('partial', 13, 3)->default(0);
-            $table->decimal('discount_value', 13, 3)->default(0);
+            $table->decimal('partial', 13, 2)->default(0);
+            $table->decimal('discount_value', 13, 2)->default(0);
             $table->enum('discount_type', \App\Domain\Constants\Bill\DiscountTypes::LIST);
 
             $table->date('date')->nullable();
@@ -373,8 +374,8 @@ class CreateTables extends Migration
             $table->string('quote_number')->nullable();
             $table->string('po_number')->nullable();
 
-            $table->decimal('partial', 13, 3)->default(0);
-            $table->decimal('discount_value', 13, 3)->default(0);
+            $table->decimal('partial', 13, 2)->default(0);
+            $table->decimal('discount_value', 13, 2)->default(0);
             $table->enum('discount_type', \App\Domain\Constants\Bill\DiscountTypes::LIST);
 
             $table->date('date')->nullable();
@@ -410,8 +411,8 @@ class CreateTables extends Migration
                 ->references('uuid')->on('clients')
                 ->onDelete('cascade')->onUpdate('cascade');
 
-            $table->decimal('amount', 13, 3);
-            $table->decimal('balance', 13, 3);
+            $table->decimal('amount', 13, 2);
+            $table->decimal('balance', 13, 2);
             $table->date('credit_date');
             $table->string('credit_number')->nullable();
 
@@ -511,7 +512,7 @@ class CreateTables extends Migration
                 ->references('uuid')->on('expense_categories')
                 ->onDelete('cascade')->onUpdate('cascade');
 
-            $table->decimal('amount', 13, 3);
+            $table->decimal('amount', 13, 2);
 
             $table->string('currency_code');
 
@@ -549,8 +550,8 @@ class CreateTables extends Migration
                 ->references('uuid')->on('invoices')
                 ->onDelete('cascade')->onUpdate('cascade');
 
-            $table->decimal('amount', 13, 3);
-            $table->decimal('refunded', 13, 3)->default(0);
+            $table->decimal('amount', 13, 2);
+            $table->decimal('refunded', 13, 2)->default(0);
 
             $table->string('currency_code');
 

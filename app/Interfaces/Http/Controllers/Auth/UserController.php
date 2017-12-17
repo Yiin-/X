@@ -36,13 +36,23 @@ class UserController extends AbstractController
         ]);
     }
 
-    public function saveStateCompany($uuid)
+    public function saveSelectedCompany($uuid)
     {
         auth()->user()->update([
-            'state' => array_merge(
-                json_decode(auth()->user()->state) ?? [],
+            'state' => json_encode(array_merge(
+                json_decode(auth()->user()->state, true) ?? [],
                 [ 'company_uuid' => $uuid ]
-            )
+            ))
+        ]);
+    }
+
+    public function saveOverviewState()
+    {
+        auth()->user()->update([
+            'state' => json_encode(array_merge(
+                json_decode(auth()->user()->state, true) ?? [],
+                [ 'overview' => request()->get('overview_state') ]
+            ))
         ]);
     }
 }

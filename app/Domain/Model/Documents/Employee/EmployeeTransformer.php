@@ -11,12 +11,13 @@ class EmployeeTransformer extends Fractal\TransformerAbstract
 {
     protected $defaultIncludes = [
         'history',
-        'user'
+        'user',
+        'activity'
     ];
 
     public function excludeForBackup()
     {
-        return ['history', 'user'];
+        return ['history', 'user', 'activity'];
     }
 
     public function transform(Employee $employee)
@@ -57,5 +58,10 @@ class EmployeeTransformer extends Fractal\TransformerAbstract
         else {
             return null;
         }
+    }
+
+    public function includeActivity(Employee $employee)
+    {
+        return $this->collection($employee->getActivity(), new ActivityTransformer);
     }
 }

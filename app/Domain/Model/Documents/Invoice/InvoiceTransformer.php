@@ -29,6 +29,7 @@ class InvoiceTransformer extends Fractal\TransformerAbstract
         return [
             'uuid' => $invoice->uuid,
             'company_uuid' => $invoice->company_uuid,
+            'user_uuid' => $invoice->user_uuid,
 
             'client_uuid' => $invoice->client_uuid,
             'payments' => $invoice->payments->map(function (Payment $payment) {

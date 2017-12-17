@@ -131,7 +131,8 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('user')->group(function () {
         Route::post('taskbar', 'Auth\UserController@saveTaskbarState');
         Route::prefix('state')->group(function () {
-            Route::post('company/{uuid}', 'Auth\UserController@saveStateCompany');
+            Route::post('company/{uuid}', 'Auth\UserController@saveSelectedCompany');
+            Route::post('overview', 'Auth\UserController@saveOverviewState');
         });
     });
 

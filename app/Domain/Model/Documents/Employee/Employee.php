@@ -5,6 +5,7 @@ namespace App\Domain\Model\Documents\Employee;
 use App\Domain\Model\Documents\Shared\AbstractDocument;
 use App\Domain\Model\Authentication\User\User;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Domain\Model\System\ActivityLog\ActivityRepository;
 
 class Employee extends AbstractDocument
 {
@@ -28,6 +29,11 @@ class Employee extends AbstractDocument
     public function getTransformer()
     {
         return new EmployeeTransformer;
+    }
+
+    public function getActivity()
+    {
+        return app(ActivityRepository::class)->getEmployeeActivity($this);
     }
 
     /**

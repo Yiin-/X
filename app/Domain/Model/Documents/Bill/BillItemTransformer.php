@@ -15,7 +15,8 @@ class BillItemTransformer extends Fractal\TransformerAbstract
             'name' => $billItem->name,
             'identification_number' => $billItem->identification_number,
             'cost' => +$billItem->cost,
-            'discount' => +$billItem->discount,
+            'discount_type' => $billItem->discount_type,
+            'discount_value' => +$billItem->discount_value,
             'qty' => +$billItem->qty,
             'tax_rate' => $billItem->taxRate,
             'index' => $billItem->index

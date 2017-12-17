@@ -40,6 +40,10 @@ class UserRepository extends AbstractDocumentRepository
         $personalRole = new Role;
         $personalRole->uuid = $this->roleRepository->generateUuid();
 
+        if (!$user->created_by) {
+            $personalRole->name = 'Owner';
+        }
+
         $user->role()->save($personalRole);
         $user->roles()->attach($personalRole->uuid);
 

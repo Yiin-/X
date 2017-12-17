@@ -3,6 +3,7 @@
 namespace App\Domain\Model\System\ActivityLog;
 
 use App\Domain\Model\Documents\Shared\AbstractDocument;
+use App\Domain\Model\Documents\Employee\Employee;
 
 class ActivityRepository
 {
@@ -28,6 +29,21 @@ class ActivityRepository
         return Activity::where([
             'document_type' => get_class($document),
             'document_uuid' => $document->getKey()
-        ])->orderBy('id', 'desc')->get();
+        ])
+        ->orderBy('id', 'desc')
+        ->get();
+    }
+
+    public function getEmployeeActivity(Employee $employee)
+    {
+        return Activity::where([
+            'document_type' => Employee::class,
+            'document_uuid' => $employee->uuid
+        ])
+        ->when($employee->auth, function ($query) use ($employee) {
+            return $query->orWhere('user_uuid', $employee->auth->uuid);
+        })
+        ->orderBy('id', 'desc')
+        ->get();
     }
 }
